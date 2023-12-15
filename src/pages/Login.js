@@ -1,5 +1,7 @@
-import { Box, TextField, Typography } from "@mui/material";
+import { Box, Button, TextField, Typography } from "@mui/material";
 import backgroundImage from "../img/Foto Produção Samuel.jpeg";
+import { useState } from "react";
+import axios from "axios";
 
 const styles = {
   container: {
@@ -32,7 +34,7 @@ const styles = {
   },
   conteudoLogin: {
     minWidth: 300,
-    padding: "45px 20px",
+    padding: "30px 20px",
   },
   tituloLogin: {
     fontFamily: "Libre Baskerville",
@@ -47,11 +49,12 @@ const styles = {
     "& .MuiInputLabel-root": {
       color: "#fff",
       fontFamily: "Libre Baskerville",
-      fontSize: "18px",
+      fontSize: "16px",
       "&.MuiInputLabel-shrink": {
         marginTop: "5px",
         transform: "translate(5px, -26px)",
         fontSize: "15px",
+        color: "#fff",
       },
     },
     "& .MuiOutlinedInput-root": {
@@ -69,9 +72,123 @@ const styles = {
       color: "#fff",
     },
   },
+  botaoEqueciSenha: {
+    height: "5px",
+    marginTop: "10px",
+    marginLeft: "-4px",
+    color: "#fff",
+    background: "transparent",
+    fontFamily: "Libre Baskerville",
+    fontSize: "14px",
+    textTransform: "none",
+    autoCapitalize: "none",
+    textDecorationLine: "underline",
+    transition: "none",
+    border: "none",
+    outline: "none",
+    "&:hover": {
+      background: "transparent",
+      boxShadow: "none",
+    },
+    "&:active": {
+      background: "transparent",
+      outline: "none",
+      boxShadow: "none",
+    },
+    "&:focus": {
+      background: "transparent",
+      outline: "none",
+      boxShadow: "none",
+    },
+    "&:focus-visible": {
+      background: "transparent",
+      outline: "none",
+      boxShadow: "none",
+    },
+    "&.MuiButton-contained": {
+      background: "transparent",
+      outline: "none",
+      boxShadow: "none",
+    },
+  },
+  botaoEntrar: {
+    width: 210,
+    height: 40,
+    borderRadius: "10px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    margin: "auto",
+    marginTop: "20px",
+    fontFamily: "Roboto, sans-serif",
+    fontSize: "14px",
+    background: "#F3A913",
+    "&:hover": {
+      background: "#FEBC36",
+    },
+  },
+  botaoCadastrar: {
+    height: "5px",
+    margin: "30px 0px 0px 60px",
+    color: "#fff",
+    background: "transparent",
+    fontFamily: "Libre Baskerville",
+    fontSize: "14px",
+    textTransform: "none",
+    autoCapitalize: "none",
+    transition: "none",
+    border: "none",
+    outline: "none",
+    "&:hover": {
+      background: "transparent",
+      boxShadow: "none",
+    },
+    "&:active": {
+      background: "transparent",
+      outline: "none",
+      boxShadow: "none",
+    },
+    "&:focus": {
+      background: "transparent",
+      outline: "none",
+      boxShadow: "none",
+    },
+    "&:focus-visible": {
+      background: "transparent",
+      outline: "none",
+      boxShadow: "none",
+    },
+    "&.MuiButton-contained": {
+      background: "transparent",
+      outline: "none",
+      boxShadow: "none",
+    },
+  },
 };
 
 const Login = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleLogin = async (event) => {
+    event.preventDefault();
+    console.log(email, password);
+
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/login",
+        JSON.stringify({ email, password }),
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      console.log(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <Box sx={styles.container}>
       <Box sx={styles.boxLogin}>
@@ -92,15 +209,28 @@ const Login = () => {
               id="outlined-basic"
               label="Email"
               variant="outlined"
+              type="email"
+              onChange={(event) => setEmail(event.target.value)}
               sx={styles.inputLogin}
             />
             <TextField
               id="outlined-basic"
               label="Senha"
               variant="outlined"
+              type="password"
+              onChange={(event) => setPassword(event.target.value)}
               sx={styles.inputLogin}
             />
           </Box>
+          <Button sx={styles.botaoEqueciSenha}>Esqueci minha senha</Button>
+          <Button
+            variant="contained"
+            onClick={(event) => handleLogin(event)}
+            sx={styles.botaoEntrar}
+          >
+            ENTRAR
+          </Button>
+          <Button sx={styles.botaoCadastrar}>Ainda não tenho uma conta</Button>
         </Box>
       </Box>
     </Box>
