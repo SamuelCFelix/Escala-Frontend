@@ -1,14 +1,15 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
-import backgroundImage from "../img/Foto Produção Samuel.jpeg";
+import BackgroundImage from "../img/Foto Produção Samuel.jpeg";
 import { useState } from "react";
 import axios from "axios";
+import LogoRodape from "../img/Logo ZS.png";
 
 const styles = {
   container: {
     margin: 0,
     padding: 0,
     fontFamily: "Libre Baskerville",
-    background: `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url("${backgroundImage}")`,
+    background: `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url("${BackgroundImage}")`,
     backgroundSize: "cover",
     backgroundRepeat: "no-repeat",
     backgroundPosition: "center",
@@ -164,28 +165,65 @@ const styles = {
       boxShadow: "none",
     },
   },
+  boxRodape: {
+    width: "100vw",
+    height: "4vw",
+    position: "fixed",
+    bottom: 0,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
 };
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const [errorSenha, setErrorSenha] = useState(false);
+  const [errorEmail, setErrorEmail] = useState(false);
+
   const handleLogin = async (event) => {
-    event.preventDefault();
-    console.log(email, password);
+    if (email !== "" && password === "") {
+      handlePreencher(password);
+    } else if (email === "" && password !== "") {
+      handlePreencher(email);
+    } else if (email !== "" && password !== "") {
+      try {
+        const response = await axios.post(
+          "http://localhost:3000/login",
+          JSON.stringify({ email, password }),
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        );
 
-    try {
-      const response = await axios.post(
-        "http://localhost:3000/login",
-        JSON.stringify({ email, password }),
-        {
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+        console.log(response.data);
+      } catch (error) {
+        console.error(error);
+      }
 
-      console.log(response.data);
-    } catch (error) {
-      console.error(error);
+      console.log(email, password);
+    }
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      if (email !== "" && password === "") {
+        handlePreencher(password);
+      } else if (email === "" && password !== "") {
+        handlePreencher(email);
+      } else if (email !== "" && password !== "") {
+        handleLogin(event);
+      }
+    }
+  };
+
+  const handlePreencher = (preencher) => {
+    if (preencher === password) {
+      setErrorSenha(true);
+    } else if (preencher === email) {
+      setErrorEmail(true);
     }
   };
 
@@ -206,19 +244,29 @@ const Login = () => {
             autoComplete="off"
           >
             <TextField
+              error={errorEmail}
               id="outlined-basic"
               label="Email"
               variant="outlined"
               type="email"
-              onChange={(event) => setEmail(event.target.value)}
+              onChange={(event) => {
+                setEmail(event.target.value);
+                setErrorEmail(false);
+              }}
+              onKeyDown={handleKeyDown}
               sx={styles.inputLogin}
             />
             <TextField
+              error={errorSenha}
               id="outlined-basic"
               label="Senha"
               variant="outlined"
               type="password"
-              onChange={(event) => setPassword(event.target.value)}
+              onChange={(event) => {
+                setPassword(event.target.value);
+                setErrorSenha(false);
+              }}
+              onKeyDown={handleKeyDown}
               sx={styles.inputLogin}
             />
           </Box>
@@ -232,6 +280,13 @@ const Login = () => {
           </Button>
           <Button sx={styles.botaoCadastrar}>Ainda não tenho uma conta</Button>
         </Box>
+      </Box>
+      <Box sx={styles.boxRodape}>
+        <img
+          src={LogoRodape}
+          style={{ width: "200px", marginBottom: "10px" }}
+          alt="LogoRodape"
+        />
       </Box>
     </Box>
   );
