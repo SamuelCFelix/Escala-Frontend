@@ -7,6 +7,7 @@ import {
   Navigate,
 } from "react-router-dom";
 import Login from "./pages/Login";
+import Cadastrar from "./pages/Cadastrar";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/cadastrar" element={<Cadastrar />} />
       </Routes>
     </Router>
   );

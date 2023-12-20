@@ -20,12 +20,10 @@ const styles = {
     alignItems: "center",
     justifyContent: "center",
   },
-  boxLogin: {
+  boxCadastro: {
     display: "flex",
-    minWidth: 340,
-    minHeight: 390,
-    marginLeft: "auto",
-    marginRight: "150px",
+    minWidth: 810,
+    minHeight: 514,
     background: "rgba(2, 2, 2, 0.7)",
     boxShadow: `
                 0px 4px 4px 0px rgba(0, 0, 0, 0.25),
@@ -34,15 +32,19 @@ const styles = {
     borderRadius: "10px",
     color: "#ffff",
   },
-  conteudoLogin: {
-    minWidth: 300,
+  conteudoCadastro: {
+    minWidth: "100%",
     padding: "30px 20px",
   },
-  tituloLogin: {
+  boxAlinhar: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  tituloCadastro: {
     fontFamily: "Libre Baskerville",
     fontSize: "2.5rem",
-    width: "100px",
-    marginLeft: "10px",
+    width: "200px",
   },
   inputLogin: {
     background: "rgba(86, 86, 86, 0.8)",
@@ -74,46 +76,7 @@ const styles = {
       color: "#fff",
     },
   },
-  botaoEqueciSenha: {
-    height: "5px",
-    marginTop: "10px",
-    marginLeft: "-4px",
-    color: "#fff",
-    background: "transparent",
-    fontFamily: "Libre Baskerville",
-    fontSize: "14px",
-    textTransform: "none",
-    autoCapitalize: "none",
-    textDecorationLine: "underline",
-    transition: "none",
-    border: "none",
-    outline: "none",
-    "&:hover": {
-      background: "transparent",
-      boxShadow: "none",
-    },
-    "&:active": {
-      background: "transparent",
-      outline: "none",
-      boxShadow: "none",
-    },
-    "&:focus": {
-      background: "transparent",
-      outline: "none",
-      boxShadow: "none",
-    },
-    "&:focus-visible": {
-      background: "transparent",
-      outline: "none",
-      boxShadow: "none",
-    },
-    "&.MuiButton-contained": {
-      background: "transparent",
-      outline: "none",
-      boxShadow: "none",
-    },
-  },
-  botaoEntrar: {
+  botaoCriarConta: {
     width: 210,
     height: 40,
     borderRadius: "10px",
@@ -121,7 +84,7 @@ const styles = {
     alignItems: "center",
     justifyContent: "center",
     margin: "auto",
-    marginTop: "20px",
+    marginTop: "130px",
     fontFamily: "Roboto, sans-serif",
     fontSize: "14px",
     background: "#F3A913",
@@ -129,9 +92,14 @@ const styles = {
       background: "#FEBC36",
     },
   },
-  botaoCadastrar: {
+  botaoJaTenhoConta: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    mt: "4%",
+    ml: "335px",
     height: "5px",
-    margin: "30px 0px 0px 60px",
+    width: "140px",
     color: "#fff",
     background: "transparent",
     fontFamily: "Libre Baskerville",
@@ -177,7 +145,7 @@ const styles = {
   },
 };
 
-const Login = () => {
+const Cadastrar = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -230,11 +198,13 @@ const Login = () => {
 
   return (
     <Box sx={styles.container}>
-      <Box sx={styles.boxLogin}>
-        <Box sx={styles.conteudoLogin}>
-          <Typography variant="h3" sx={styles.tituloLogin}>
-            Login
-          </Typography>
+      <Box sx={styles.boxCadastro}>
+        <Box sx={styles.conteudoCadastro}>
+          <Box sx={styles.boxAlinhar}>
+            <Typography variant="h3" sx={styles.tituloCadastro}>
+              Cadastrar-se
+            </Typography>
+          </Box>
           <Box
             component="form"
             sx={{
@@ -247,9 +217,9 @@ const Login = () => {
             <TextField
               error={errorEmail}
               id="outlined-basic"
-              label="Email"
+              label="Nome completo"
               variant="outlined"
-              type="email"
+              type="text"
               onChange={(event) => {
                 setEmail(event.target.value);
                 setErrorEmail(false);
@@ -271,19 +241,20 @@ const Login = () => {
               sx={styles.inputLogin}
             />
           </Box>
-          <Button sx={styles.botaoEqueciSenha}>Esqueci minha senha</Button>
+
           <Button
             variant="contained"
             onClick={(event) => handleLogin(event)}
-            sx={styles.botaoEntrar}
+            sx={styles.botaoCriarConta}
           >
-            ENTRAR
+            CRIAR CONTA
           </Button>
-          <Button component={Link} to="/cadastrar" sx={styles.botaoCadastrar}>
-            Ainda não tenho uma conta
+          <Button component={Link} to="/login" sx={styles.botaoJaTenhoConta}>
+            Já tenho uma conta
           </Button>
         </Box>
       </Box>
+
       <Box sx={styles.boxRodape}>
         <img
           src={LogoRodape}
@@ -295,4 +266,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Cadastrar;
