@@ -1,4 +1,4 @@
-import { Box, Button, TextField, Typography } from "@mui/material";
+import { Box, Button, Stack, TextField, Typography } from "@mui/material";
 import BackgroundImage from "../img/Foto Produção Samuel.jpeg";
 import { useState } from "react";
 import axios from "axios";
@@ -22,8 +22,8 @@ const styles = {
   },
   boxCadastro: {
     display: "flex",
-    minWidth: 810,
-    minHeight: 514,
+    minWidth: 670,
+    minHeight: 314,
     background: "rgba(2, 2, 2, 0.7)",
     boxShadow: `
                 0px 4px 4px 0px rgba(0, 0, 0, 0.25),
@@ -33,7 +33,7 @@ const styles = {
     color: "#ffff",
   },
   conteudoCadastro: {
-    minWidth: "100%",
+    minWidth: "94%",
     padding: "30px 20px",
   },
   boxAlinhar: {
@@ -46,10 +46,11 @@ const styles = {
     fontSize: "2.5rem",
     width: "200px",
   },
-  inputLogin: {
+  inputCadastro: {
     background: "rgba(86, 86, 86, 0.8)",
     borderRadius: "10px",
-    width: "100%",
+    width: "300px",
+    marginBottom: "12%",
     "& .MuiInputLabel-root": {
       color: "#fff",
       fontFamily: "Libre Baskerville",
@@ -84,7 +85,7 @@ const styles = {
     alignItems: "center",
     justifyContent: "center",
     margin: "auto",
-    marginTop: "130px",
+    marginTop: "3%",
     fontFamily: "Roboto, sans-serif",
     fontSize: "14px",
     background: "#F3A913",
@@ -97,7 +98,7 @@ const styles = {
     alignItems: "center",
     justifyContent: "center",
     mt: "4%",
-    ml: "335px",
+    ml: "39%",
     height: "5px",
     width: "140px",
     color: "#fff",
@@ -202,44 +203,102 @@ const Cadastrar = () => {
         <Box sx={styles.conteudoCadastro}>
           <Box sx={styles.boxAlinhar}>
             <Typography variant="h3" sx={styles.tituloCadastro}>
-              Cadastrar-se
+              Cadastre-se
             </Typography>
           </Box>
           <Box
             component="form"
             sx={{
-              "& > :not(style)": { m: "40px 0px 0px  0px", width: "36ch" },
-              width: "300px",
+              "& > :not(style)": { mt: "40px", width: "81ch" },
             }}
             noValidate
             autoComplete="off"
+            direction={"row"}
           >
-            <TextField
-              error={errorEmail}
-              id="outlined-basic"
-              label="Nome completo"
-              variant="outlined"
-              type="text"
-              onChange={(event) => {
-                setEmail(event.target.value);
-                setErrorEmail(false);
-              }}
-              onKeyDown={handleKeyDown}
-              sx={styles.inputLogin}
-            />
-            <TextField
-              error={errorSenha}
-              id="outlined-basic"
-              label="Senha"
-              variant="outlined"
-              type="password"
-              onChange={(event) => {
-                setPassword(event.target.value);
-                setErrorSenha(false);
-              }}
-              onKeyDown={handleKeyDown}
-              sx={styles.inputLogin}
-            />
+            <Stack direction={"row"} height={"245px"}>
+              <Box width={"95%"}>
+                <TextField
+                  error={errorEmail}
+                  id="outlined-basic"
+                  label="Nome completo"
+                  variant="outlined"
+                  type="text"
+                  onChange={(event) => {
+                    setEmail(event.target.value);
+                    setErrorEmail(false);
+                  }}
+                  onKeyDown={handleKeyDown}
+                  sx={styles.inputCadastro}
+                />
+                <TextField
+                  error={errorEmail}
+                  id="outlined-basic"
+                  label="Email"
+                  variant="outlined"
+                  type="Email"
+                  onChange={(event) => {
+                    setEmail(event.target.value);
+                    setErrorEmail(false);
+                  }}
+                  onKeyDown={handleKeyDown}
+                  sx={styles.inputCadastro}
+                />
+                <TextField
+                  error={errorEmail}
+                  id="outlined-basic"
+                  label="Senha"
+                  variant="outlined"
+                  type="password"
+                  onChange={(event) => {
+                    setEmail(event.target.value);
+                    setErrorEmail(false);
+                  }}
+                  onKeyDown={handleKeyDown}
+                  sx={styles.inputCadastro}
+                />
+              </Box>
+              <Box width={"93%"} ml={"7%"}>
+                <TextField
+                  error={errorSenha}
+                  id="outlined-basic"
+                  label="Data de nascimento"
+                  variant="outlined"
+                  type="text"
+                  onChange={(event) => {
+                    setPassword(event.target.value);
+                    setErrorSenha(false);
+                  }}
+                  onKeyDown={handleKeyDown}
+                  sx={styles.inputCadastro}
+                />
+                <TextField
+                  error={errorSenha}
+                  id="outlined-basic"
+                  label="CPF"
+                  variant="outlined"
+                  type="text"
+                  onChange={(event) => {
+                    setPassword(event.target.value);
+                    setErrorSenha(false);
+                  }}
+                  onKeyDown={handleKeyDown}
+                  sx={styles.inputCadastro}
+                />
+                <TextField
+                  error={errorSenha}
+                  id="outlined-basic"
+                  label="Confirmar senha"
+                  variant="outlined"
+                  type="password"
+                  onChange={(event) => {
+                    setPassword(event.target.value);
+                    setErrorSenha(false);
+                  }}
+                  onKeyDown={handleKeyDown}
+                  sx={styles.inputCadastro}
+                />
+              </Box>
+            </Stack>
           </Box>
 
           <Button
