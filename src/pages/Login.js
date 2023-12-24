@@ -181,15 +181,19 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const [errorSenha, setErrorSenha] = useState(false);
   const [errorEmail, setErrorEmail] = useState(false);
+  const [errorPassword, setErrorPassword] = useState(false);
 
+  //Botão de Login
   const handleLogin = async (event) => {
-    if (email !== "" && password === "") {
-      handlePreencher(password);
-    } else if (email === "" && password !== "") {
-      handlePreencher(email);
-    } else if (email !== "" && password !== "") {
+    if (email === "" || password === "") {
+      if (email === "") {
+        setErrorEmail(true);
+      }
+      if (password === "") {
+        setErrorPassword(true);
+      }
+    } else {
       try {
         const response = await axios.post(
           "http://localhost:3000/login",
@@ -208,23 +212,10 @@ const Login = () => {
     }
   };
 
+  //APERTAR ENTER
   const handleKeyDown = (event) => {
     if (event.key === "Enter") {
-      if (email !== "" && password === "") {
-        handlePreencher(password);
-      } else if (email === "" && password !== "") {
-        handlePreencher(email);
-      } else if (email !== "" && password !== "") {
-        handleLogin(event);
-      }
-    }
-  };
-
-  const handlePreencher = (preencher) => {
-    if (preencher === password) {
-      setErrorSenha(true);
-    } else if (preencher === email) {
-      setErrorEmail(true);
+      handleLogin(event);
     }
   };
 
@@ -258,14 +249,14 @@ const Login = () => {
               sx={styles.inputLogin}
             />
             <TextField
-              error={errorSenha}
+              error={errorPassword}
               id="outlined-basic"
               label="Senha"
               variant="outlined"
               type="password"
               onChange={(event) => {
                 setPassword(event.target.value);
-                setErrorSenha(false);
+                setErrorPassword(false);
               }}
               onKeyDown={handleKeyDown}
               sx={styles.inputLogin}
@@ -287,7 +278,7 @@ const Login = () => {
       <Box sx={styles.boxRodape}>
         <img
           src={LogoRodape}
-          style={{ width: "200px", marginBottom: "10px" }}
+          style={{ width: "200px", marginBottom: "10px", marginLeft: "-10px" }}
           alt="LogoRodape"
         />
       </Box>
