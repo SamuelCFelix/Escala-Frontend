@@ -73,6 +73,26 @@ const styles = {
     "& input": {
       color: "#fff",
     },
+    "& .MuiOutlinedInput-notchedOutline": {
+      borderRadius: "10px",
+    },
+    "&.MuiFormControl-root-MuiTextField-root .MuiInputLabel-root": {
+      color: "#d32f2f !important",
+    },
+    "& label.Mui-error": {
+      color: "#d32f2f !important",
+    },
+    "& .MuiOutlinedInput-root.Mui-error:hover .MuiOutlinedInput-notchedOutline":
+      {
+        borderColor: "#d32f2f",
+      },
+    "& .MuiOutlinedInput-root.Mui-error .MuiOutlinedInput-notchedOutline": {
+      borderColor: "#d32f2f",
+    },
+    "& .MuiOutlinedInput-root.Mui-focused.Mui-error .MuiOutlinedInput-notchedOutline":
+      {
+        borderColor: "#d32f2f",
+      },
   },
   botaoEqueciSenha: {
     height: "5px",
@@ -186,7 +206,12 @@ const Login = () => {
 
   //Botão de Login
   const handleLogin = async (event) => {
-    if (email === "" || password === "") {
+    if (
+      email === "" ||
+      errorEmail === true ||
+      password === "" ||
+      errorPassword === true
+    ) {
       if (email === "") {
         setErrorEmail(true);
       }
@@ -206,9 +231,8 @@ const Login = () => {
         console.log(response.data);
       } catch (error) {
         console.error(error);
+        console.log("Email ou Senha Inválidos");
       }
-
-      console.log(email, password);
     }
   };
 
@@ -216,6 +240,35 @@ const Login = () => {
   const handleKeyDown = (event) => {
     if (event.key === "Enter") {
       handleLogin(event);
+    }
+  };
+
+  const validarEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
+  const handleBlurEmail = (event) => {
+    const inputEmail = event.target.value;
+
+    if (inputEmail.trim().length === 0) {
+      setErrorEmail(false);
+    } else {
+      const emailValido = validarEmail(inputEmail);
+
+      if (!emailValido) {
+        setErrorEmail(true);
+      } else {
+        setErrorEmail(false);
+      }
+    }
+  };
+
+  const handleBlurPassword = (event) => {
+    const inputPassword = event.target.value;
+
+    if (inputPassword.trim().length === 0) {
+      setErrorPassword(false);
     }
   };
 
@@ -247,6 +300,7 @@ const Login = () => {
               }}
               onKeyDown={handleKeyDown}
               sx={styles.inputLogin}
+              onBlur={handleBlurEmail}
             />
             <TextField
               error={errorPassword}
@@ -260,6 +314,7 @@ const Login = () => {
               }}
               onKeyDown={handleKeyDown}
               sx={styles.inputLogin}
+              onBlur={handleBlurPassword}
             />
           </Box>
           <Button sx={styles.botaoEqueciSenha}>Esqueci minha senha</Button>

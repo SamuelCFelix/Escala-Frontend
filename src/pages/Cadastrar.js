@@ -10,7 +10,7 @@ import BackgroundImage from "../img/Foto Produção Samuel.jpeg";
 import { useState } from "react";
 import axios from "axios";
 import LogoRodape from "../img/Logo ZS.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const styles = {
   container: {
@@ -84,6 +84,26 @@ const styles = {
     "& input": {
       color: "#fff",
     },
+    "& .MuiOutlinedInput-notchedOutline": {
+      borderRadius: "10px",
+    },
+    "&.MuiFormControl-root-MuiTextField-root .MuiInputLabel-root": {
+      color: "#d32f2f !important",
+    },
+    "& label.Mui-error": {
+      color: "#d32f2f !important",
+    },
+    "& .MuiOutlinedInput-root.Mui-error:hover .MuiOutlinedInput-notchedOutline":
+      {
+        borderColor: "#d32f2f",
+      },
+    "& .MuiOutlinedInput-root.Mui-error .MuiOutlinedInput-notchedOutline": {
+      borderColor: "#d32f2f",
+    },
+    "& .MuiOutlinedInput-root.Mui-focused.Mui-error .MuiOutlinedInput-notchedOutline":
+      {
+        borderColor: "#d32f2f",
+      },
   },
   botaoCriarConta: {
     width: 210,
@@ -173,8 +193,10 @@ const Cadastrar = () => {
   const [errorEmail, setErrorEmail] = useState(false);
   const [errorPassword, setErrorPassword] = useState(false);
   const [errorConfirmPassword, setErrorConfirmPassword] = useState(false);
+  const [errorConfirmPassword2, setErrorConfirmPassword2] = useState(false);
   const [errorChecked, setErrorChecked] = useState(false);
 
+  const navigate = useNavigate();
   //Botão de Criar Cadastro
   const handleCriarCadastro = async (event) => {
     if (
@@ -186,7 +208,15 @@ const Cadastrar = () => {
       password === "" ||
       confirmPassword === "" ||
       confirmPassword !== password ||
-      checked === false
+      checked === false ||
+      errorNome === true ||
+      errorCpf === true ||
+      errorDataNascimento === true ||
+      errorTelefone === true ||
+      errorEmail === true ||
+      errorPassword === true ||
+      errorConfirmPassword === true ||
+      errorConfirmPassword2 === true
     ) {
       if (nome === "") {
         setErrorNome(true);
@@ -211,12 +241,15 @@ const Cadastrar = () => {
       }
       if (confirmPassword !== password) {
         setErrorConfirmPassword(true);
+        setErrorConfirmPassword2(true);
       }
       if (checked === false) {
         setErrorChecked(true);
       }
+      console.log("PREENCHA TODOS OS CAMPOS CORRETAMENTE!!!");
     } else {
       console.log("PERFIL CRIADO COM SUCESSO!!!");
+      navigate("/login");
     }
   };
 
@@ -236,8 +269,25 @@ const Cadastrar = () => {
 
   const handleInputNome = (event) => {
     const inputNome = event.target.value;
+
     if (validarSomenteLetras(inputNome)) {
       setNome(inputNome);
+    }
+  };
+
+  const handleBlurNome = (event) => {
+    const inputNome = event.target.value;
+
+    if (inputNome.trim().length === 0) {
+      setErrorNome(false);
+    } else {
+      const spaceFollowedByLetter = / \S/.test(inputNome); // Verifica se há um espaço seguido por qualquer caractere não espaço
+
+      if (!spaceFollowedByLetter) {
+        setErrorNome(true);
+      } else {
+        setErrorNome(false);
+      }
     }
   };
 
@@ -250,6 +300,20 @@ const Cadastrar = () => {
     const inputCPF = event.target.value;
     const formattedCPF = formatarCPF(inputCPF);
     setCpf(formattedCPF);
+  };
+
+  const handleBlurCPF = (event) => {
+    const inputCPF = event.target.value;
+    const formattedCPF = formatarCPF(inputCPF);
+
+    if (formattedCPF.length === 14) {
+      setCpf(formattedCPF);
+      setErrorCpf(false);
+    } else if (formattedCPF.length === 0) {
+      setErrorCpf(false);
+    } else {
+      setErrorCpf(true);
+    }
   };
 
   const formatarCPF = (input) => {
@@ -281,6 +345,20 @@ const Cadastrar = () => {
     setDataNascimento(formattedDataNascimento);
   };
 
+  const handleBlurDataNascimento = (event) => {
+    const inputDataNascimento = event.target.value;
+    const formattedDataNascimento = formatarDataNascimento(inputDataNascimento);
+
+    if (formattedDataNascimento.length === 10) {
+      setDataNascimento(formattedDataNascimento);
+      setErrorDataNascimento(false);
+    } else if (formattedDataNascimento.length === 0) {
+      setErrorDataNascimento(false);
+    } else {
+      setErrorDataNascimento(true);
+    }
+  };
+
   const formatarDataNascimento = (input) => {
     const cleaned = ("" + input).replace(/\D/g, ""); // Remove caracteres não numéricos
 
@@ -308,6 +386,20 @@ const Cadastrar = () => {
     setTelefone(formattedTelefone);
   };
 
+  const handleBlurTelefone = (event) => {
+    const inputTelefone = event.target.value;
+    const formattedTelefone = formatarTelefone(inputTelefone);
+
+    if (formattedTelefone.length === 15) {
+      setTelefone(formattedTelefone);
+      setErrorTelefone(false);
+    } else if (formattedTelefone.length === 0) {
+      setErrorTelefone(false);
+    } else {
+      setErrorTelefone(true);
+    }
+  };
+
   const formatarTelefone = (input) => {
     const cleaned = ("" + input).replace(/\D/g, ""); // Remove caracteres não numéricos
 
@@ -327,6 +419,43 @@ const Cadastrar = () => {
     if (thirdPart) formattedPartial += `-${thirdPart}`;
 
     return formattedPartial;
+  };
+
+  const validarEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
+  const handleBlurEmail = (event) => {
+    const inputEmail = event.target.value;
+
+    if (inputEmail.trim().length === 0) {
+      setErrorEmail(false);
+    } else {
+      const emailValido = validarEmail(inputEmail);
+
+      if (!emailValido) {
+        setErrorEmail(true);
+      } else {
+        setErrorEmail(false);
+      }
+    }
+  };
+
+  const handleBlurPassword = (event) => {
+    const inputPassword = event.target.value;
+
+    if (inputPassword.trim().length === 0) {
+      setErrorPassword(false);
+    }
+  };
+
+  const handleBlurConfirmPassword = (event) => {
+    const inputConfirmPassword = event.target.value;
+
+    if (inputConfirmPassword.trim().length === 0) {
+      setErrorConfirmPassword(false);
+    }
   };
 
   return (
@@ -367,6 +496,7 @@ const Cadastrar = () => {
                   }}
                   onKeyDown={handleKeyDown}
                   sx={styles.inputCadastro}
+                  onBlur={handleBlurNome}
                 />
                 <TextField
                   error={errorCpf}
@@ -386,6 +516,7 @@ const Cadastrar = () => {
                   }}
                   onKeyDown={handleKeyDown}
                   sx={styles.inputCadastro}
+                  onBlur={handleBlurCPF}
                 />
                 <TextField
                   error={errorDataNascimento}
@@ -405,6 +536,7 @@ const Cadastrar = () => {
                   }}
                   onKeyDown={handleKeyDown}
                   sx={styles.inputCadastro}
+                  onBlur={handleBlurDataNascimento}
                 />
                 <TextField
                   error={errorTelefone}
@@ -424,6 +556,7 @@ const Cadastrar = () => {
                   }}
                   onKeyDown={handleKeyDown}
                   sx={styles.inputCadastro}
+                  onBlur={handleBlurTelefone}
                 />
               </Box>
 
@@ -441,6 +574,7 @@ const Cadastrar = () => {
                   }}
                   onKeyDown={handleKeyDown}
                   sx={styles.inputCadastro}
+                  onBlur={handleBlurEmail}
                 />
                 <TextField
                   error={errorPassword}
@@ -452,9 +586,11 @@ const Cadastrar = () => {
                   onChange={(event) => {
                     setPassword(event.target.value);
                     setErrorPassword(false);
+                    setErrorConfirmPassword2(false);
                   }}
                   onKeyDown={handleKeyDown}
                   sx={styles.inputCadastro}
+                  onBlur={handleBlurPassword}
                 />
                 <TextField
                   error={errorConfirmPassword}
@@ -466,11 +602,13 @@ const Cadastrar = () => {
                   onChange={(event) => {
                     setConfirmPassword(event.target.value);
                     setErrorConfirmPassword(false);
+                    setErrorConfirmPassword2(false);
                   }}
                   onKeyDown={handleKeyDown}
                   sx={styles.inputCadastro}
+                  onBlur={handleBlurConfirmPassword}
                 />
-                {errorConfirmPassword && (
+                {errorConfirmPassword2 && (
                   <Typography
                     height="10px"
                     mt={"-32px"}
