@@ -8,16 +8,19 @@ import {
 } from "react-router-dom";
 import Login from "./pages/Login";
 import Cadastrar from "./pages/Cadastrar";
+import { AuthProvider } from "./components/AuthContext";
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Navigate to="/login" />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/cadastrar" element={<Cadastrar />} />
-      </Routes>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Navigate to="/login" />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/cadastrar" element={<Cadastrar />} />
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 }
 

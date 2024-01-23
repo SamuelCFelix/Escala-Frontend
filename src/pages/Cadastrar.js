@@ -7,10 +7,13 @@ import {
   Typography,
 } from "@mui/material";
 import BackgroundImage from "../img/Foto Produção Samuel.jpeg";
-import { useState } from "react";
+import { useState, forwardRef } from "react";
 import axios from "axios";
 import LogoRodape from "../img/Logo ZS.png";
 import { Link, useNavigate } from "react-router-dom";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
+import { useAuth } from "../components/AuthContext";
 
 const styles = {
   container: {
@@ -120,6 +123,8 @@ const styles = {
     "&:hover": {
       background: "#FEBC36",
     },
+    position: "relative",
+    zIndex: "2",
   },
   botaoJaTenhoConta: {
     display: "flex",
@@ -177,6 +182,10 @@ const styles = {
 };
 
 const Cadastrar = () => {
+  const { showPopup } = useAuth();
+
+  const navigate = useNavigate();
+
   const [nome, setNome] = useState("");
   const [cpf, setCpf] = useState("");
   const [dataNascimento, setDataNascimento] = useState("");
@@ -196,7 +205,21 @@ const Cadastrar = () => {
   const [errorConfirmPassword2, setErrorConfirmPassword2] = useState(false);
   const [errorChecked, setErrorChecked] = useState(false);
 
-  const navigate = useNavigate();
+  const Alert = forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+  });
+
+  const [openPopUpError, setOpenPopUpError] = useState(false);
+  const handleOpenPopUpError = () => {
+    setOpenPopUpError(true);
+  };
+  const handleClosePopUpError = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpenPopUpError(false);
+  };
+
   //Botão de Criar Cadastro
   const handleCriarCadastro = async (event) => {
     if (
@@ -247,7 +270,9 @@ const Cadastrar = () => {
         setErrorChecked(true);
       }
       console.log("PREENCHA TODOS OS CAMPOS CORRETAMENTE!!!");
+      handleOpenPopUpError();
     } else {
+      showPopup();
       console.log("PERFIL CRIADO COM SUCESSO!!!");
       navigate("/login");
     }
@@ -659,6 +684,20 @@ const Cadastrar = () => {
           </Button>
         </Box>
       </Box>
+
+      <Snackbar
+        open={openPopUpError}
+        autoHideDuration={6000}
+        onClose={handleClosePopUpError}
+      >
+        <Alert
+          onClose={handleClosePopUpError}
+          severity="error"
+          sx={{ width: "100%" }}
+        >
+          Preencha todos os campos corretamente!
+        </Alert>
+      </Snackbar>
 
       <Box sx={styles.boxRodape}>
         <img

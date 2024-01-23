@@ -1,9 +1,11 @@
-import { Box, Button, TextField, Typography } from "@mui/material";
+import { Box, Button, Snackbar, TextField, Typography } from "@mui/material";
 import BackgroundImage from "../img/Foto Produção Samuel.jpeg";
-import { useState } from "react";
+import { forwardRef, useState } from "react";
 import axios from "axios";
 import LogoRodape from "../img/Logo ZS.png";
 import { Link } from "react-router-dom";
+import MuiAlert from "@mui/material/Alert";
+import { useAuth } from "../components/AuthContext";
 
 const styles = {
   container: {
@@ -198,11 +200,41 @@ const styles = {
 };
 
 const Login = () => {
+  const { hidePopup } = useAuth();
+  const { showCadastroFeitoPopup } = useAuth();
+  const [showPopup, setShowPopup] = useState(showCadastroFeitoPopup);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const [errorEmail, setErrorEmail] = useState(false);
   const [errorPassword, setErrorPassword] = useState(false);
+
+  const Alert = forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+  });
+
+  const handleOpenPopUpSuccess = () => {
+    setShowPopup(true);
+  };
+  const handleClosePopUpSuccess = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setShowPopup(false);
+    hidePopup();
+  };
+
+  const [openPopUpError, setOpenPopUpError] = useState(false);
+  const handleOpenPopUpError = () => {
+    setOpenPopUpError(true);
+  };
+  const handleClosePopUpError = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpenPopUpError(false);
+  };
 
   //Botão de Login
   const handleLogin = async (event) => {
@@ -218,6 +250,7 @@ const Login = () => {
       if (password === "") {
         setErrorPassword(true);
       }
+      handleOpenPopUpError();
     } else {
       try {
         const response = await axios.post(
@@ -325,11 +358,45 @@ const Login = () => {
           >
             ENTRAR
           </Button>
-          <Button component={Link} to="/cadastrar" sx={styles.botaoCadastrar}>
+          <Button
+            onClick={handleOpenPopUpSuccess}
+            component={Link}
+            to="/cadastrar"
+            sx={styles.botaoCadastrar}
+          >
             Ainda não tenho uma conta
           </Button>
         </Box>
       </Box>
+
+      <Snackbar
+        open={showPopup}
+        autoHideDuration={6000}
+        onClose={handleClosePopUpSuccess}
+      >
+        <Alert
+          onClose={handleClosePopUpSuccess}
+          severity="success"
+          sx={{ width: "100%" }}
+        >
+          Perfil criado com sucesso!
+        </Alert>
+      </Snackbar>
+
+      <Snackbar
+        open={openPopUpError}
+        autoHideDuration={6000}
+        onClose={handleClosePopUpError}
+      >
+        <Alert
+          onClose={handleClosePopUpError}
+          severity="error"
+          sx={{ width: "100%" }}
+        >
+          Email e/ou senha incorretos!
+        </Alert>
+      </Snackbar>
+
       <Box sx={styles.boxRodape}>
         <img
           src={LogoRodape}
