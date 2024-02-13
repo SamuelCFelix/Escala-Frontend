@@ -1,11 +1,11 @@
 import { Box, Button, Snackbar, TextField, Typography } from "@mui/material";
-import BackgroundImage from "../img/Foto Produção Samuel.jpeg";
+import BackgroundImage from "../../img/Foto Produção Samuel.jpeg";
 import { forwardRef, useState } from "react";
 import axios from "axios";
-import LogoRodape from "../img/Logo ZS.png";
-import { Link } from "react-router-dom";
+import LogoRodape from "../../img/Logo ZS.png";
+import { Link, useNavigate } from "react-router-dom";
 import MuiAlert from "@mui/material/Alert";
-import { useAuth } from "../components/AuthContext";
+import { useAuth } from "../../components/authContext";
 
 const styles = {
   container: {
@@ -200,6 +200,7 @@ const styles = {
 };
 
 const Login = () => {
+  const navigate = useNavigate();
   const { hidePopup } = useAuth();
   const { showCadastroFeitoPopup } = useAuth();
   const [showPopup, setShowPopup] = useState(showCadastroFeitoPopup);
@@ -253,18 +254,15 @@ const Login = () => {
       handleOpenPopUpError();
     } else {
       try {
-        const response = await axios.post(
-          "http://localhost:3000/login",
-          JSON.stringify({ email, password }),
-          {
-            headers: { "Content-Type": "application/json" },
-          }
-        );
-
-        console.log(response.data);
+        const response = await axios.post("http://localhost:3000/loginAuth", {
+          email: email,
+          senha: password,
+        });
+        if (response.status === 200 && response.data.token) {
+          navigate("/home");
+        }
       } catch (error) {
-        console.error(error);
-        console.log("Email ou Senha Inválidos");
+        console.error("Erro ao conectar com o servidor: ", error);
       }
     }
   };
@@ -323,7 +321,7 @@ const Login = () => {
           >
             <TextField
               error={errorEmail}
-              id="outlined-basic"
+              id="emailLogin"
               label="Email"
               variant="outlined"
               type="email"
@@ -337,7 +335,7 @@ const Login = () => {
             />
             <TextField
               error={errorPassword}
-              id="outlined-basic"
+              id="senhaLogin"
               label="Senha"
               variant="outlined"
               type="password"

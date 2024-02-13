@@ -6,14 +6,14 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import BackgroundImage from "../img/Foto Produção Samuel.jpeg";
+import BackgroundImage from "../../img/Foto Produção Samuel.jpeg";
 import { useState, forwardRef } from "react";
 import axios from "axios";
-import LogoRodape from "../img/Logo ZS.png";
-import { Link, useNavigate } from "react-router-dom";
+import LogoRodape from "../../img/Logo ZS.png";
+import { Link, json, useNavigate } from "react-router-dom";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
-import { useAuth } from "../components/AuthContext";
+import { useAuth } from "../../components/authContext";
 
 const styles = {
   container: {
@@ -182,7 +182,7 @@ const styles = {
 };
 
 const Cadastrar = () => {
-  const { showPopup } = useAuth();
+  const { showPopup, hidePopup } = useAuth();
 
   const navigate = useNavigate();
 
@@ -269,12 +269,31 @@ const Cadastrar = () => {
       if (checked === false) {
         setErrorChecked(true);
       }
-      console.log("PREENCHA TODOS OS CAMPOS CORRETAMENTE!!!");
       handleOpenPopUpError();
     } else {
-      showPopup();
-      console.log("PERFIL CRIADO COM SUCESSO!!!");
-      navigate("/login");
+      try {
+        const response = await axios.post(
+          "http://localhost:3000/createPerfil",
+          {
+            nome: nome.toUpperCase(),
+            cpf: cpf,
+            dataNascimento: dataNascimento,
+            numeroTelefone: telefone,
+            email: email,
+            senha: password,
+          }
+        );
+
+        if (response.status === 201) {
+          showPopup();
+          console.log("PERFIL CRIADO COM SUCESSO!!!");
+          navigate("/login");
+        } else {
+          console.error("erro ao criar perfil", response.data);
+        }
+      } catch (error) {
+        console.error("erro ao criar perfil: ", error);
+      }
     }
   };
 
@@ -447,7 +466,7 @@ const Cadastrar = () => {
   };
 
   const validarEmail = (email) => {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const regex = /^[^\s@]+@adpaz-zs\.com\.br$/;
     return regex.test(email);
   };
 
@@ -679,7 +698,14 @@ const Cadastrar = () => {
           >
             CRIAR CONTA
           </Button>
-          <Button component={Link} to="/login" sx={styles.botaoJaTenhoConta}>
+          <Button
+            component={Link}
+            to="/login"
+            sx={styles.botaoJaTenhoConta}
+            onClick={() => {
+              hidePopup();
+            }}
+          >
             Já tenho uma conta
           </Button>
         </Box>

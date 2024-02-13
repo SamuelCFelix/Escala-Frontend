@@ -6,9 +6,11 @@ import {
   Routes,
   Navigate,
 } from "react-router-dom";
-import Login from "./pages/Login";
-import Cadastrar from "./pages/Cadastrar";
-import { AuthProvider } from "./components/AuthContext";
+import { AuthProvider } from "./components/authContext";
+import Login from "./pages/login/index";
+import Cadastrar from "./pages/cadastrar/index";
+import Home from "./pages/home/index";
+import isAuthenticated from "./components/auth";
 
 function App() {
   return (
@@ -18,6 +20,7 @@ function App() {
           <Route path="/" element={<Navigate to="/login" />} />
           <Route path="/login" element={<Login />} />
           <Route path="/cadastrar" element={<Cadastrar />} />
+          <Route path="/home" element={<Home />} />
         </Routes>
       </Router>
     </AuthProvider>
