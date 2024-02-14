@@ -1,5 +1,6 @@
 import { Box } from "@mui/material";
 import BackgroundImage from "../../img/Foto Produção Samuel.jpeg";
+import { useEffect } from "react";
 
 const styles = {
   container: {
@@ -18,6 +19,14 @@ const styles = {
   },
 };
 const Home = () => {
+  const autenticated = localStorage.getItem("token");
+
+  useEffect(() => {
+    if (!autenticated) {
+      window.location.href = "/";
+    }
+  }, [autenticated]);
+
   return <Box sx={styles.container}>aaaaaaaaaaaaah</Box>;
 };
 export default Home;

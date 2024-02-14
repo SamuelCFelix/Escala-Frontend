@@ -258,7 +258,8 @@ const Login = () => {
           email: email,
           senha: password,
         });
-        if (response.status === 200 && response.data.token) {
+        if (response.status === 200 && response.data) {
+          localStorage.setItem("token", response.data);
           navigate("/home");
         }
       } catch (error) {
