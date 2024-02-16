@@ -1,6 +1,16 @@
-import { Box, ButtonBase, Stack, Typography, styled } from "@mui/material";
+import {
+  Box,
+  Button,
+  ButtonBase,
+  Fade,
+  Slide,
+  Stack,
+  Typography,
+  styled,
+} from "@mui/material";
 import imagemLider from "../../img/zs-lider.JPG";
 import imagemServo from "../../img/zs-servo.JPG";
+import { Fragment, useEffect, useState } from "react";
 
 const styles = {
   container: {
@@ -8,9 +18,6 @@ const styles = {
     padding: 0,
     fontFamily: "Roboto",
     background: "#000000",
-    backgroundSize: "cover",
-    backgroundRepeat: "no-repeat",
-    backgroundPosition: "center",
     width: "100vw",
     height: "100vh",
     display: "flex",
@@ -70,12 +77,28 @@ const styles = {
     height: "70%",
   },
   stackopcoes: {
-    background: "green",
     width: "100%",
     height: "100%",
     alignItems: "center",
     justifyContent: "space-between",
   },
+  boxButton: {
+    position: "relative",
+    backgroundImage: `url(${imagemLider})`,
+    backgroundSize: "cover",
+    backgroundRepeat: "no-repeat",
+    backgroundPosition: "center",
+    width: "100%",
+    height: "100%",
+    padding: "0px",
+    borderRadius: "10px",
+    /* color: "#000000", */
+    color: "#F3A913",
+    "&:hover": {
+      opacity: 0.9,
+    },
+  },
+
   boxLider: {
     width: "49%",
     height: "100%",
@@ -91,71 +114,71 @@ const styles = {
     display: "flex",
     justifyContent: "center",
   },
-};
-
-const PrimerioAcesso = () => {
-  const ImageButton = styled(ButtonBase)(({ theme }) => ({
-    position: "relative",
-    height: 200,
-    [theme.breakpoints.down("sm")]: {
-      width: "100% !important",
-      height: 100,
-    },
-    "&:hover, &.Mui-focusVisible": {
-      zIndex: 1,
-      "& .MuiImageBackdrop-root": {
-        opacity: 0.15,
-      },
-      "& .MuiImageMarked-root": {
-        opacity: 0,
-      },
-    },
-  }));
-
-  const ImageSrc = styled("span")({
+  conteudoCards: {
+    background: "#000000",
+    opacity: "0.8 !important",
     position: "absolute",
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
-    borderRadius: "10px",
-    backgroundSize: "cover",
-    backgroundPosition: "center 40%",
-  });
-
-  const Image = styled("span")(({ theme }) => ({
-    position: "absolute",
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    color: theme.palette.common.white,
-  }));
-
-  const ImageBackdrop = styled("span")(({ theme }) => ({
-    position: "absolute",
-    left: 0,
-    right: 0,
-    top: 0,
     bottom: 0,
-    borderRadius: "10px",
-    backgroundColor: theme.palette.common.black,
-    opacity: 0.4,
-    transition: theme.transitions.create("opacity"),
-  }));
-
-  const ImageMarked = styled("span")(({ theme }) => ({
-    height: 3,
-    width: 18,
-    backgroundColor: theme.palette.common.white,
+    left: 0,
+    width: "100%",
+    height: "90%",
+    borderBottomLeftRadius: "10px",
+    borderBottomRightRadius: "10px",
+  },
+  descricaoCards: {
     position: "absolute",
-    bottom: -2,
-    left: "calc(50% - 9px)",
-    transition: theme.transitions.create("opacity"),
-  }));
+    display: "flex",
+    width: "100%",
+    height: "30%",
+    alignItems: "center",
+    justifyContent: "center",
+    bottom: "30%",
+    left: 0,
+    color: "#ffffff",
+    textTransform: "uppercase",
+    fontSize: "12px",
+    lineHeight: "14px",
+    letterSpacing: "1.25px",
+  },
+  boxSelecionar: {
+    display: "flex",
+    position: "absolute",
+    bottom: "10%",
+    width: "15%",
+    height: "5%",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  botaoSelecionar: {
+    display: "flex",
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    bottom: "10%",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: "10px",
+    fontFamily: "Roboto, sans-serif",
+    fontSize: "14px",
+    lineHeight: "34px",
+    letterSpacing: "1.25px",
+    color: "#ffffff",
+    background: "#F3A913",
+    "&:hover": {
+      background: "#FEBC36",
+    },
+  },
+};
+
+const PrimerioAcesso = () => {
+  const [selectLider, setSelectLider] = useState(false);
+
+  const handleSelectLider = () => {
+    setSelectLider(!selectLider);
+  };
 
   return (
     <Box sx={styles.container}>
@@ -166,22 +189,37 @@ const PrimerioAcesso = () => {
       <Box sx={styles.boxCenter}>
         <Stack direction={"row"} sx={styles.stackopcoes}>
           <Box sx={styles.boxLider}>
-            <ImageButton
-              focusRipple
-              key={"imagemLider"}
-              style={{
-                width: "100%",
-                height: "100%",
-                position: "relative",
+            <Button
+              sx={{
+                ...styles.boxButton,
+                border: selectLider ? "4px solid #F3A913" : "none",
+              }}
+              onClick={() => {
+                handleSelectLider();
               }}
             >
-              <ImageSrc style={{ backgroundImage: `url(${imagemLider})` }} />
-              <ImageBackdrop className="MuiImageBackdrop-root" />
               <Box sx={styles.boxTituloCards}>
                 <Typography sx={styles.tituloCards}>Líder</Typography>
                 <Box sx={styles.baseTituloCards} />
               </Box>
-            </ImageButton>
+              <Fade in={selectLider}>
+                <Box sx={styles.conteudoCards}>
+                  <Typography sx={styles.descricaoCards}>
+                    perfil de liderança:
+                    <br />
+                    <br /> criará uma equipe e será responsável por administrar
+                    as escalas e servos que fazem parte dela
+                  </Typography>
+                </Box>
+              </Fade>
+            </Button>
+            <Fade in={selectLider}>
+              <Box sx={styles.boxSelecionar}>
+                <Button sx={styles.botaoSelecionar} onClick={() => {}}>
+                  Selecionar
+                </Button>
+              </Box>
+            </Fade>
           </Box>
           <Box sx={styles.boxServo}>
             <Box sx={styles.boxTituloCards}>
