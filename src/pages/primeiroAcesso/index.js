@@ -8,6 +8,8 @@ import {
   Typography,
   styled,
 } from "@mui/material";
+import { motion } from "framer-motion";
+import "../../../src/style.css";
 import imagemLider from "../../img/zs-lider.JPG";
 import imagemServo from "../../img/zs-servo.JPG";
 import { Fragment, useEffect, useState } from "react";
@@ -104,6 +106,7 @@ const styles = {
     height: "100%",
     borderRadius: "10px",
     display: "flex",
+    position: "relative",
     justifyContent: "center",
   },
   boxServo: {
@@ -112,6 +115,7 @@ const styles = {
     height: "100%",
     borderRadius: "10px",
     display: "flex",
+    position: "relative",
     justifyContent: "center",
   },
   conteudoCards: {
@@ -146,24 +150,24 @@ const styles = {
   boxSelecionar: {
     display: "flex",
     position: "absolute",
-    bottom: "10%",
-    width: "15%",
-    height: "5%",
+    bottom: "7%",
+    width: "100%",
+    height: "7%",
     alignItems: "center",
     justifyContent: "center",
   },
   botaoSelecionar: {
     display: "flex",
     position: "absolute",
-    width: "100%",
+    width: "50%",
     height: "100%",
-    bottom: "10%",
+    left: "25%",
     alignItems: "center",
     justifyContent: "center",
     borderRadius: "10px",
     fontFamily: "Roboto, sans-serif",
     fontSize: "14px",
-    lineHeight: "34px",
+    lineHeight: "36px",
     letterSpacing: "1.25px",
     color: "#ffffff",
     background: "#F3A913",
@@ -189,37 +193,53 @@ const PrimerioAcesso = () => {
       <Box sx={styles.boxCenter}>
         <Stack direction={"row"} sx={styles.stackopcoes}>
           <Box sx={styles.boxLider}>
-            <Button
-              sx={{
-                ...styles.boxButton,
-                border: selectLider ? "4px solid #F3A913" : "none",
-              }}
-              onClick={() => {
-                handleSelectLider();
-              }}
-            >
-              <Box sx={styles.boxTituloCards}>
-                <Typography sx={styles.tituloCards}>Líder</Typography>
-                <Box sx={styles.baseTituloCards} />
-              </Box>
-              <Fade in={selectLider}>
-                <Box sx={styles.conteudoCards}>
-                  <Typography sx={styles.descricaoCards}>
-                    perfil de liderança:
-                    <br />
-                    <br /> criará uma equipe e será responsável por administrar
-                    as escalas e servos que fazem parte dela
-                  </Typography>
+            <motion.div className="motionDiv" whileHover={{ scale: 1.04 }}>
+              <Button
+                sx={{
+                  ...styles.boxButton,
+                  border: selectLider
+                    ? "4px solid #F3A913"
+                    : "4px solid #ffffff",
+                }}
+                onClick={handleSelectLider}
+              >
+                <Box sx={styles.boxTituloCards}>
+                  <Typography sx={styles.tituloCards}>Líder</Typography>
+                  <Box sx={styles.baseTituloCards} />
                 </Box>
-              </Fade>
-            </Button>
-            <Fade in={selectLider}>
+                <motion.div
+                  className="motionDiv"
+                  initial={{ height: "0px", opacity: 0 }}
+                  animate={selectLider ? { height: "100%", opacity: 1 } : ""}
+                  transition={{ delay: 0.1, ease: "easeInOut" }}
+                >
+                  <Box sx={styles.conteudoCards}>
+                    <Typography sx={styles.descricaoCards}>
+                      perfil de liderança:
+                      <br />
+                      <br /> criará uma equipe e será responsável por
+                      administrar as escalas e servos que fazem parte dela
+                    </Typography>
+                  </Box>
+                </motion.div>
+              </Button>
               <Box sx={styles.boxSelecionar}>
-                <Button sx={styles.botaoSelecionar} onClick={() => {}}>
-                  Selecionar
-                </Button>
+                <motion.div
+                  className="motionDiv"
+                  initial={{ opacity: 0 }}
+                  animate={selectLider ? { opacity: 1 } : ""}
+                  transition={
+                    selectLider
+                      ? { delay: 0.3, ease: "easeInOut" }
+                      : { delay: 0, ease: "easeInOut" }
+                  }
+                >
+                  <Button sx={styles.botaoSelecionar} onClick={() => {}}>
+                    Selecionar
+                  </Button>
+                </motion.div>
               </Box>
-            </Fade>
+            </motion.div>
           </Box>
           <Box sx={styles.boxServo}>
             <Box sx={styles.boxTituloCards}>
