@@ -86,7 +86,6 @@ const styles = {
   },
   boxButton: {
     position: "relative",
-    backgroundImage: `url(${imagemLider})`,
     backgroundSize: "cover",
     backgroundRepeat: "no-repeat",
     backgroundPosition: "center",
@@ -110,7 +109,6 @@ const styles = {
     justifyContent: "center",
   },
   boxServo: {
-    background: "blue",
     width: "49%",
     height: "100%",
     borderRadius: "10px",
@@ -166,7 +164,7 @@ const styles = {
     justifyContent: "center",
     borderRadius: "10px",
     fontFamily: "Roboto, sans-serif",
-    fontSize: "14px",
+    fontSize: "12px",
     lineHeight: "36px",
     letterSpacing: "1.25px",
     color: "#ffffff",
@@ -179,9 +177,19 @@ const styles = {
 
 const PrimerioAcesso = () => {
   const [selectLider, setSelectLider] = useState(false);
+  const [selectServo, setSelectServo] = useState(false);
 
   const handleSelectLider = () => {
     setSelectLider(!selectLider);
+    if (selectServo) {
+      setSelectServo(false);
+    }
+  };
+  const handleSelectServo = () => {
+    setSelectServo(!selectServo);
+    if (selectLider) {
+      setSelectLider(false);
+    }
   };
 
   return (
@@ -193,10 +201,19 @@ const PrimerioAcesso = () => {
       <Box sx={styles.boxCenter}>
         <Stack direction={"row"} sx={styles.stackopcoes}>
           <Box sx={styles.boxLider}>
-            <motion.div className="motionDiv" whileHover={{ scale: 1.04 }}>
+            <motion.div
+              className="motionDiv"
+              initial={{ opacity: 0 }}
+              animate={{
+                opacity: 1,
+                transition: { delay: 0.5, ease: "easeInOut" },
+              }}
+              whileHover={{ scale: 1.04 }}
+            >
               <Button
                 sx={{
                   ...styles.boxButton,
+                  backgroundImage: `url(${imagemLider})`,
                   border: selectLider
                     ? "4px solid #F3A913"
                     : "4px solid #ffffff",
@@ -223,29 +240,90 @@ const PrimerioAcesso = () => {
                   </Box>
                 </motion.div>
               </Button>
-              <Box sx={styles.boxSelecionar}>
-                <motion.div
-                  className="motionDiv"
-                  initial={{ opacity: 0 }}
-                  animate={selectLider ? { opacity: 1 } : ""}
-                  transition={
-                    selectLider
-                      ? { delay: 0.3, ease: "easeInOut" }
-                      : { delay: 0, ease: "easeInOut" }
-                  }
-                >
-                  <Button sx={styles.botaoSelecionar} onClick={() => {}}>
-                    Selecionar
-                  </Button>
-                </motion.div>
-              </Box>
+              {selectLider && (
+                <Box sx={styles.boxSelecionar}>
+                  <motion.div
+                    className="motionDiv"
+                    initial={{ opacity: 0 }}
+                    animate={selectLider ? { opacity: 1 } : { opacity: 0 }}
+                    transition={
+                      selectLider
+                        ? { delay: 0.3, ease: "easeInOut" }
+                        : { delay: 0, ease: "easeInOut" }
+                    }
+                  >
+                    <Button
+                      disabled={!selectLider}
+                      sx={styles.botaoSelecionar}
+                      onClick={() => {}}
+                    >
+                      Escolher
+                    </Button>
+                  </motion.div>
+                </Box>
+              )}
             </motion.div>
           </Box>
           <Box sx={styles.boxServo}>
-            <Box sx={styles.boxTituloCards}>
-              <Typography sx={styles.tituloCards}>Servo</Typography>
-              <Box sx={styles.baseTituloCards} />
-            </Box>
+            <motion.div
+              className="motionDiv"
+              initial={{ opacity: 0 }}
+              animate={{
+                opacity: 1,
+                transition: { delay: 1, ease: "easeInOut" },
+              }}
+              whileHover={{ scale: 1.04 }}
+            >
+              <Button
+                sx={{
+                  ...styles.boxButton,
+                  backgroundImage: `url(${imagemServo})`,
+                  border: selectServo
+                    ? "4px solid #F3A913"
+                    : "4px solid #ffffff",
+                }}
+                onClick={handleSelectServo}
+              >
+                <Box sx={styles.boxTituloCards}>
+                  <Typography sx={styles.tituloCards}>Servo</Typography>
+                  <Box sx={styles.baseTituloCards} />
+                </Box>
+                <motion.div
+                  className="motionDiv"
+                  initial={{ height: "0px", opacity: 0 }}
+                  animate={selectServo ? { height: "100%", opacity: 1 } : ""}
+                  transition={{ delay: 0.1, ease: "easeInOut" }}
+                >
+                  <Box sx={styles.conteudoCards}>
+                    <Typography sx={styles.descricaoCards}>
+                      perfil de servo:
+                      <br />
+                      <br />
+                      entrará em uma equipe e será responsável por informar sua
+                      disponibilidade para criação da escala
+                    </Typography>
+                  </Box>
+                </motion.div>
+              </Button>
+              {selectServo && (
+                <Box sx={styles.boxSelecionar}>
+                  <motion.div
+                    className="motionDiv"
+                    initial={{ opacity: 0 }}
+                    animate={selectServo ? { opacity: 1 } : { opacity: 0 }}
+                    transition={
+                      selectServo
+                        ? { delay: 0.3, ease: "easeInOut" }
+                        : { delay: 0, ease: "easeInOut" }
+                    }
+                  >
+                    <Button sx={styles.botaoSelecionar} onClick={() => {}}>
+                      Escolher
+                    </Button>
+                  </motion.div>
+                </Box>
+              )}
+            </motion.div>
           </Box>
         </Stack>
       </Box>

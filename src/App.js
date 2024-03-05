@@ -11,6 +11,7 @@ import Login from "./pages/login/index";
 import Cadastrar from "./pages/cadastrar/index";
 import Home from "./pages/home/index";
 import PrimerioAcesso from "./pages/primeiroAcesso";
+import CriarEquipe from "./pages/criarEquipe";
 
 function App() {
   return (
@@ -21,7 +22,8 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/cadastrar" element={<Cadastrar />} />
           <Route path="/home" element={<Home />} />
-          <Route path="/primeiroAcesso" element={<PrimerioAcesso />} />
+          <Route path="/primeiroacesso" element={<PrimerioAcesso />} />
+          <Route path="/primeiroacesso/criarequipe" element={<CriarEquipe />} />
         </Routes>
       </Router>
     </AuthProvider>
