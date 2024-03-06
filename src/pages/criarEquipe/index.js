@@ -65,6 +65,35 @@ const styles = {
     mt: "30px",
     mb: "30px",
   },
+  step: {
+    "& .MuiStepLabel-root .Mui-completed": {
+      color: "#F3A913", // circle color (COMPLETED)
+    },
+    "& .MuiStepConnector-line .Mui-completed": {
+      borderColor: "#F3A913", // line color (COMPLETED)
+    },
+    "& .MuiStepLabel-label.Mui-completed.MuiStepLabel-alternativeLabel": {
+      color: "#ffffff", // Just text label (COMPLETED)
+    },
+    "& .MuiStepLabel-iconContainer .MuiStepIcon-completed": {
+      fill: "#ffffff", // Cor do ícone de verificação (COMPLETED)
+    },
+    "& .MuiStepLabel-root .Mui-active": {
+      color: "#F3A913", // circle color (ACTIVE)
+    },
+    "& .MuiStepLabel-label.Mui-active.MuiStepLabel-alternativeLabel": {
+      color: "#F3A913", // Just text label (ACTIVE)
+    },
+    "& .MuiStepLabel-root .Mui-active .MuiStepIcon-text": {
+      fill: "#ffffff", // circle's number (ACTIVE)
+    },
+    "& .MuiStepLabel-label.MuiStepLabel-alternativeLabel": {
+      color: "#ffffff", // Just text label (NEXT)
+    },
+    "& .css-1u4zpwo-MuiSvgIcon-root-MuiStepIcon-root": {
+      color: "#BDBDBD", // circle color (NEXT)
+    },
+  },
   boxConteudo: {
     background: "red",
     width: "100%",
@@ -74,7 +103,19 @@ const styles = {
 };
 
 const CriarEquipe = () => {
-  const [activeStep, setActiveStep] = useState(1);
+  const [activeStep, setActiveStep] = useState(0);
+
+  const handlenProximoStep = () => {
+    if (activeStep < 2) {
+      setActiveStep((proximo) => proximo + 1);
+    }
+  };
+
+  const handlenVoltarStep = () => {
+    if (activeStep > 0) {
+      setActiveStep((voltar) => voltar - 1);
+    }
+  };
 
   const stepsCriarEquipe = [
     {
@@ -99,9 +140,9 @@ const CriarEquipe = () => {
       </Box>
       <Box sx={styles.boxCenter}>
         <Box sx={styles.boxStepper}>
-          <Stepper alternativeLabel>
+          <Stepper activeStep={activeStep} alternativeLabel>
             {stepsCriarEquipe.map((step, index) => (
-              <Step key={step.label}>
+              <Step key={step.label} sx={styles.step}>
                 <StepLabel>{step.label}</StepLabel>
               </Step>
             ))}
