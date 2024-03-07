@@ -255,7 +255,9 @@ const PrimerioAcesso = () => {
                     <Button
                       disabled={!selectLider}
                       sx={styles.botaoSelecionar}
-                      onClick={() => {}}
+                      onClick={() => {
+                        window.location.href = "/primeiroAcesso/criarequipe";
+                      }}
                     >
                       Escolher
                     </Button>

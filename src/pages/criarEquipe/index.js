@@ -6,9 +6,11 @@ import {
   Slide,
   Stack,
   Step,
+  StepConnector,
   StepLabel,
   Stepper,
   Typography,
+  stepConnectorClasses,
   styled,
 } from "@mui/material";
 import { motion } from "framer-motion";
@@ -75,6 +77,9 @@ const styles = {
     "& .MuiStepLabel-label.Mui-completed.MuiStepLabel-alternativeLabel": {
       color: "#ffffff", // Just text label (COMPLETED)
     },
+    "& .css-z7uhs0-MuiStepConnector-line": {
+      borderColor: "#F3A913", // Color line (COMPLETED)
+    },
     "& .MuiStepLabel-iconContainer .MuiStepIcon-completed": {
       fill: "#ffffff", // Cor do ícone de verificação (COMPLETED)
     },
@@ -95,10 +100,41 @@ const styles = {
     },
   },
   boxConteudo: {
-    background: "red",
+    /*  background: "red", */
     width: "100%",
     height: "100%",
+  },
+  boxBotao: {
+    width: "100%",
+    height: "15%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "right",
+    borderBottomLeftRadius: "10px",
+    borderBottomRightRadius: "10px",
+  },
+  boxBotoesStepper: {
+    width: "35%",
+    height: "100%",
+    mr: "4%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  botaoStepper: {
+    width: "48%",
+    height: "50%",
+    padding: "0px 40px",
     borderRadius: "10px",
+    fontFamily: "Roboto, sans-serif",
+    fontSize: "12px",
+    lineHeight: "36px",
+    letterSpacing: "1.25px",
+    color: "#ffffff",
+    background: "#F3A913",
+    "&:hover": {
+      background: "#FEBC36",
+    },
   },
 };
 
@@ -149,6 +185,30 @@ const CriarEquipe = () => {
           </Stepper>
         </Box>
         <Box sx={styles.boxConteudo}></Box>
+        <Box sx={styles.boxBotao}>
+          <Box sx={styles.boxBotoesStepper}>
+            <Button
+              sx={styles.botaoStepper}
+              onClick={() => {
+                if (activeStep !== 0) {
+                  handlenVoltarStep();
+                } else {
+                  window.location.href = "/primeiroAcesso";
+                }
+              }}
+            >
+              {activeStep === 0 ? "Cancelar" : "Voltar"}
+            </Button>
+            <Button
+              sx={styles.botaoStepper}
+              onClick={() => {
+                handlenProximoStep();
+              }}
+            >
+              {activeStep === 2 ? "Criar" : "Próximo"}
+            </Button>
+          </Box>
+        </Box>
       </Box>
     </Box>
   );
