@@ -3,12 +3,14 @@ import {
   Button,
   ButtonBase,
   Fade,
+  Icon,
   Slide,
   Stack,
   Step,
   StepConnector,
   StepLabel,
   Stepper,
+  TextField,
   Typography,
   stepConnectorClasses,
   styled,
@@ -16,6 +18,11 @@ import {
 import { motion } from "framer-motion";
 import "../../../src/style.css";
 import { Fragment, useEffect, useState } from "react";
+import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
+import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
+import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
+import ChurchOutlinedIcon from "@mui/icons-material/ChurchOutlined";
+import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
 
 const styles = {
   container: {
@@ -100,7 +107,10 @@ const styles = {
     },
   },
   boxConteudo: {
-    /*  background: "red", */
+    /*     background: "red", */
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
     width: "100%",
     height: "100%",
   },
@@ -136,6 +146,81 @@ const styles = {
       background: "#FEBC36",
     },
   },
+  boxStepper0: {
+    /* background: "blue", */
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+    height: "100%",
+  },
+  box1Stepper0: {
+    /* background: "green", */
+    display: "flex",
+    flexDirection: "column",
+    width: "35%",
+    height: "100%",
+    mr: "25px",
+    ml: "40px",
+  },
+  textField: {
+    display: "flex",
+    width: "100%",
+    "& input": {
+      color: "#fff",
+    },
+    "& .MuiInputLabel-root": {
+      color: "#BDBDBD",
+      "&.MuiInputLabel-shrink": {
+        color: "#fff",
+      },
+    },
+
+    "& .MuiOutlinedInput-root": {
+      "& fieldset": {
+        borderColor: "#F3A913",
+      },
+      "&:hover fieldset": {
+        borderColor: "#F3A913",
+      },
+      "&.Mui-focused fieldset": {
+        borderColor: "#F3A913",
+      },
+    },
+  },
+  box2Stepper0: {
+    /* background: "green", */
+    width: "65%",
+    height: "100%",
+    ml: "25px",
+    mr: "40px",
+  },
+  boxTabela: {
+    display: "flex",
+    width: "100%",
+    height: "56px",
+    alignItems: "center",
+    justifyContent: "center",
+    borderBottom: "1px solid #F3A913",
+  },
+  boxColunas: {
+    display: "flex",
+    width: "20%",
+    height: "55%",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRight: "1px solid #F3A913",
+  },
+  nomesTabela: {
+    fontSize: "14px",
+    color: "#ffffff",
+    ml: "2%",
+  },
+  estiloIcones: {
+    fontSize: "16px",
+    color: "#F3A913",
+    mr: "2%",
+  },
 };
 
 const CriarEquipe = () => {
@@ -156,15 +241,75 @@ const CriarEquipe = () => {
   const stepsCriarEquipe = [
     {
       label: "Informações da equipe",
-      description: [<Box>oiiii</Box>],
+      conteudo: [
+        <Box sx={styles.boxStepper0}>
+          <Box sx={styles.box1Stepper0}>
+            <TextField
+              label="Nome da equipe"
+              variant="outlined"
+              sx={{ ...styles.textField, mb: "10%" }}
+            />
+            <TextField
+              label="Descrição da equipe"
+              multiline
+              rows={7}
+              sx={{
+                ...styles.textField,
+                "& .css-dpjnhs-MuiInputBase-root-MuiOutlinedInput-root": {
+                  color: "#fff",
+                },
+              }}
+            />
+          </Box>
+          <Box sx={styles.box2Stepper0}>
+            <Box sx={styles.boxTabela}>
+              <Box sx={styles.boxColunas}>
+                <CalendarMonthOutlinedIcon sx={styles.estiloIcones} />
+                <Typography sx={styles.nomesTabela}>Dia</Typography>
+              </Box>
+              <Box sx={styles.boxColunas}>
+                <AccessTimeOutlinedIcon sx={styles.estiloIcones} />
+                <Typography sx={styles.nomesTabela}>Horário</Typography>
+              </Box>
+              <Box sx={styles.boxColunas}>
+                <GroupsOutlinedIcon sx={styles.estiloIcones} />
+                <Typography sx={styles.nomesTabela}>Servindo</Typography>
+              </Box>
+              <Box
+                sx={{
+                  ...styles.boxColunas,
+                  width: "40%",
+                  borderRight: "none",
+                  position: "relative",
+                }}
+              >
+                <ChurchOutlinedIcon sx={styles.estiloIcones} />
+                <Typography sx={styles.nomesTabela}>Culto</Typography>
+                <Box
+                  sx={{
+                    position: "absolute",
+                    right: "0",
+                    top: "55%",
+                    transform: "translateY(-50%)",
+                  }}
+                >
+                  <AddCircleOutlineOutlinedIcon
+                    sx={{ ...styles.estiloIcones, fontSize: "20px" }}
+                  />
+                </Box>
+              </Box>
+            </Box>
+          </Box>
+        </Box>,
+      ],
     },
     {
       label: "Criação das Tags",
-      description: [<Box>oiiii</Box>],
+      conteudo: [<Box sx={styles.boxStepper0}></Box>],
     },
     {
       label: "Escala de Serviço",
-      description: [<Box>oiiii</Box>],
+      conteudo: [<Box sx={styles.boxStepper0}></Box>],
     },
   ];
 
@@ -184,7 +329,9 @@ const CriarEquipe = () => {
             ))}
           </Stepper>
         </Box>
-        <Box sx={styles.boxConteudo}></Box>
+        <Box sx={styles.boxConteudo}>
+          {stepsCriarEquipe[activeStep].conteudo}
+        </Box>
         <Box sx={styles.boxBotao}>
           <Box sx={styles.boxBotoesStepper}>
             <Button

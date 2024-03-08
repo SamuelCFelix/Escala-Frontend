@@ -95,9 +95,6 @@ const styles = {
     borderRadius: "10px",
     /* color: "#000000", */
     color: "#F3A913",
-    "&:hover": {
-      opacity: 0.9,
-    },
   },
 
   boxLider: {
@@ -133,12 +130,12 @@ const styles = {
   descricaoCards: {
     position: "absolute",
     display: "flex",
-    width: "100%",
+    width: "90%",
     height: "30%",
     alignItems: "center",
     justifyContent: "center",
     bottom: "30%",
-    left: 0,
+    left: "5%",
     color: "#ffffff",
     textTransform: "uppercase",
     fontSize: "12px",
