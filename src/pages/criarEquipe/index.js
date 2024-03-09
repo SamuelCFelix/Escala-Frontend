@@ -1,9 +1,15 @@
 import {
+  Backdrop,
   Box,
   Button,
   ButtonBase,
   Fade,
   Icon,
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
+  Modal,
   Slide,
   Stack,
   Step,
@@ -23,6 +29,7 @@ import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
 import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
 import ChurchOutlinedIcon from "@mui/icons-material/ChurchOutlined";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
+import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 
 const styles = {
   container: {
@@ -40,7 +47,7 @@ const styles = {
   boxTitulo: {
     width: "25%",
     height: "10%",
-    marginBottom: "30px",
+    mb: "30px",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
@@ -107,7 +114,7 @@ const styles = {
     },
   },
   boxConteudo: {
-    /*     background: "red", */
+    /* background: "red", */
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -147,7 +154,6 @@ const styles = {
     },
   },
   boxStepper0: {
-    /* background: "blue", */
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -155,7 +161,6 @@ const styles = {
     height: "100%",
   },
   box1Stepper0: {
-    /* background: "green", */
     display: "flex",
     flexDirection: "column",
     width: "35%",
@@ -190,15 +195,20 @@ const styles = {
   },
   box2Stepper0: {
     /* background: "green", */
+    display: "flex",
+    flexDirection: "column",
     width: "65%",
     height: "100%",
+    maxHeight: "600px",
     ml: "25px",
     mr: "40px",
   },
   boxTabela: {
+    /* background: "blue", */
     display: "flex",
     width: "100%",
     height: "56px",
+    mb: "2%",
     alignItems: "center",
     justifyContent: "center",
     borderBottom: "1px solid #F3A913",
@@ -212,6 +222,7 @@ const styles = {
     borderRight: "1px solid #F3A913",
   },
   nomesTabela: {
+    fontWeight: 600,
     fontSize: "14px",
     color: "#ffffff",
     ml: "2%",
@@ -221,10 +232,85 @@ const styles = {
     color: "#F3A913",
     mr: "2%",
   },
+  boxBotaoAdd: {
+    position: "absolute",
+    right: "0",
+    top: "50%",
+    transform: "translateY(-50%)",
+    alignItems: "center",
+    justifyContent: "flex-end",
+  },
+  boxConteudoTabela: {
+    /* background: "red", */
+    display: "flex",
+    width: "100%",
+    height: "100%",
+  },
+  textoTabelaVazio: {
+    fontSize: "14px",
+    color: "#ffffff",
+    lineHeight: "24px",
+    letterSpacing: "0.17px",
+  },
+  boxModal: {
+    backgroundColor: "#1B1B1B",
+    border: "1px solid #F3A913",
+    borderRadius: "10px",
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: "40%",
+    height: "35%",
+    boxShadow: 24,
+  },
+  boxConteudoModal: {
+    width: "100%",
+    height: "100%",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  boxAreaTituloModal: {
+    width: "100%",
+    height: "20%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  boxTituloModal: {
+    width: "35%",
+    height: "100%",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  tituloModal: {
+    color: "#ffffff",
+    textTransform: "uppercase",
+    fontSize: "14px",
+    lineHeight: "16px",
+    letterSpacing: "1.25px",
+    margin: "6% 0%",
+  },
+  baseTituloModal: {
+    background: "#F3A913",
+    width: "95%",
+    height: "3.5%",
+  },
+  boxInputsModal: {
+    /* background: "red", */
+    width: "100%",
+    height: "80%",
+    display: "flex",
+  },
 };
 
 const CriarEquipe = () => {
   const [activeStep, setActiveStep] = useState(0);
+  const [openModal, setOpenModal] = useState(false);
 
   const handlenProximoStep = () => {
     if (activeStep < 2) {
@@ -237,6 +323,11 @@ const CriarEquipe = () => {
       setActiveStep((voltar) => voltar - 1);
     }
   };
+
+  const handleOpenModal = () => setOpenModal(true);
+  const handleCloseModal = () => setOpenModal(false);
+
+  const programacoes = [];
 
   const stepsCriarEquipe = [
     {
@@ -252,7 +343,7 @@ const CriarEquipe = () => {
             <TextField
               label="Descrição da equipe"
               multiline
-              rows={7}
+              rows={11}
               sx={{
                 ...styles.textField,
                 "& .css-dpjnhs-MuiInputBase-root-MuiOutlinedInput-root": {
@@ -285,19 +376,55 @@ const CriarEquipe = () => {
               >
                 <ChurchOutlinedIcon sx={styles.estiloIcones} />
                 <Typography sx={styles.nomesTabela}>Culto</Typography>
-                <Box
-                  sx={{
-                    position: "absolute",
-                    right: "0",
-                    top: "55%",
-                    transform: "translateY(-50%)",
-                  }}
-                >
-                  <AddCircleOutlineOutlinedIcon
-                    sx={{ ...styles.estiloIcones, fontSize: "20px" }}
-                  />
+                <Box sx={styles.boxBotaoAdd}>
+                  <IconButton
+                    sx={{ width: "18px", height: "18px" }}
+                    onClick={() => {
+                      handleOpenModal();
+                    }}
+                  >
+                    <AddCircleOutlineOutlinedIcon
+                      sx={{ ...styles.estiloIcones, fontSize: "20px" }}
+                    />
+                  </IconButton>
                 </Box>
               </Box>
+            </Box>
+            <Box sx={styles.boxConteudoTabela}>
+              {programacoes.length > 0 ? (
+                ""
+              ) : (
+                <Typography sx={styles.textoTabelaVazio}>
+                  Aqui será inserido as programações padrões da sua equipe...
+                  <br />
+                  <br />
+                  Clique no botão de adicionar no canto superior direito.
+                  <br />
+                  <br />
+                  Observação: Cadastre apenas cultos concretos em que sua equipe
+                  serve durante a semana. Cultos especiais como eventos e etc,
+                  poderão ser criados como “evento” na sua página inicial.
+                  <br />
+                  <br />
+                  Exemplos de programações padrões:
+                  <List>
+                    <ListItem>
+                      <FiberManualRecordIcon sx={{ width: "8px", mr: "5px" }} />
+                      <ListItemText
+                        primaryTypographyProps={{ fontSize: "14px" }}
+                        primary="Quinta-Feira / 19:30 / 2 pessoas servindo / Culto de Doutrina"
+                      />
+                    </ListItem>
+                    <ListItem>
+                      <FiberManualRecordIcon sx={{ width: "8px", mr: "5px" }} />
+                      <ListItemText
+                        primaryTypographyProps={{ fontSize: "14px" }}
+                        primary="Domingo / 10:00 / 3 pessoas servindo / Culto Celebração - ZS10"
+                      />
+                    </ListItem>
+                  </List>
+                </Typography>
+              )}
             </Box>
           </Box>
         </Box>,
@@ -357,6 +484,34 @@ const CriarEquipe = () => {
           </Box>
         </Box>
       </Box>
+
+      <Modal
+        open={openModal}
+        onClose={handleCloseModal}
+        closeAfterTransition
+        slots={{ backdrop: Backdrop }}
+        slotProps={{
+          backdrop: {
+            timeout: 500,
+          },
+        }}
+      >
+        <Fade in={openModal}>
+          <Box sx={styles.boxModal}>
+            <Box sx={styles.boxConteudoModal}>
+              <Box sx={styles.boxAreaTituloModal}>
+                <Box sx={styles.boxTituloModal}>
+                  <Typography sx={styles.tituloModal}>
+                    Crie uma programação
+                  </Typography>
+                  <Box sx={styles.baseTituloModal} />
+                </Box>
+              </Box>
+              <Box sx={styles.boxInputsModal}></Box>
+            </Box>
+          </Box>
+        </Fade>
+      </Modal>
     </Box>
   );
 };
