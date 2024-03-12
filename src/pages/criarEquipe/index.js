@@ -1,15 +1,20 @@
 import {
+  Autocomplete,
   Backdrop,
   Box,
   Button,
   ButtonBase,
   Fade,
+  FormControl,
   Icon,
   IconButton,
+  InputLabel,
   List,
   ListItem,
   ListItemText,
+  MenuItem,
   Modal,
+  Select,
   Slide,
   Stack,
   Step,
@@ -23,13 +28,17 @@ import {
 } from "@mui/material";
 import { motion } from "framer-motion";
 import "../../../src/style.css";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, forwardRef, useEffect, useState } from "react";
 import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
 import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
 import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
 import ChurchOutlinedIcon from "@mui/icons-material/ChurchOutlined";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
+import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 
 const styles = {
   container: {
@@ -114,7 +123,6 @@ const styles = {
     },
   },
   boxConteudo: {
-    /* background: "red", */
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -180,6 +188,9 @@ const styles = {
         color: "#fff",
       },
     },
+    "&.MuiFormControl-root .MuiOutlinedInput-root": {
+      color: "#fff",
+    },
 
     "& .MuiOutlinedInput-root": {
       "& fieldset": {
@@ -194,7 +205,6 @@ const styles = {
     },
   },
   box2Stepper0: {
-    /* background: "green", */
     display: "flex",
     flexDirection: "column",
     width: "65%",
@@ -204,7 +214,6 @@ const styles = {
     mr: "40px",
   },
   boxTabela: {
-    /* background: "blue", */
     display: "flex",
     width: "100%",
     height: "56px",
@@ -241,7 +250,6 @@ const styles = {
     justifyContent: "flex-end",
   },
   boxConteudoTabela: {
-    /* background: "red", */
     display: "flex",
     width: "100%",
     height: "100%",
@@ -305,12 +313,16 @@ const styles = {
     width: "100%",
     height: "80%",
     display: "flex",
+    flexDirection: "row",
   },
 };
 
 const CriarEquipe = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [openModal, setOpenModal] = useState(false);
+  const [diaDaSemana, setDiaDaSemana] = useState("");
+  const [horario, setHorario] = useState("");
+  const [servindo, setServindo] = useState("");
 
   const handlenProximoStep = () => {
     if (activeStep < 2) {
@@ -326,6 +338,25 @@ const CriarEquipe = () => {
 
   const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = () => setOpenModal(false);
+
+  const handleSelectDiaDaSemana = (event) => {
+    setDiaDaSemana(event.target.value);
+  };
+  const handleSelectHorario = (event) => {
+    setHorario(event.target.value);
+  };
+  const handleSelectServindo = (event) => {
+    setServindo(event.target.value);
+  };
+
+  const CustomInputComponent = forwardRef(({ value, onChange }, ref) => (
+    <input
+      ref={ref}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      list="tituloCulto-list"
+    />
+  ));
 
   const programacoes = [];
 
@@ -344,12 +375,7 @@ const CriarEquipe = () => {
               label="Descrição da equipe"
               multiline
               rows={11}
-              sx={{
-                ...styles.textField,
-                "& .css-dpjnhs-MuiInputBase-root-MuiOutlinedInput-root": {
-                  color: "#fff",
-                },
-              }}
+              sx={styles.textField}
             />
           </Box>
           <Box sx={styles.box2Stepper0}>
@@ -440,6 +466,24 @@ const CriarEquipe = () => {
     },
   ];
 
+  const diasDaSemana = [
+    "Domingo",
+    "Segunda-Feira",
+    "Terça-Feira",
+    "Quarta-Feira",
+    "Quinta-Feira",
+    "Sexta-Feira",
+    "Sábado",
+  ];
+
+  const tituloCulto = [
+    "Culto Celebração - ZS08",
+    "Culto Celebração - ZS10",
+    "Culto Celebração - ZS17",
+    "Culto Terça-Feira",
+    "Culto de Doutrina",
+  ];
+
   return (
     <Box sx={styles.container}>
       <Box sx={styles.boxTitulo}>
@@ -487,7 +531,12 @@ const CriarEquipe = () => {
 
       <Modal
         open={openModal}
-        onClose={handleCloseModal}
+        onClose={() => {
+          handleCloseModal();
+          setDiaDaSemana("");
+          setHorario("");
+          setServindo("");
+        }}
         closeAfterTransition
         slots={{ backdrop: Backdrop }}
         slotProps={{
@@ -507,7 +556,107 @@ const CriarEquipe = () => {
                   <Box sx={styles.baseTituloModal} />
                 </Box>
               </Box>
-              <Box sx={styles.boxInputsModal}></Box>
+              <Box sx={styles.boxInputsModal}>
+                <FormControl
+                  sx={{
+                    ...styles.textField,
+                    width: "auto",
+                    margin: "15px 5px 0px 10px",
+                  }}
+                >
+                  <InputLabel id="labelDia">Dia da semana</InputLabel>
+                  <Select
+                    labelId="labelDia"
+                    value={diaDaSemana}
+                    label="Dia da semana"
+                    onChange={handleSelectDiaDaSemana}
+                    sx={{
+                      width: "165px",
+                    }}
+                    MenuProps={{
+                      PaperProps: {
+                        style: {
+                          maxHeight: "180px",
+                        },
+                      },
+                    }}
+                  >
+                    {diasDaSemana.map((dia) => (
+                      <MenuItem key={dia} value={dia}>
+                        {dia}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DemoContainer
+                    sx={{
+                      ...styles.textField,
+                      margin: "5px 5px 0px 10px",
+                      padding: "10px 0px",
+                      width: "auto",
+                    }}
+                    components={["TimePicker"]}
+                  >
+                    <TimePicker
+                      sx={{ width: "165px", height: "56px" }}
+                      ampm={false}
+                      label="Horário"
+                    />
+                  </DemoContainer>
+                </LocalizationProvider>
+                <FormControl
+                  sx={{
+                    ...styles.textField,
+                    width: "auto",
+                    margin: "15px 5px 0px 10px",
+                  }}
+                >
+                  <InputLabel id="servindo">Servindo</InputLabel>
+                  <Select
+                    labelId="servindo"
+                    value={servindo}
+                    label="Servindo"
+                    onChange={handleSelectServindo}
+                    sx={{ width: "120px", height: "56px" }}
+                    MenuProps={{
+                      PaperProps: {
+                        style: {
+                          maxHeight: "180px",
+                        },
+                      },
+                    }}
+                  >
+                    {[...Array(20)].map((_, index) => (
+                      <MenuItem key={index + 1} value={index + 1}>
+                        {index + 1}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <Autocomplete
+                  sx={{
+                    ...styles.textField,
+                    width: "auto",
+                    margin: "15px 5px 0px 10px",
+                  }}
+                  freeSolo
+                  disableClearable
+                  options={tituloCulto}
+                  renderInput={(params) => (
+                    <TextField
+                      sx={{ width: "220px" }}
+                      {...params}
+                      label="Título do culto"
+                      variant="outlined"
+                      inputComponent={CustomInputComponent}
+                      PopperProps={{
+                        style: { maxHeight: "180px" },
+                      }}
+                    />
+                  )}
+                />
+              </Box>
             </Box>
           </Box>
         </Fade>
