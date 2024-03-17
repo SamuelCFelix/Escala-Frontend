@@ -180,18 +180,17 @@ const styles = {
     display: "flex",
     width: "100%",
     "& input": {
-      color: "#fff",
+      color: "#ffffff",
     },
     "& .MuiInputLabel-root": {
       color: "#BDBDBD",
       "&.MuiInputLabel-shrink": {
-        color: "#fff",
+        color: "#ffffff",
       },
     },
-    "&.MuiFormControl-root .MuiOutlinedInput-root": {
-      color: "#fff",
+    "& .MuiSelect-icon": {
+      color: "#ffffff",
     },
-
     "& .MuiOutlinedInput-root": {
       "& fieldset": {
         borderColor: "#F3A913",
@@ -202,8 +201,21 @@ const styles = {
       "&.Mui-focused fieldset": {
         borderColor: "#F3A913",
       },
+      "& .MuiInputBase-input": {
+        color: "#ffffff",
+      },
+    },
+    "& .MuiMenuItem-root.Mui-selected": {
+      color: "#ffffff",
+    },
+    "& .MuiSvgIcon-root": {
+      color: "#ffffff",
+    },
+    "& .MuiOutlinedInput-root .MuiSelect-select": {
+      textAlign: "center",
     },
   },
+
   box2Stepper0: {
     display: "flex",
     flexDirection: "column",
@@ -268,7 +280,7 @@ const styles = {
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: "40%",
+    width: "38%",
     height: "35%",
     boxShadow: 24,
   },
@@ -575,14 +587,43 @@ const CriarEquipe = () => {
                     }}
                     MenuProps={{
                       PaperProps: {
-                        style: {
-                          maxHeight: "180px",
+                        sx: {
+                          maxHeight: "170px",
+                          backgroundColor: "#565656",
+                          borderRadius: "4px",
+                          boxShadow:
+                            "0px 5px 5px -3px rgba(0,0,0,0.2), 0px 8px 10px 1px rgba(0,0,0,0.14), 0px 3px 14px 2px rgba(0,0,0,0.12)",
+                          overflowY: "auto",
+                          "&::-webkit-scrollbar": {
+                            display: "none",
+                          },
+                          scrollbarWidth: "none",
+                        },
+                      },
+                      MenuListProps: {
+                        sx: {
+                          "& .Mui-selected": {
+                            color: "#F3A913",
+                            backgroundColor: "transparent",
+                            "&:hover": {
+                              backgroundColor: "rgba(0, 0, 0, 0.04)",
+                            },
+                          },
                         },
                       },
                     }}
                   >
                     {diasDaSemana.map((dia) => (
-                      <MenuItem key={dia} value={dia}>
+                      <MenuItem
+                        key={dia}
+                        value={dia}
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          color: "#ffffff",
+                        }}
+                      >
                         {dia}
                       </MenuItem>
                     ))}
@@ -595,13 +636,31 @@ const CriarEquipe = () => {
                       margin: "5px 5px 0px 10px",
                       padding: "10px 0px",
                       width: "auto",
+                      "& .MuiFormControl-root.MuiTextField-root": {
+                        minWidth: "0px",
+                      },
                     }}
                     components={["TimePicker"]}
                   >
                     <TimePicker
-                      sx={{ width: "165px", height: "56px" }}
+                      sx={{
+                        width: "114px",
+                        height: "56px",
+                      }}
                       ampm={false}
                       label="Horário"
+                      PopperProps={{
+                        sx: {
+                          "& .MuiButtonBase-root.MuiMenuItem-root.Mui-selected":
+                            {
+                              backgroundColor: "#F3A913",
+                            },
+                          "& .MuiPaper-root.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation8.MuiPickersPopper-paper":
+                            {
+                              maxHeight: "170px",
+                            },
+                        },
+                      }}
                     />
                   </DemoContainer>
                 </LocalizationProvider>
@@ -618,17 +677,52 @@ const CriarEquipe = () => {
                     value={servindo}
                     label="Servindo"
                     onChange={handleSelectServindo}
-                    sx={{ width: "120px", height: "56px" }}
+                    sx={{
+                      width: "110px",
+                      height: "56px",
+                      "& .MuiSelect-select.MuiSelect-outlined.MuiInputBase-input.MuiOutlinedInput-input":
+                        {
+                          marginLeft: "18px",
+                        },
+                    }}
                     MenuProps={{
                       PaperProps: {
-                        style: {
-                          maxHeight: "180px",
+                        sx: {
+                          maxHeight: "170px",
+                          backgroundColor: "#565656",
+                          borderRadius: "4px",
+                          boxShadow:
+                            "0px 5px 5px -3px rgba(0,0,0,0.2), 0px 8px 10px 1px rgba(0,0,0,0.14), 0px 3px 14px 2px rgba(0,0,0,0.12)",
+                          overflowY: "auto",
+                          "&::-webkit-scrollbar": {
+                            display: "none",
+                          },
+                          scrollbarWidth: "none",
+                        },
+                      },
+                      MenuListProps: {
+                        sx: {
+                          "& .Mui-selected": {
+                            color: "#ffffff",
+                            backgroundColor: "#F3A913",
+                            "&:hover": {
+                              backgroundColor: "#F3A913",
+                            },
+                          },
                         },
                       },
                     }}
                   >
                     {[...Array(20)].map((_, index) => (
-                      <MenuItem key={index + 1} value={index + 1}>
+                      <MenuItem
+                        key={index + 1}
+                        value={index + 1}
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
                         {index + 1}
                       </MenuItem>
                     ))}
@@ -645,13 +739,13 @@ const CriarEquipe = () => {
                   options={tituloCulto}
                   renderInput={(params) => (
                     <TextField
-                      sx={{ width: "220px" }}
+                      sx={{ width: "275px" }}
                       {...params}
                       label="Título do culto"
                       variant="outlined"
                       inputComponent={CustomInputComponent}
                       PopperProps={{
-                        style: { maxHeight: "180px" },
+                        style: { maxHeight: "170px" },
                       }}
                     />
                   )}
