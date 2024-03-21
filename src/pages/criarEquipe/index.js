@@ -14,6 +14,7 @@ import {
   ListItemText,
   MenuItem,
   Modal,
+  Paper,
   Select,
   Slide,
   Stack,
@@ -39,6 +40,7 @@ import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
+import { DesktopTimePicker, pickersLayoutClasses } from "@mui/x-date-pickers";
 
 const styles = {
   container: {
@@ -604,10 +606,13 @@ const CriarEquipe = () => {
                         sx: {
                           "& .Mui-selected": {
                             color: "#F3A913",
-                            backgroundColor: "transparent",
-                            "&:hover": {
-                              backgroundColor: "rgba(0, 0, 0, 0.04)",
-                            },
+                            "&.MuiButtonBase-root.MuiMenuItem-root.Mui-selected":
+                              {
+                                background: "transparent",
+                                "&:hover": {
+                                  backgroundColor: "rgba(0, 0, 0, 0.04)",
+                                },
+                              },
                           },
                         },
                       },
@@ -647,20 +652,54 @@ const CriarEquipe = () => {
                         width: "114px",
                         height: "56px",
                       }}
-                      ampm={false}
-                      label="Horário"
-                      PopperProps={{
-                        sx: {
-                          "& .MuiButtonBase-root.MuiMenuItem-root.Mui-selected":
-                            {
-                              backgroundColor: "#F3A913",
-                            },
-                          "& .MuiPaper-root.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation8.MuiPickersPopper-paper":
-                            {
+                      slotProps={{
+                        layout: {
+                          sx: {
+                            [`.${pickersLayoutClasses.contentWrapper}`]: {
                               maxHeight: "170px",
+                              backgroundColor: "#565656",
+                              color: "#ffffff",
+                              borderRadius: "4px",
+                              boxShadow:
+                                "0px 5px 5px -3px rgba(0,0,0,0.2), 0px 8px 10px 1px rgba(0,0,0,0.14), 0px 3px 14px 2px rgba(0,0,0,0.12)",
+                              overflowY: "auto",
+                              "&::-webkit-scrollbar": {
+                                display: "none",
+                              },
+                              scrollbarWidth: "none",
+                              "& .Mui-selected": {
+                                backgroundColor: "#F3A913",
+                                color: "white",
+                                "&:hover": {
+                                  backgroundColor: "#F3A913",
+                                  color: "white",
+                                },
+                                "&:focus": {
+                                  backgroundColor: "#F3A913",
+                                  color: "white",
+                                },
+                              },
+                              "& .MuiButtonBase-root.MuiMenuItem-root.MuiMultiSectionDigitalClockSection-item":
+                                {
+                                  "&:hover": {
+                                    backgroundColor: "rgba(0, 0, 0, 0.04)",
+                                  },
+                                },
+                              "&.MuiButtonBase-root.MuiMenuItem-root.MuiMenuItem-gutters.Mui-selected.MuiMenuItem-root.MuiMenuItem-gutters.Mui-selected.MuiMultiSectionDigitalClockSection-item":
+                                {
+                                  "&:hover": {
+                                    backgroundColor: "#F3A913",
+                                  },
+                                },
                             },
+                          },
+                        },
+                        actionBar: {
+                          actions: [],
                         },
                       }}
+                      ampm={false}
+                      label="Horário"
                     />
                   </DemoContainer>
                 </LocalizationProvider>
@@ -704,10 +743,16 @@ const CriarEquipe = () => {
                         sx: {
                           "& .Mui-selected": {
                             color: "#ffffff",
-                            backgroundColor: "#F3A913",
-                            "&:hover": {
-                              backgroundColor: "#F3A913",
-                            },
+                            "&.MuiButtonBase-root.MuiMenuItem-root.Mui-selected":
+                              {
+                                background: "#F3A913",
+                                width: "40px",
+                                borderRadius: "2px",
+                                margin: "auto",
+                                "&:hover": {
+                                  backgroundColor: "#F3A913",
+                                },
+                              },
                           },
                         },
                       },
@@ -721,6 +766,7 @@ const CriarEquipe = () => {
                           display: "flex",
                           justifyContent: "center",
                           alignItems: "center",
+                          color: "#ffffff",
                         }}
                       >
                         {index + 1}
@@ -739,15 +785,59 @@ const CriarEquipe = () => {
                   options={tituloCulto}
                   renderInput={(params) => (
                     <TextField
-                      sx={{ width: "275px" }}
                       {...params}
                       label="Título do culto"
                       variant="outlined"
                       inputComponent={CustomInputComponent}
-                      PopperProps={{
-                        style: { maxHeight: "170px" },
+                      sx={{
+                        width: "275px",
                       }}
                     />
+                  )}
+                  PaperComponent={({ children }) => (
+                    <>
+                      <Paper
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          maxHeight: "170px",
+                          backgroundColor: "#565656",
+                          borderRadius: "4px",
+                          boxShadow:
+                            "0px 5px 5px -3px rgba(0,0,0,0.2), 0px 8px 10px 1px rgba(0,0,0,0.14), 0px 3px 14px 2px rgba(0,0,0,0.12)",
+                          overflowY: "auto",
+                          "&::-webkit-scrollbar": {
+                            display: "none",
+                          },
+                          scrollbarWidth: "none",
+                          "& .MuiAutocomplete-listbox .MuiAutocomplete-option[aria-selected='true']":
+                            {
+                              color: "#F3A913",
+                              backgroundColor: "transparent",
+                              "&.Mui-focused": {
+                                backgroundColor: "transparent",
+                              },
+                              "&:hover": {
+                                backgroundColor: "rgba(0, 0, 0, 0.04)",
+                              },
+                            },
+                          "& .MuiAutocomplete-listbox .MuiAutocomplete-option:not([aria-selected='true'])":
+                            {
+                              color: "#ffffff",
+                              backgroundColor: "transparent",
+                              "&:hover": {
+                                backgroundColor: "rgba(0, 0, 0, 0.04)",
+                              },
+                            },
+                        }}
+                      >
+                        {children}
+                      </Paper>
+                    </>
+                  )}
+                  renderOption={(props, option) => (
+                    <MenuItem {...props}>{option}</MenuItem>
                   )}
                 />
               </Box>
