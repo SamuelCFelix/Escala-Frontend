@@ -295,6 +295,7 @@ const styles = {
     justifyContent: "center",
   },
   boxAreaTituloModal: {
+    /* background: "green", */
     width: "100%",
     height: "20%",
     display: "flex",
@@ -325,9 +326,26 @@ const styles = {
   boxInputsModal: {
     /* background: "red", */
     width: "100%",
-    height: "80%",
+    height: "60%",
     display: "flex",
     flexDirection: "row",
+  },
+  boxBotaoModal: {
+    /* background: "blue", */
+    width: "100%",
+    height: "20%",
+    display: "flex",
+    alignItems: "end",
+    justifyContent: "end",
+  },
+  boxBotoesModal: {
+    /* background: "yellow", */
+    width: "210px",
+    height: "100%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    mr: "10px",
   },
 };
 
@@ -337,6 +355,11 @@ const CriarEquipe = () => {
   const [diaDaSemana, setDiaDaSemana] = useState("");
   const [horario, setHorario] = useState("");
   const [servindo, setServindo] = useState("");
+  const [tituloCulto, setTituloCulto] = useState("");
+
+  console.log(`${diaDaSemana}   ${horario}    ${servindo}    ${tituloCulto}`);
+
+  /* MuiInputBase-root-MuiOutlinedInput-root.Mui-error .MuiOutlinedInput-notchedOutline */
 
   const handlenProximoStep = () => {
     if (activeStep < 2) {
@@ -352,16 +375,6 @@ const CriarEquipe = () => {
 
   const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = () => setOpenModal(false);
-
-  const handleSelectDiaDaSemana = (event) => {
-    setDiaDaSemana(event.target.value);
-  };
-  const handleSelectHorario = (event) => {
-    setHorario(event.target.value);
-  };
-  const handleSelectServindo = (event) => {
-    setServindo(event.target.value);
-  };
 
   const CustomInputComponent = forwardRef(({ value, onChange }, ref) => (
     <input
@@ -490,8 +503,7 @@ const CriarEquipe = () => {
     "Sábado",
   ];
 
-  const tituloCulto = [
-    "Culto Celebração - ZS08",
+  const titulosCultoDefault = [
     "Culto Celebração - ZS10",
     "Culto Celebração - ZS17",
     "Culto Terça-Feira",
@@ -550,6 +562,7 @@ const CriarEquipe = () => {
           setDiaDaSemana("");
           setHorario("");
           setServindo("");
+          setTituloCulto("");
         }}
         closeAfterTransition
         slots={{ backdrop: Backdrop }}
@@ -583,7 +596,9 @@ const CriarEquipe = () => {
                     labelId="labelDia"
                     value={diaDaSemana}
                     label="Dia da semana"
-                    onChange={handleSelectDiaDaSemana}
+                    onChange={(newValue) => {
+                      setDiaDaSemana(newValue);
+                    }}
                     sx={{
                       width: "165px",
                     }}
@@ -648,6 +663,10 @@ const CriarEquipe = () => {
                     components={["TimePicker"]}
                   >
                     <TimePicker
+                      value={horario}
+                      onChange={(newValue) => {
+                        setHorario(newValue);
+                      }}
                       sx={{
                         width: "114px",
                         height: "56px",
@@ -662,11 +681,16 @@ const CriarEquipe = () => {
                               borderRadius: "4px",
                               boxShadow:
                                 "0px 5px 5px -3px rgba(0,0,0,0.2), 0px 8px 10px 1px rgba(0,0,0,0.14), 0px 3px 14px 2px rgba(0,0,0,0.12)",
-                              overflowY: "auto",
-                              "&::-webkit-scrollbar": {
-                                display: "none",
+
+                              "@media (pointer: fine)": {
+                                ".MuiList-root.MuiMultiSectionDigitalClockSection-root:hover":
+                                  {
+                                    overflowY: "auto",
+                                    "&::-webkit-scrollbar": {
+                                      display: "none",
+                                    },
+                                  },
                               },
-                              scrollbarWidth: "none",
                               "& .Mui-selected": {
                                 backgroundColor: "#F3A913",
                                 color: "white",
@@ -684,10 +708,8 @@ const CriarEquipe = () => {
                                   "&:hover": {
                                     backgroundColor: "rgba(0, 0, 0, 0.04)",
                                   },
-                                },
-                              "&.MuiButtonBase-root.MuiMenuItem-root.MuiMenuItem-gutters.Mui-selected.MuiMenuItem-root.MuiMenuItem-gutters.Mui-selected.MuiMultiSectionDigitalClockSection-item":
-                                {
-                                  "&:hover": {
+
+                                  "&[aria-selected='true']:hover": {
                                     backgroundColor: "#F3A913",
                                   },
                                 },
@@ -715,7 +737,9 @@ const CriarEquipe = () => {
                     labelId="servindo"
                     value={servindo}
                     label="Servindo"
-                    onChange={handleSelectServindo}
+                    onChange={(newValue) => {
+                      setServindo(newValue);
+                    }}
                     sx={{
                       width: "110px",
                       height: "56px",
@@ -782,10 +806,14 @@ const CriarEquipe = () => {
                   }}
                   freeSolo
                   disableClearable
-                  options={tituloCulto}
+                  options={titulosCultoDefault}
                   renderInput={(params) => (
                     <TextField
                       {...params}
+                      value={tituloCulto}
+                      onChange={(event) => {
+                        setTituloCulto(event.target.value);
+                      }}
                       label="Título do culto"
                       variant="outlined"
                       inputComponent={CustomInputComponent}
@@ -799,8 +827,6 @@ const CriarEquipe = () => {
                       <Paper
                         sx={{
                           display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
                           maxHeight: "170px",
                           backgroundColor: "#565656",
                           borderRadius: "4px",
@@ -840,6 +866,25 @@ const CriarEquipe = () => {
                     <MenuItem {...props}>{option}</MenuItem>
                   )}
                 />
+              </Box>
+              <Box sx={styles.boxBotaoModal}>
+                <Box sx={styles.boxBotoesModal}>
+                  <Button
+                    sx={styles.botaoStepper}
+                    onClick={() => {
+                      handleCloseModal();
+                      setDiaDaSemana("");
+                      setHorario("");
+                      setServindo("");
+                      setTituloCulto("");
+                    }}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button sx={styles.botaoStepper} onClick={() => {}}>
+                    Adicionar
+                  </Button>
+                </Box>
               </Box>
             </Box>
           </Box>
