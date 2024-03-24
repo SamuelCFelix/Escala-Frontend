@@ -713,8 +713,13 @@ const Cadastrar = () => {
 
       <Snackbar
         open={openPopUpError}
-        autoHideDuration={6000}
+        autoHideDuration={3000}
         onClose={handleClosePopUpError}
+        style={{
+          bottom: "20px",
+          left: "50%",
+          transform: "translateX(-50%)",
+        }}
       >
         <Alert
           onClose={handleClosePopUpError}

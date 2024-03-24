@@ -1,4 +1,5 @@
 import {
+  Alert,
   Autocomplete,
   Backdrop,
   Box,
@@ -17,6 +18,7 @@ import {
   Paper,
   Select,
   Slide,
+  Snackbar,
   Stack,
   Step,
   StepConnector,
@@ -25,7 +27,6 @@ import {
   TextField,
   Typography,
   stepConnectorClasses,
-  styled,
 } from "@mui/material";
 import { motion } from "framer-motion";
 import "../../../src/style.css";
@@ -40,7 +41,10 @@ import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
-import { DesktopTimePicker, pickersLayoutClasses } from "@mui/x-date-pickers";
+import { pickersLayoutClasses } from "@mui/x-date-pickers";
+import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
+import { format } from "date-fns-tz";
+import MuiAlert from "@mui/material/Alert";
 
 const styles = {
   container: {
@@ -230,7 +234,7 @@ const styles = {
   boxTabela: {
     display: "flex",
     width: "100%",
-    height: "56px",
+    height: "66px",
     mb: "2%",
     alignItems: "center",
     justifyContent: "center",
@@ -295,7 +299,6 @@ const styles = {
     justifyContent: "center",
   },
   boxAreaTituloModal: {
-    /* background: "green", */
     width: "100%",
     height: "20%",
     display: "flex",
@@ -324,14 +327,12 @@ const styles = {
     height: "3.5%",
   },
   boxInputsModal: {
-    /* background: "red", */
     width: "100%",
     height: "60%",
     display: "flex",
     flexDirection: "row",
   },
   boxBotaoModal: {
-    /* background: "blue", */
     width: "100%",
     height: "20%",
     display: "flex",
@@ -339,7 +340,6 @@ const styles = {
     justifyContent: "end",
   },
   boxBotoesModal: {
-    /* background: "yellow", */
     width: "210px",
     height: "100%",
     display: "flex",
@@ -347,19 +347,132 @@ const styles = {
     justifyContent: "space-between",
     mr: "10px",
   },
+  boxProgramacoes: {
+    /* background: "blue", */
+    display: "flex",
+    flexDirection: "column",
+    width: "100%",
+    maxHeight: "296px",
+    overflowY: "auto",
+  },
+  boxCulto: {
+    /* background: "green", */
+    display: "flex",
+    width: "528px",
+    height: "40px",
+    justifyContent: "space-between",
+    mb: "10px",
+  },
+  boxCardCulto: {
+    backgroundColor: "#1B1B1B",
+    border: "1px solid #F3A913",
+    borderRadius: "10px",
+    display: "flex",
+    width: "505px",
+    height: "40px",
+  },
+  conteudoCardCulto: {
+    display: "flex",
+    width: "108px",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  conteudoCardCulto2: {
+    display: "flex",
+    width: "180px",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  boxBotaoSettings: {
+    display: "flex",
+    width: "auto",
+    height: "auto",
+    alignItems: "center",
+    justifyContent: "center",
+  },
 };
 
 const CriarEquipe = () => {
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarSeverity, setSnackbarSeverity] = useState("");
+  const [snackbarMessage, setSnackbarMessage] = useState("");
   const [activeStep, setActiveStep] = useState(0);
   const [openModal, setOpenModal] = useState(false);
+  const [disableButton, setDisableButton] = useState(true);
   const [diaDaSemana, setDiaDaSemana] = useState("");
-  const [horario, setHorario] = useState("");
+  const [horario, setHorario] = useState(null);
   const [servindo, setServindo] = useState("");
   const [tituloCulto, setTituloCulto] = useState("");
+  const [programacoes, setProgramacoes] = useState([]);
 
-  console.log(`${diaDaSemana}   ${horario}    ${servindo}    ${tituloCulto}`);
+  useEffect(() => {
+    if (diaDaSemana && horario && servindo && tituloCulto) {
+      setDisableButton(false);
+    } else {
+      setDisableButton(true);
+    }
+  }, [diaDaSemana, horario, servindo, tituloCulto]);
 
-  /* MuiInputBase-root-MuiOutlinedInput-root.Mui-error .MuiOutlinedInput-notchedOutline */
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbarOpen(false);
+  };
+
+  const setSnackbar = (severity, message) => {
+    setSnackbarSeverity(severity);
+    setSnackbarMessage(message);
+    setSnackbarOpen(true);
+  };
+
+  const diasDaSemana = [
+    "Domingo",
+    "Segunda-Feira",
+    "Terça-Feira",
+    "Quarta-Feira",
+    "Quinta-Feira",
+    "Sexta-Feira",
+    "Sábado",
+  ];
+
+  const titulosCultoDefault = [
+    "Culto Celebração - ZS10",
+    "Culto Celebração - ZS17",
+    "Culto Terça-Feira",
+    "Culto de Doutrina",
+  ];
+
+  function handleGerarProgramacao() {
+    let novaProgramacao = {
+      dia: diaDaSemana,
+      horario: format(new Date(horario), "HH:mm", {
+        timeZone: "America/Sao_Paulo",
+      }),
+      servindo: servindo,
+      culto: tituloCulto,
+    };
+
+    if (
+      !programacoes.some(
+        (item) =>
+          item.dia === novaProgramacao.dia &&
+          item.horario === novaProgramacao.horario &&
+          item.servindo === novaProgramacao.servindo &&
+          item.culto === novaProgramacao.culto
+      )
+    ) {
+      let novoArrayProgramacoes = [...programacoes, novaProgramacao];
+      setProgramacoes(novoArrayProgramacoes);
+      handleCloseModal();
+      setDiaDaSemana("");
+      setHorario(null);
+      setServindo("");
+      setTituloCulto("");
+    } else {
+      setSnackbar("warning", "Programação existente");
+    }
+  }
 
   const handlenProximoStep = () => {
     if (activeStep < 2) {
@@ -385,8 +498,6 @@ const CriarEquipe = () => {
     />
   ));
 
-  const programacoes = [];
-
   const stepsCriarEquipe = [
     {
       label: "Informações da equipe",
@@ -396,7 +507,7 @@ const CriarEquipe = () => {
             <TextField
               label="Nome da equipe"
               variant="outlined"
-              sx={{ ...styles.textField, mb: "10%" }}
+              sx={{ ...styles.textField, mb: "20px" }}
             />
             <TextField
               label="Descrição da equipe"
@@ -445,7 +556,50 @@ const CriarEquipe = () => {
             </Box>
             <Box sx={styles.boxConteudoTabela}>
               {programacoes.length > 0 ? (
-                ""
+                <Box sx={styles.boxProgramacoes}>
+                  {programacoes.map(({ dia, horario, servindo, culto }) => (
+                    <Box sx={styles.boxCulto} key={`${dia}-${horario}`}>
+                      <Box sx={styles.boxCardCulto}>
+                        <Box sx={styles.conteudoCardCulto}>
+                          <Typography sx={styles.textoTabelaVazio}>
+                            {dia}
+                          </Typography>
+                        </Box>
+                        <Box sx={styles.conteudoCardCulto}>
+                          <Typography sx={styles.textoTabelaVazio}>
+                            {horario}
+                          </Typography>
+                        </Box>
+                        <Box sx={styles.conteudoCardCulto}>
+                          <Typography sx={styles.textoTabelaVazio}>
+                            {servindo}
+                          </Typography>
+                        </Box>
+                        <Box sx={styles.conteudoCardCulto2}>
+                          <Typography
+                            sx={{
+                              ...styles.textoTabelaVazio,
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              whiteSpace: "nowrap",
+                            }}
+                          >
+                            {culto}
+                          </Typography>
+                        </Box>
+                      </Box>
+                      <Box sx={styles.boxBotaoSettings}>
+                        <IconButton sx={{ width: "16px", height: "16px" }}>
+                          <Icon>
+                            <SettingsOutlinedIcon
+                              sx={{ color: "#F3A913", fontSize: "16px" }}
+                            />
+                          </Icon>
+                        </IconButton>
+                      </Box>
+                    </Box>
+                  ))}
+                </Box>
               ) : (
                 <Typography sx={styles.textoTabelaVazio}>
                   Aqui será inserido as programações padrões da sua equipe...
@@ -491,23 +645,6 @@ const CriarEquipe = () => {
       label: "Escala de Serviço",
       conteudo: [<Box sx={styles.boxStepper0}></Box>],
     },
-  ];
-
-  const diasDaSemana = [
-    "Domingo",
-    "Segunda-Feira",
-    "Terça-Feira",
-    "Quarta-Feira",
-    "Quinta-Feira",
-    "Sexta-Feira",
-    "Sábado",
-  ];
-
-  const titulosCultoDefault = [
-    "Culto Celebração - ZS10",
-    "Culto Celebração - ZS17",
-    "Culto Terça-Feira",
-    "Culto de Doutrina",
   ];
 
   return (
@@ -560,7 +697,7 @@ const CriarEquipe = () => {
         onClose={() => {
           handleCloseModal();
           setDiaDaSemana("");
-          setHorario("");
+          setHorario(null);
           setServindo("");
           setTituloCulto("");
         }}
@@ -596,8 +733,8 @@ const CriarEquipe = () => {
                     labelId="labelDia"
                     value={diaDaSemana}
                     label="Dia da semana"
-                    onChange={(newValue) => {
-                      setDiaDaSemana(newValue);
+                    onChange={(event) => {
+                      setDiaDaSemana(event.target.value);
                     }}
                     sx={{
                       width: "165px",
@@ -659,6 +796,10 @@ const CriarEquipe = () => {
                       "& .MuiFormControl-root.MuiTextField-root": {
                         minWidth: "0px",
                       },
+                      "&.MuiInputBase-root.MuiOutlinedInput-root.Mui-error.MuiOutlinedInput-notchedOutline":
+                        {
+                          borderColor: "#F3A913",
+                        },
                     }}
                     components={["TimePicker"]}
                   >
@@ -737,8 +878,8 @@ const CriarEquipe = () => {
                     labelId="servindo"
                     value={servindo}
                     label="Servindo"
-                    onChange={(newValue) => {
-                      setServindo(newValue);
+                    onChange={(event) => {
+                      setServindo(event.target.value);
                     }}
                     sx={{
                       width: "110px",
@@ -807,60 +948,61 @@ const CriarEquipe = () => {
                   freeSolo
                   disableClearable
                   options={titulosCultoDefault}
+                  value={tituloCulto}
+                  onChange={(event, newValue) => {
+                    setTituloCulto(newValue);
+                  }}
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      value={tituloCulto}
-                      onChange={(event) => {
-                        setTituloCulto(event.target.value);
-                      }}
                       label="Título do culto"
                       variant="outlined"
                       inputComponent={CustomInputComponent}
                       sx={{
                         width: "275px",
                       }}
+                      onChange={(event) => {
+                        setTituloCulto(event.target.value);
+                      }}
                     />
                   )}
                   PaperComponent={({ children }) => (
-                    <>
-                      <Paper
-                        sx={{
-                          display: "flex",
-                          maxHeight: "170px",
-                          backgroundColor: "#565656",
-                          borderRadius: "4px",
-                          boxShadow:
-                            "0px 5px 5px -3px rgba(0,0,0,0.2), 0px 8px 10px 1px rgba(0,0,0,0.14), 0px 3px 14px 2px rgba(0,0,0,0.12)",
-                          overflowY: "auto",
-                          "&::-webkit-scrollbar": {
-                            display: "none",
+                    <Paper
+                      sx={{
+                        display: "flex",
+                        maxHeight: "170px",
+                        backgroundColor: "#565656",
+                        borderRadius: "4px",
+                        boxShadow:
+                          "0px 5px 5px -3px rgba(0,0,0,0.2), 0px 8px 10px 1px rgba(0,0,0,0.14), 0px 3px 14px 2px rgba(0,0,0,0.12)",
+                        overflowY: "auto",
+                        "&::-webkit-scrollbar": {
+                          display: "none",
+                        },
+                        scrollbarWidth: "none",
+                        '& .MuiAutocomplete-listbox .MuiAutocomplete-option[aria-selected="true"]':
+                          {
+                            color: "#F3A913",
+                            backgroundColor: "transparent",
+                            "&.Mui-focused": {
+                              backgroundColor: "transparent",
+                            },
+                            "&:hover": {
+                              backgroundColor: "rgba(0, 0, 0, 0.04)",
+                            },
                           },
-                          scrollbarWidth: "none",
-                          "& .MuiAutocomplete-listbox .MuiAutocomplete-option[aria-selected='true']":
-                            {
-                              color: "#F3A913",
-                              backgroundColor: "transparent",
-                              "&.Mui-focused": {
-                                backgroundColor: "transparent",
-                              },
-                              "&:hover": {
-                                backgroundColor: "rgba(0, 0, 0, 0.04)",
-                              },
+                        '& .MuiAutocomplete-listbox .MuiAutocomplete-option:not([aria-selected="true"])':
+                          {
+                            color: "#ffffff",
+                            backgroundColor: "transparent",
+                            "&:hover": {
+                              backgroundColor: "rgba(0, 0, 0, 0.04)",
                             },
-                          "& .MuiAutocomplete-listbox .MuiAutocomplete-option:not([aria-selected='true'])":
-                            {
-                              color: "#ffffff",
-                              backgroundColor: "transparent",
-                              "&:hover": {
-                                backgroundColor: "rgba(0, 0, 0, 0.04)",
-                              },
-                            },
-                        }}
-                      >
-                        {children}
-                      </Paper>
-                    </>
+                          },
+                      }}
+                    >
+                      {children}
+                    </Paper>
                   )}
                   renderOption={(props, option) => (
                     <MenuItem {...props}>{option}</MenuItem>
@@ -874,14 +1016,26 @@ const CriarEquipe = () => {
                     onClick={() => {
                       handleCloseModal();
                       setDiaDaSemana("");
-                      setHorario("");
+                      setHorario(null);
                       setServindo("");
                       setTituloCulto("");
                     }}
                   >
                     Cancelar
                   </Button>
-                  <Button sx={styles.botaoStepper} onClick={() => {}}>
+                  <Button
+                    disabled={disableButton}
+                    sx={{
+                      ...styles.botaoStepper,
+                      "&.MuiButtonBase-root.MuiButton-root.Mui-disabled": {
+                        background: "gray",
+                        color: "#ffffff",
+                      },
+                    }}
+                    onClick={() => {
+                      handleGerarProgramacao();
+                    }}
+                  >
                     Adicionar
                   </Button>
                 </Box>
@@ -890,6 +1044,25 @@ const CriarEquipe = () => {
           </Box>
         </Fade>
       </Modal>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={handleSnackbarClose}
+        style={{
+          bottom: "20px",
+          left: "50%",
+          transform: "translateX(-50%)",
+        }}
+      >
+        <Alert
+          elevation={6}
+          variant="filled"
+          onClose={handleSnackbarClose}
+          severity={snackbarSeverity}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

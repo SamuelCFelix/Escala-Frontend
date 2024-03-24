@@ -370,29 +370,35 @@ const Login = () => {
 
       <Snackbar
         open={showPopup}
-        autoHideDuration={6000}
+        autoHideDuration={3000}
         onClose={handleClosePopUpSuccess}
+        style={{
+          bottom: "20px",
+          left: "50%",
+          transform: "translateX(-50%)",
+        }}
       >
-        <Alert
-          onClose={handleClosePopUpSuccess}
-          severity="success"
-          sx={{ width: "100%" }}
-        >
+        <Alert onClose={handleClosePopUpSuccess} severity="success">
           Perfil criado com sucesso!
         </Alert>
       </Snackbar>
 
       <Snackbar
         open={openPopUpError}
-        autoHideDuration={6000}
+        autoHideDuration={3000}
         onClose={handleClosePopUpError}
+        style={{
+          bottom: "20px",
+          left: "50%",
+          transform: "translateX(-50%)",
+        }}
       >
         <Alert
           onClose={handleClosePopUpError}
           severity="error"
           sx={{ width: "100%" }}
         >
-          Email e/ou senha incorretos!
+          Email e/ou senha incorreta
         </Alert>
       </Snackbar>
 
