@@ -5,6 +5,7 @@ import {
   Box,
   Button,
   ButtonBase,
+  Divider,
   Fade,
   FormControl,
   Icon,
@@ -12,8 +13,11 @@ import {
   InputLabel,
   List,
   ListItem,
+  ListItemIcon,
   ListItemText,
+  Menu,
   MenuItem,
+  MenuList,
   Modal,
   Paper,
   Select,
@@ -44,7 +48,8 @@ import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import { pickersLayoutClasses } from "@mui/x-date-pickers";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import { format } from "date-fns-tz";
-import MuiAlert from "@mui/material/Alert";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 
 const styles = {
   container: {
@@ -152,7 +157,7 @@ const styles = {
     alignItems: "center",
     justifyContent: "space-between",
   },
-  botaoStepper: {
+  botaoDefault: {
     width: "48%",
     height: "50%",
     padding: "0px 40px",
@@ -161,6 +166,7 @@ const styles = {
     fontSize: "12px",
     lineHeight: "36px",
     letterSpacing: "1.25px",
+    fontWeight: 600,
     color: "#ffffff",
     background: "#F3A913",
     "&:hover": {
@@ -290,6 +296,18 @@ const styles = {
     height: "35%",
     boxShadow: 24,
   },
+  boxModalDelete: {
+    backgroundColor: "#1B1B1B",
+    border: "1px solid #D32F2F",
+    borderRadius: "10px",
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: "38%",
+    height: "35%",
+    boxShadow: 24,
+  },
   boxConteudoModal: {
     width: "100%",
     height: "100%",
@@ -323,6 +341,11 @@ const styles = {
   },
   baseTituloModal: {
     background: "#F3A913",
+    width: "95%",
+    height: "3.5%",
+  },
+  baseTituloModalDelete: {
+    background: "#D32F2F",
     width: "95%",
     height: "3.5%",
   },
@@ -390,6 +413,13 @@ const styles = {
     alignItems: "center",
     justifyContent: "center",
   },
+  boxMenu: {
+    /* backgroundColor: "#565656",
+    color: "#ffffff",
+    "&.MuiPaper-root.MuiPopover-paper.MuiMenu-paper": {
+      backgroundColor: "#565656",
+    }, */
+  },
 };
 
 const CriarEquipe = () => {
@@ -398,12 +428,16 @@ const CriarEquipe = () => {
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [activeStep, setActiveStep] = useState(0);
   const [openModal, setOpenModal] = useState(false);
+  const [openModalEdit, setOpenModalEdit] = useState(false);
+  const [openModalDelete, setOpenModalDelete] = useState(false);
   const [disableButton, setDisableButton] = useState(true);
   const [diaDaSemana, setDiaDaSemana] = useState("");
   const [horario, setHorario] = useState(null);
   const [servindo, setServindo] = useState("");
   const [tituloCulto, setTituloCulto] = useState("");
+  const [anchorEl, setAnchorEl] = useState(null);
   const [programacoes, setProgramacoes] = useState([]);
+  const [positionProgramacao, setPositionProgramacao] = useState("");
 
   useEffect(() => {
     if (diaDaSemana && horario && servindo && tituloCulto) {
@@ -443,12 +477,29 @@ const CriarEquipe = () => {
     "Culto de Doutrina",
   ];
 
+  const handleClickSettings = (
+    event,
+    index,
+    dia,
+    horarioTimePicker,
+    servindo,
+    culto
+  ) => {
+    setDiaDaSemana(dia);
+    setHorario(horarioTimePicker);
+    setServindo(servindo);
+    setTituloCulto(culto);
+    setPositionProgramacao(index);
+    setAnchorEl(event.currentTarget);
+  };
+
   function handleGerarProgramacao() {
     let novaProgramacao = {
       dia: diaDaSemana,
       horario: format(new Date(horario), "HH:mm", {
         timeZone: "America/Sao_Paulo",
       }),
+      horarioTimePicker: horario,
       servindo: servindo,
       culto: tituloCulto,
     };
@@ -474,6 +525,41 @@ const CriarEquipe = () => {
     }
   }
 
+  function handleEditProgramacao() {
+    let positionEdit = positionProgramacao;
+
+    let editProgramacao = {
+      dia: diaDaSemana,
+      horario: format(new Date(horario), "HH:mm", {
+        timeZone: "America/Sao_Paulo",
+      }),
+      horarioTimePicker: horario,
+      servindo: servindo,
+      culto: tituloCulto,
+    };
+
+    if (
+      !programacoes.some(
+        (item) =>
+          item.dia === editProgramacao.dia &&
+          item.horario === editProgramacao.horario &&
+          item.servindo === editProgramacao.servindo &&
+          item.culto === editProgramacao.culto
+      )
+    ) {
+      let novoArrayProgramacoes = [...programacoes];
+      novoArrayProgramacoes[positionEdit] = editProgramacao;
+      setProgramacoes(novoArrayProgramacoes);
+      handleCloseModal();
+      setDiaDaSemana("");
+      setHorario(null);
+      setServindo("");
+      setTituloCulto("");
+    } else {
+      setSnackbar("warning", "Programação existente");
+    }
+  }
+
   const handlenProximoStep = () => {
     if (activeStep < 2) {
       setActiveStep((proximo) => proximo + 1);
@@ -486,8 +572,19 @@ const CriarEquipe = () => {
     }
   };
 
-  const handleOpenModal = () => setOpenModal(true);
-  const handleCloseModal = () => setOpenModal(false);
+  const handleCloseModal = () => {
+    setOpenModal(false);
+    setOpenModalEdit(false);
+    setOpenModalDelete(false);
+  };
+
+  const handleCloseMenu = () => {
+    setDiaDaSemana("");
+    setHorario(null);
+    setServindo("");
+    setTituloCulto("");
+    setAnchorEl(null);
+  };
 
   const CustomInputComponent = forwardRef(({ value, onChange }, ref) => (
     <input
@@ -544,7 +641,7 @@ const CriarEquipe = () => {
                   <IconButton
                     sx={{ width: "18px", height: "18px" }}
                     onClick={() => {
-                      handleOpenModal();
+                      setOpenModal(true);
                     }}
                   >
                     <AddCircleOutlineOutlinedIcon
@@ -557,48 +654,118 @@ const CriarEquipe = () => {
             <Box sx={styles.boxConteudoTabela}>
               {programacoes.length > 0 ? (
                 <Box sx={styles.boxProgramacoes}>
-                  {programacoes.map(({ dia, horario, servindo, culto }) => (
-                    <Box sx={styles.boxCulto} key={`${dia}-${horario}`}>
-                      <Box sx={styles.boxCardCulto}>
-                        <Box sx={styles.conteudoCardCulto}>
-                          <Typography sx={styles.textoTabelaVazio}>
-                            {dia}
-                          </Typography>
+                  {programacoes.map(
+                    (
+                      { dia, horario, horarioTimePicker, servindo, culto },
+                      index
+                    ) => (
+                      <Box sx={styles.boxCulto} key={`${dia}-${horario}`}>
+                        <Box sx={styles.boxCardCulto}>
+                          <Box sx={styles.conteudoCardCulto}>
+                            <Typography sx={styles.textoTabelaVazio}>
+                              {dia}
+                            </Typography>
+                          </Box>
+                          <Box sx={styles.conteudoCardCulto}>
+                            <Typography sx={styles.textoTabelaVazio}>
+                              {horario}
+                            </Typography>
+                          </Box>
+                          <Box sx={styles.conteudoCardCulto}>
+                            <Typography sx={styles.textoTabelaVazio}>
+                              {servindo}
+                            </Typography>
+                          </Box>
+                          <Box sx={styles.conteudoCardCulto2}>
+                            <Typography
+                              sx={{
+                                ...styles.textoTabelaVazio,
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap",
+                              }}
+                            >
+                              {culto}
+                            </Typography>
+                          </Box>
                         </Box>
-                        <Box sx={styles.conteudoCardCulto}>
-                          <Typography sx={styles.textoTabelaVazio}>
-                            {horario}
-                          </Typography>
-                        </Box>
-                        <Box sx={styles.conteudoCardCulto}>
-                          <Typography sx={styles.textoTabelaVazio}>
-                            {servindo}
-                          </Typography>
-                        </Box>
-                        <Box sx={styles.conteudoCardCulto2}>
-                          <Typography
-                            sx={{
-                              ...styles.textoTabelaVazio,
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                              whiteSpace: "nowrap",
+
+                        <Box sx={styles.boxBotaoSettings}>
+                          <IconButton
+                            sx={{ width: "16px", height: "16px" }}
+                            onClick={(event) =>
+                              handleClickSettings(
+                                event,
+                                index,
+                                dia,
+                                horarioTimePicker,
+                                servindo,
+                                culto
+                              )
+                            }
+                          >
+                            <Icon>
+                              <SettingsOutlinedIcon
+                                sx={{ color: "#F3A913", fontSize: "16px" }}
+                              />
+                            </Icon>
+                          </IconButton>
+
+                          <Menu
+                            id={index}
+                            anchorEl={anchorEl}
+                            open={Boolean(anchorEl)}
+                            onClose={handleCloseMenu}
+                            PaperProps={{
+                              sx: {
+                                backgroundColor: "#565656",
+                              },
+                            }}
+                            MenuListProps={{
+                              "aria-labelledby": "basic-button",
                             }}
                           >
-                            {culto}
-                          </Typography>
+                            <MenuList>
+                              <MenuItem
+                                sx={{
+                                  color: "#ffffff",
+                                }}
+                                onClick={() => {
+                                  setOpenModalEdit(true);
+                                  setAnchorEl(false);
+                                }}
+                              >
+                                <ListItemIcon>
+                                  <EditOutlinedIcon
+                                    sx={{ color: "#F3A913" }}
+                                    fontSize="small"
+                                  />
+                                </ListItemIcon>
+                                <ListItemText>Editar</ListItemText>
+                              </MenuItem>
+                              <MenuItem
+                                sx={{
+                                  color: "#ffffff",
+                                }}
+                                onClick={() => {
+                                  setOpenModalDelete(true);
+                                  setAnchorEl(false);
+                                }}
+                              >
+                                <ListItemIcon>
+                                  <DeleteOutlineOutlinedIcon
+                                    color="error"
+                                    fontSize="small"
+                                  />
+                                </ListItemIcon>
+                                <ListItemText>Deletar</ListItemText>
+                              </MenuItem>
+                            </MenuList>
+                          </Menu>
                         </Box>
                       </Box>
-                      <Box sx={styles.boxBotaoSettings}>
-                        <IconButton sx={{ width: "16px", height: "16px" }}>
-                          <Icon>
-                            <SettingsOutlinedIcon
-                              sx={{ color: "#F3A913", fontSize: "16px" }}
-                            />
-                          </Icon>
-                        </IconButton>
-                      </Box>
-                    </Box>
-                  ))}
+                    )
+                  )}
                 </Box>
               ) : (
                 <Typography sx={styles.textoTabelaVazio}>
@@ -669,7 +836,7 @@ const CriarEquipe = () => {
         <Box sx={styles.boxBotao}>
           <Box sx={styles.boxBotoesStepper}>
             <Button
-              sx={styles.botaoStepper}
+              sx={styles.botaoDefault}
               onClick={() => {
                 if (activeStep !== 0) {
                   handlenVoltarStep();
@@ -681,7 +848,7 @@ const CriarEquipe = () => {
               {activeStep === 0 ? "Cancelar" : "Voltar"}
             </Button>
             <Button
-              sx={styles.botaoStepper}
+              sx={styles.botaoDefault}
               onClick={() => {
                 handlenProximoStep();
               }}
@@ -693,7 +860,7 @@ const CriarEquipe = () => {
       </Box>
 
       <Modal
-        open={openModal}
+        open={openModal || openModalEdit}
         onClose={() => {
           handleCloseModal();
           setDiaDaSemana("");
@@ -709,7 +876,7 @@ const CriarEquipe = () => {
           },
         }}
       >
-        <Fade in={openModal}>
+        <Fade in={openModal || openModalEdit}>
           <Box sx={styles.boxModal}>
             <Box sx={styles.boxConteudoModal}>
               <Box sx={styles.boxAreaTituloModal}>
@@ -1012,7 +1179,7 @@ const CriarEquipe = () => {
               <Box sx={styles.boxBotaoModal}>
                 <Box sx={styles.boxBotoesModal}>
                   <Button
-                    sx={styles.botaoStepper}
+                    sx={styles.botaoDefault}
                     onClick={() => {
                       handleCloseModal();
                       setDiaDaSemana("");
@@ -1023,20 +1190,98 @@ const CriarEquipe = () => {
                   >
                     Cancelar
                   </Button>
+                  {openModal && (
+                    <Button
+                      disabled={disableButton}
+                      sx={{
+                        ...styles.botaoDefault,
+                        "&.MuiButtonBase-root.MuiButton-root.Mui-disabled": {
+                          background: "gray",
+                          color: "#ffffff",
+                        },
+                      }}
+                      onClick={() => {
+                        handleGerarProgramacao();
+                      }}
+                    >
+                      Adicionar
+                    </Button>
+                  )}
+                  {openModalEdit && (
+                    <Button
+                      disabled={disableButton}
+                      sx={{
+                        ...styles.botaoDefault,
+                        "&.MuiButtonBase-root.MuiButton-root.Mui-disabled": {
+                          background: "gray",
+                          color: "#ffffff",
+                        },
+                      }}
+                      onClick={() => {
+                        handleEditProgramacao();
+                      }}
+                    >
+                      Editar
+                    </Button>
+                  )}
+                </Box>
+              </Box>
+            </Box>
+          </Box>
+        </Fade>
+      </Modal>
+      <Modal
+        open={openModalDelete}
+        onClose={() => {
+          handleCloseModal();
+        }}
+        closeAfterTransition
+        slots={{ backdrop: Backdrop }}
+        slotProps={{
+          backdrop: {
+            timeout: 500,
+          },
+        }}
+      >
+        <Fade in={openModalDelete}>
+          <Box sx={styles.boxModalDelete}>
+            <Box sx={styles.boxConteudoModal}>
+              <Box sx={styles.boxAreaTituloModal}>
+                <Box sx={styles.boxTituloModal}>
+                  <Typography sx={styles.tituloModal}>
+                    Deletar Programação?
+                  </Typography>
+                  <Box sx={styles.baseTituloModalDelete} />
+                </Box>
+              </Box>
+              <Box sx={styles.boxInputsModal}>{"aaaaaaaaaaaaaaaaaaah"}</Box>
+              <Box sx={styles.boxBotaoModal}>
+                <Box sx={styles.boxBotoesModal}>
                   <Button
-                    disabled={disableButton}
                     sx={{
-                      ...styles.botaoStepper,
-                      "&.MuiButtonBase-root.MuiButton-root.Mui-disabled": {
-                        background: "gray",
-                        color: "#ffffff",
+                      ...styles.botaoDefault,
+                      background: "#565656",
+                      "&:hover": {
+                        background: "#666666",
                       },
                     }}
-                    onClick={() => {
-                      handleGerarProgramacao();
-                    }}
+                    onClick={() => {}}
                   >
-                    Adicionar
+                    Cancelar
+                  </Button>
+
+                  <Button
+                    sx={{
+                      ...styles.botaoDefault,
+                      background: "#565656",
+                      "&:hover": {
+                        background: "#666666",
+                      },
+                      color: "#D32F2F",
+                    }}
+                    onClick={() => {}}
+                  >
+                    Confirmar
                   </Button>
                 </Box>
               </Box>
