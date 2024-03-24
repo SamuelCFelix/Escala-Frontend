@@ -166,7 +166,6 @@ const styles = {
     fontSize: "12px",
     lineHeight: "36px",
     letterSpacing: "1.25px",
-    fontWeight: 600,
     color: "#ffffff",
     background: "#F3A913",
     "&:hover": {
@@ -1273,11 +1272,11 @@ const CriarEquipe = () => {
                   <Button
                     sx={{
                       ...styles.botaoDefault,
-                      background: "#565656",
+                      background: "#D32F2F",
                       "&:hover": {
-                        background: "#666666",
+                        background: "#E63737",
                       },
-                      color: "#D32F2F",
+                      color: "#ffffff",
                     }}
                     onClick={() => {}}
                   >
