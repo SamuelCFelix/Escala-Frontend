@@ -65,9 +65,9 @@ const styles = {
     justifyContent: "center",
   },
   boxTitulo: {
-    width: "25%",
-    height: "10%",
-    mb: "30px",
+    width: "384px",
+    height: "72px",
+    mb: "16px",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
@@ -84,12 +84,12 @@ const styles = {
   baseTitulo: {
     background: "#F3A913",
     width: "60%",
-    height: "3.5%",
+    height: "3.8%",
   },
   boxCenter: {
     background: "#1B1B1B",
-    width: "50%",
-    height: "70%",
+    width: "898px",
+    height: "500px",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
@@ -97,9 +97,9 @@ const styles = {
     borderRadius: "10px",
   },
   boxStepper: {
-    width: "100%",
-    mt: "30px",
-    mb: "30px",
+    width: "852px",
+    mt: "20px",
+    mb: "20px",
   },
   step: {
     "& .MuiStepLabel-root .Mui-completed": {
@@ -138,16 +138,17 @@ const styles = {
     alignItems: "center",
     justifyContent: "center",
     width: "100%",
-    height: "100%",
+    height: "355px",
   },
   boxBotao: {
     width: "100%",
-    height: "15%",
+    height: "45px",
     display: "flex",
     alignItems: "center",
     justifyContent: "right",
     borderBottomLeftRadius: "10px",
     borderBottomRightRadius: "10px",
+    mb: "5px",
   },
   boxBotoesStepper: {
     width: "35%",
@@ -158,8 +159,9 @@ const styles = {
     justifyContent: "space-between",
   },
   botaoDefault: {
-    width: "48%",
-    height: "50%",
+    display: "flex",
+    width: "140px",
+    height: "30px",
     padding: "0px 40px",
     borderRadius: "10px",
     fontFamily: "Roboto, sans-serif",
@@ -197,7 +199,7 @@ const styles = {
   box1Stepper0: {
     display: "flex",
     flexDirection: "column",
-    width: "35%",
+    width: "305px",
     height: "100%",
     mr: "25px",
     ml: "40px",
@@ -245,7 +247,7 @@ const styles = {
   box2Stepper0: {
     display: "flex",
     flexDirection: "column",
-    width: "65%",
+    width: "548px",
     height: "100%",
     maxHeight: "600px",
     ml: "25px",
@@ -254,7 +256,7 @@ const styles = {
   boxTabela: {
     display: "flex",
     width: "100%",
-    height: "66px",
+    height: "56px",
     mb: "2%",
     alignItems: "center",
     justifyContent: "center",
@@ -290,7 +292,7 @@ const styles = {
   boxConteudoTabela: {
     display: "flex",
     width: "100%",
-    height: "100%",
+    height: "275px",
   },
   textoTabelaVazio: {
     fontSize: "14px",
@@ -306,8 +308,8 @@ const styles = {
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: "38%",
-    height: "35%",
+    width: "700px",
+    height: "320px",
     boxShadow: 24,
   },
   boxConteudoModal: {
@@ -320,7 +322,7 @@ const styles = {
   },
   boxAreaTituloModal: {
     width: "100%",
-    height: "20%",
+    height: "21%",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -344,13 +346,14 @@ const styles = {
   baseTituloModal: {
     background: "#F3A913",
     width: "95%",
-    height: "3.5%",
+    height: "3.8%",
   },
   boxInputsModal: {
     width: "100%",
     height: "60%",
     display: "flex",
     flexDirection: "row",
+    gap: "10px",
   },
   boxBotaoModal: {
     width: "100%",
@@ -432,17 +435,15 @@ const styles = {
     mr: "10px",
   },
   boxProgramacoes: {
-    /* background: "blue", */
     display: "flex",
     flexDirection: "column",
-    width: "100%",
-    maxHeight: "296px",
+    width: "528px",
+    maxHeight: "275px",
     overflowY: "auto",
   },
   boxCulto: {
-    /* background: "green", */
     display: "flex",
-    width: "528px",
+    width: "516px",
     height: "40px",
     justifyContent: "space-between",
     mb: "10px",
@@ -452,7 +453,7 @@ const styles = {
     border: "1px solid #F3A913",
     borderRadius: "10px",
     display: "flex",
-    width: "505px",
+    width: "496px",
     height: "40px",
   },
   conteudoCardCulto: {
@@ -473,13 +474,6 @@ const styles = {
     height: "auto",
     alignItems: "center",
     justifyContent: "center",
-  },
-  boxMenu: {
-    /* backgroundColor: "#565656",
-    color: "#ffffff",
-    "&.MuiPaper-root.MuiPopover-paper.MuiMenu-paper": {
-      backgroundColor: "#565656",
-    }, */
   },
 };
 
@@ -707,7 +701,7 @@ const CriarEquipe = () => {
               }}
               label="Descrição da equipe"
               multiline
-              rows={11}
+              rows={10}
               sx={styles.textField}
             />
           </Box>
@@ -879,15 +873,22 @@ const CriarEquipe = () => {
                   <br />
                   <br />
                   Exemplos de programações padrões:
-                  <List>
-                    <ListItem>
+                  <List
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      width: "100%",
+                      height: "43px",
+                    }}
+                  >
+                    <ListItem sx={{ mt: "-14px" }}>
                       <FiberManualRecordIcon sx={{ width: "8px", mr: "5px" }} />
                       <ListItemText
                         primaryTypographyProps={{ fontSize: "14px" }}
                         primary="Quinta-Feira / 19:30 / 2 pessoas servindo / Culto de Doutrina"
                       />
                     </ListItem>
-                    <ListItem>
+                    <ListItem sx={{ mt: "-14px" }}>
                       <FiberManualRecordIcon sx={{ width: "8px", mr: "5px" }} />
                       <ListItemText
                         primaryTypographyProps={{ fontSize: "14px" }}
@@ -998,7 +999,8 @@ const CriarEquipe = () => {
                   sx={{
                     ...styles.textField,
                     width: "auto",
-                    margin: "15px 5px 0px 10px",
+                    marginTop: "15px",
+                    ml: "10px",
                   }}
                 >
                   <InputLabel id="labelDia">Dia da semana</InputLabel>
@@ -1063,7 +1065,7 @@ const CriarEquipe = () => {
                   <DemoContainer
                     sx={{
                       ...styles.textField,
-                      margin: "5px 5px 0px 10px",
+                      marginTop: "5px",
                       padding: "10px 0px",
                       width: "auto",
                       "& .MuiFormControl-root.MuiTextField-root": {
@@ -1143,7 +1145,7 @@ const CriarEquipe = () => {
                   sx={{
                     ...styles.textField,
                     width: "auto",
-                    margin: "15px 5px 0px 10px",
+                    marginTop: "15px",
                   }}
                 >
                   <InputLabel id="servindo">Servindo</InputLabel>
@@ -1216,7 +1218,7 @@ const CriarEquipe = () => {
                   sx={{
                     ...styles.textField,
                     width: "auto",
-                    margin: "15px 5px 0px 10px",
+                    marginTop: "15px",
                   }}
                   freeSolo
                   disableClearable
@@ -1232,7 +1234,7 @@ const CriarEquipe = () => {
                       variant="outlined"
                       inputComponent={CustomInputComponent}
                       sx={{
-                        width: "275px",
+                        width: "260px",
                       }}
                       onChange={(event) => {
                         setTituloCulto(event.target.value);

@@ -28,8 +28,8 @@ const styles = {
     justifyContent: "center",
   },
   boxTitulo: {
-    width: "25%",
-    height: "10%",
+    width: "384px",
+    height: "70px",
     marginBottom: "30px",
     display: "flex",
     flexDirection: "column",
@@ -75,8 +75,8 @@ const styles = {
     height: "3.8%",
   },
   boxCenter: {
-    width: "50%",
-    height: "70%",
+    width: "768px",
+    height: "487px",
   },
   stackopcoes: {
     width: "100%",
