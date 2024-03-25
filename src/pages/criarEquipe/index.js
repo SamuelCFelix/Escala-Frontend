@@ -492,6 +492,9 @@ const CriarEquipe = () => {
   const [openModalEdit, setOpenModalEdit] = useState(false);
   const [openModalDelete, setOpenModalDelete] = useState(false);
   const [disableButton, setDisableButton] = useState(true);
+  const [disableStepperButton, setDisableStepperButton] = useState(true);
+  const [nomeEquipe, setNomeEquipe] = useState("");
+  const [descricaoEquipe, setDescricaoEquipe] = useState("");
   const [diaDaSemana, setDiaDaSemana] = useState("");
   const [horario, setHorario] = useState(null);
   const [servindo, setServindo] = useState("");
@@ -507,6 +510,18 @@ const CriarEquipe = () => {
       setDisableButton(true);
     }
   }, [diaDaSemana, horario, servindo, tituloCulto]);
+
+  useEffect(() => {
+    if (
+      nomeEquipe.trim().length > 0 &&
+      descricaoEquipe.trim().length > 0 &&
+      programacoes.length > 0
+    ) {
+      setDisableStepperButton(false);
+    } else {
+      setDisableStepperButton(true);
+    }
+  }, [nomeEquipe, descricaoEquipe, programacoes]);
 
   const handleSnackbarClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -616,9 +631,23 @@ const CriarEquipe = () => {
       setHorario(null);
       setServindo("");
       setTituloCulto("");
+      setPositionProgramacao("");
     } else {
       setSnackbar("warning", "Programação existente");
     }
+  }
+
+  function handleDeletarProgramacao() {
+    let novoArrayProgramacoes = programacoes.filter(
+      (programacao, index) => index !== positionProgramacao
+    );
+    setProgramacoes(novoArrayProgramacoes);
+    handleCloseModal();
+    setDiaDaSemana("");
+    setHorario(null);
+    setServindo("");
+    setTituloCulto("");
+    setPositionProgramacao("");
   }
 
   const handlenProximoStep = () => {
@@ -663,11 +692,19 @@ const CriarEquipe = () => {
         <Box sx={styles.boxStepper0}>
           <Box sx={styles.box1Stepper0}>
             <TextField
+              value={nomeEquipe}
+              onChange={(event) => {
+                setNomeEquipe(event.target.value);
+              }}
               label="Nome da equipe"
               variant="outlined"
               sx={{ ...styles.textField, mb: "20px" }}
             />
             <TextField
+              value={descricaoEquipe}
+              onChange={(event) => {
+                setDescricaoEquipe(event.target.value);
+              }}
               label="Descrição da equipe"
               multiline
               rows={11}
@@ -909,7 +946,14 @@ const CriarEquipe = () => {
               {activeStep === 0 ? "Cancelar" : "Voltar"}
             </Button>
             <Button
-              sx={styles.botaoDefault}
+              disabled={disableStepperButton}
+              sx={{
+                ...styles.botaoDefault,
+                "&.MuiButtonBase-root.MuiButton-root.Mui-disabled": {
+                  background: "gray",
+                  color: "#ffffff",
+                },
+              }}
               onClick={() => {
                 handlenProximoStep();
               }}
@@ -1343,7 +1387,9 @@ const CriarEquipe = () => {
                       },
                       color: "#ffffff",
                     }}
-                    onClick={() => {}}
+                    onClick={() => {
+                      handleDeletarProgramacao();
+                    }}
                   >
                     Confirmar
                   </Button>
