@@ -172,6 +172,21 @@ const styles = {
       background: "#FEBC36",
     },
   },
+  botaoDefaultModal: {
+    width: "100px",
+    height: "25px",
+    padding: "0px 40px",
+    borderRadius: "10px",
+    fontFamily: "Roboto, sans-serif",
+    fontSize: "12px",
+    lineHeight: "36px",
+    letterSpacing: "1.25px",
+    color: "#ffffff",
+    background: "#F3A913",
+    "&:hover": {
+      background: "#FEBC36",
+    },
+  },
   boxStepper0: {
     display: "flex",
     alignItems: "center",
@@ -295,18 +310,6 @@ const styles = {
     height: "35%",
     boxShadow: 24,
   },
-  boxModalDelete: {
-    backgroundColor: "#1B1B1B",
-    border: "1px solid #D32F2F",
-    borderRadius: "10px",
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: "38%",
-    height: "35%",
-    boxShadow: 24,
-  },
   boxConteudoModal: {
     width: "100%",
     height: "100%",
@@ -343,11 +346,6 @@ const styles = {
     width: "95%",
     height: "3.5%",
   },
-  baseTituloModalDelete: {
-    background: "#D32F2F",
-    width: "95%",
-    height: "3.5%",
-  },
   boxInputsModal: {
     width: "100%",
     height: "60%",
@@ -362,6 +360,70 @@ const styles = {
     justifyContent: "end",
   },
   boxBotoesModal: {
+    width: "210px",
+    height: "100%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    mr: "10px",
+  },
+  boxModalDelete: {
+    backgroundColor: "#1B1B1B",
+    border: "1px solid #D32F2F",
+    borderRadius: "10px",
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: "400px",
+    height: "145px",
+    boxShadow: 24,
+  },
+  boxConteudoModalDelete: {
+    width: "100%",
+    height: "100%",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  boxAreaTituloModalDelete: {
+    width: "100%",
+    height: "52%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  boxTituloModalDelete: {
+    width: "70%",
+    height: "100%",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  tituloModalDelete: {
+    color: "#ffffff",
+    textTransform: "uppercase",
+    fontSize: "14px",
+    lineHeight: "16px",
+    letterSpacing: "1.25px",
+    margin: "6% 0%",
+  },
+  baseTituloModalDelete: {
+    background: "#D32F2F",
+    width: "95%",
+    height: "3.5%",
+  },
+  boxBotaoModalDelete: {
+    width: "100%",
+    height: "20%",
+    display: "flex",
+    alignItems: "end",
+    justifyContent: "end",
+    mb: "8px",
+  },
+  boxBotoesModalDelete: {
     width: "210px",
     height: "100%",
     display: "flex",
@@ -881,7 +943,8 @@ const CriarEquipe = () => {
               <Box sx={styles.boxAreaTituloModal}>
                 <Box sx={styles.boxTituloModal}>
                   <Typography sx={styles.tituloModal}>
-                    Crie uma programação
+                    {openModal && "Crie uma programação"}
+                    {openModalEdit && "Editar programação"}
                   </Typography>
                   <Box sx={styles.baseTituloModal} />
                 </Box>
@@ -1178,7 +1241,7 @@ const CriarEquipe = () => {
               <Box sx={styles.boxBotaoModal}>
                 <Box sx={styles.boxBotoesModal}>
                   <Button
-                    sx={styles.botaoDefault}
+                    sx={styles.botaoDefaultModal}
                     onClick={() => {
                       handleCloseModal();
                       setDiaDaSemana("");
@@ -1193,7 +1256,7 @@ const CriarEquipe = () => {
                     <Button
                       disabled={disableButton}
                       sx={{
-                        ...styles.botaoDefault,
+                        ...styles.botaoDefaultModal,
                         "&.MuiButtonBase-root.MuiButton-root.Mui-disabled": {
                           background: "gray",
                           color: "#ffffff",
@@ -1210,7 +1273,7 @@ const CriarEquipe = () => {
                     <Button
                       disabled={disableButton}
                       sx={{
-                        ...styles.botaoDefault,
+                        ...styles.botaoDefaultModal,
                         "&.MuiButtonBase-root.MuiButton-root.Mui-disabled": {
                           background: "gray",
                           color: "#ffffff",
@@ -1244,34 +1307,36 @@ const CriarEquipe = () => {
       >
         <Fade in={openModalDelete}>
           <Box sx={styles.boxModalDelete}>
-            <Box sx={styles.boxConteudoModal}>
-              <Box sx={styles.boxAreaTituloModal}>
-                <Box sx={styles.boxTituloModal}>
-                  <Typography sx={styles.tituloModal}>
+            <Box sx={styles.boxConteudoModalDelete}>
+              <Box sx={styles.boxAreaTituloModalDelete}>
+                <Box sx={styles.boxTituloModalDelete}>
+                  <Typography sx={styles.tituloModalDelete}>
                     Deletar Programação?
                   </Typography>
                   <Box sx={styles.baseTituloModalDelete} />
                 </Box>
               </Box>
-              <Box sx={styles.boxInputsModal}>{"aaaaaaaaaaaaaaaaaaah"}</Box>
-              <Box sx={styles.boxBotaoModal}>
-                <Box sx={styles.boxBotoesModal}>
+              <Box sx={styles.boxInputsModal}>{""}</Box>
+              <Box sx={styles.boxBotaoModalDelete}>
+                <Box sx={styles.boxBotoesModalDelete}>
                   <Button
                     sx={{
-                      ...styles.botaoDefault,
+                      ...styles.botaoDefaultModal,
                       background: "#565656",
                       "&:hover": {
                         background: "#666666",
                       },
                     }}
-                    onClick={() => {}}
+                    onClick={() => {
+                      handleCloseModal();
+                    }}
                   >
                     Cancelar
                   </Button>
 
                   <Button
                     sx={{
-                      ...styles.botaoDefault,
+                      ...styles.botaoDefaultModal,
                       background: "#D32F2F",
                       "&:hover": {
                         background: "#E63737",
