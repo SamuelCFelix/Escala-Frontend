@@ -5,6 +5,7 @@ import {
   Box,
   Button,
   ButtonBase,
+  Chip,
   Divider,
   Fade,
   FormControl,
@@ -102,35 +103,23 @@ const styles = {
     mb: "20px",
   },
   step: {
+    "& .MuiStepLabel-label.MuiStepLabel-alternativeLabel": {
+      color: "#ffffff", // text color (next)
+    },
     "& .MuiStepLabel-root .Mui-completed": {
-      color: "#F3A913", // circle color (COMPLETED)
-    },
-    "& .MuiStepConnector-line .Mui-completed": {
-      borderColor: "#F3A913", // line color (COMPLETED)
-    },
-    "& .MuiStepLabel-label.Mui-completed.MuiStepLabel-alternativeLabel": {
-      color: "#ffffff", // Just text label (COMPLETED)
-    },
-    "& .css-z7uhs0-MuiStepConnector-line": {
-      borderColor: "#F3A913", // Color line (COMPLETED)
-    },
-    "& .MuiStepLabel-iconContainer .MuiStepIcon-completed": {
-      fill: "#ffffff", // Cor do ícone de verificação (COMPLETED)
+      color: "#ffffff", // text color (COMPLETED)
     },
     "& .MuiStepLabel-root .Mui-active": {
+      color: "#F3A913", // text color (ACTIVE)
+    },
+    "& .MuiSvgIcon-root.MuiStepIcon-root": {
+      color: "#565656", // circle color (NEXT)
+    },
+    "& .MuiSvgIcon-root.MuiStepIcon-root.Mui-active": {
       color: "#F3A913", // circle color (ACTIVE)
     },
-    "& .MuiStepLabel-label.Mui-active.MuiStepLabel-alternativeLabel": {
-      color: "#F3A913", // Just text label (ACTIVE)
-    },
-    "& .MuiStepLabel-root .Mui-active .MuiStepIcon-text": {
-      fill: "#ffffff", // circle's number (ACTIVE)
-    },
-    "& .MuiStepLabel-label.MuiStepLabel-alternativeLabel": {
-      color: "#ffffff", // Just text label (NEXT)
-    },
-    "& .css-1u4zpwo-MuiSvgIcon-root-MuiStepIcon-root": {
-      color: "#BDBDBD", // circle color (NEXT)
+    "& .MuiSvgIcon-root.MuiStepIcon-root.Mui-completed": {
+      color: "#F3A913", // circle color (ACTIVE)
     },
   },
   boxConteudo: {
@@ -151,7 +140,7 @@ const styles = {
     mb: "5px",
   },
   boxBotoesStepper: {
-    width: "35%",
+    width: "32%",
     height: "100%",
     mr: "4%",
     display: "flex",
@@ -189,7 +178,8 @@ const styles = {
       background: "#FEBC36",
     },
   },
-  boxStepper0: {
+  boxStepperBase: {
+    /* background: "red", */
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -475,13 +465,43 @@ const styles = {
     alignItems: "center",
     justifyContent: "center",
   },
+  box1Stepper1: {
+    display: "flex",
+    flexDirection: "column",
+    width: "408px",
+    height: "100%",
+    ml: "30px",
+  },
+  box2Stepper1: {
+    background: "blue",
+    display: "flex",
+    flexDirection: "column",
+    width: "408px",
+    height: "100%",
+    maxHeight: "600px",
+    mr: "30px",
+  },
+  boxChipDefault: {
+    display: "flex",
+    width: "100%",
+    height: "44px",
+    alignItems: "center",
+    justifyContent: "start",
+    gap: "5px",
+  },
+  chipDefault: {
+    backgroundColor: "#1B1B1B",
+    border: "2px solid #F3A913",
+    borderRadius: "10px",
+    color: "#ffffff",
+  },
 };
 
 const CriarEquipe = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState("");
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [activeStep, setActiveStep] = useState(0);
+  const [activeStep, setActiveStep] = useState(1);
   const [openModal, setOpenModal] = useState(false);
   const [openModalEdit, setOpenModalEdit] = useState(false);
   const [openModalDelete, setOpenModalDelete] = useState(false);
@@ -683,7 +703,7 @@ const CriarEquipe = () => {
     {
       label: "Informações da equipe",
       conteudo: [
-        <Box sx={styles.boxStepper0}>
+        <Box sx={styles.boxStepperBase}>
           <Box sx={styles.box1Stepper0}>
             <TextField
               value={nomeEquipe}
@@ -905,11 +925,90 @@ const CriarEquipe = () => {
     },
     {
       label: "Criação das Tags",
-      conteudo: [<Box sx={styles.boxStepper0}></Box>],
+      conteudo: [
+        <Box sx={{ ...styles.boxStepperBase, justifyContent: "space-between" }}>
+          <Box sx={styles.box1Stepper1}>
+            <Typography
+              sx={{
+                ...styles.textoTabelaVazio,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              Agora vamos criar as TAGS:
+            </Typography>
+            <Typography sx={{ ...styles.textoTabelaVazio, mt: "12px" }}>
+              As tags são identificações que serão necessárias para criação das
+              escalas. Elas também serão atribuídas por você aos servos da sua
+              equipe de forma individual futuramente.
+            </Typography>
+            <Typography sx={{ ...styles.textoTabelaVazio, mt: "12px" }}>
+              Todos os cultos tem uma quantidade de pessoas servindo, e será
+              através das tags que será informado a necessidade de cada culto.
+            </Typography>
+            <Typography
+              sx={{ ...styles.textoTabelaVazio, mt: "12px", mb: "5px" }}
+            >
+              Exemplo:
+            </Typography>
+
+            <Box sx={{ ...styles.boxCardCulto, width: "100%" }}>
+              <Box sx={styles.conteudoCardCulto}>
+                <Typography sx={styles.textoTabelaVazio}>
+                  Quinta-Feira
+                </Typography>
+              </Box>
+              <Box sx={styles.conteudoCardCulto}>
+                <Typography sx={styles.textoTabelaVazio}>19:30</Typography>
+              </Box>
+              <Box sx={styles.conteudoCardCulto}>
+                <Typography sx={styles.textoTabelaVazio}>3</Typography>
+              </Box>
+              <Box sx={styles.conteudoCardCulto2}>
+                <Typography
+                  sx={{
+                    ...styles.textoTabelaVazio,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  Culto de Doutrina
+                </Typography>
+              </Box>
+            </Box>
+
+            <Typography sx={{ ...styles.textoTabelaVazio, mt: "5px" }}>
+              Nesse culto precisa de 3 servos e suas TAGS serão:
+            </Typography>
+            <Box sx={styles.boxChipDefault}>
+              <Chip
+                label="Cortes de Câmera"
+                variant="outlined"
+                sx={styles.chipDefault}
+              />
+              <Chip
+                label="Gimball"
+                variant="outlined"
+                sx={styles.chipDefault}
+              />
+              <Chip
+                label="Câmera Central"
+                variant="outlined"
+                sx={styles.chipDefault}
+              />
+            </Box>
+          </Box>
+          <Box sx={styles.box2Stepper1}>
+            {"lalalalalalalalalalalalalalalalalalalala"}
+          </Box>
+        </Box>,
+      ],
     },
     {
       label: "Escala de Serviço",
-      conteudo: [<Box sx={styles.boxStepper0}></Box>],
+      conteudo: [<Box sx={styles.boxStepperBase}></Box>],
     },
   ];
 
@@ -951,7 +1050,7 @@ const CriarEquipe = () => {
               sx={{
                 ...styles.botaoDefault,
                 "&.MuiButtonBase-root.MuiButton-root.Mui-disabled": {
-                  background: "gray",
+                  background: "#565656",
                   color: "#ffffff",
                 },
               }}
@@ -1304,7 +1403,7 @@ const CriarEquipe = () => {
                       sx={{
                         ...styles.botaoDefaultModal,
                         "&.MuiButtonBase-root.MuiButton-root.Mui-disabled": {
-                          background: "gray",
+                          background: "#565656",
                           color: "#ffffff",
                         },
                       }}
@@ -1321,7 +1420,7 @@ const CriarEquipe = () => {
                       sx={{
                         ...styles.botaoDefaultModal,
                         "&.MuiButtonBase-root.MuiButton-root.Mui-disabled": {
-                          background: "gray",
+                          background: "#565656",
                           color: "#ffffff",
                         },
                       }}
