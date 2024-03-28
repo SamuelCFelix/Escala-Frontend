@@ -121,6 +121,9 @@ const styles = {
     "& .MuiSvgIcon-root.MuiStepIcon-root.Mui-completed": {
       color: "#F3A913", // circle color (ACTIVE)
     },
+    "& .MuiStepConnector-line": {
+      borderColor: "#F3A913", // Cor padrão da linha
+    },
   },
   boxConteudo: {
     display: "flex",
@@ -473,7 +476,6 @@ const styles = {
     ml: "30px",
   },
   box2Stepper1: {
-    background: "blue",
     display: "flex",
     flexDirection: "column",
     width: "408px",
@@ -495,13 +497,26 @@ const styles = {
     borderRadius: "10px",
     color: "#ffffff",
   },
+  boxChipAdd: {
+    display: "flex",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignContent: "flex-start",
+    padding: "10px 0px",
+    gap: "6px",
+    width: "100%",
+    height: "140px",
+    maxHeight: "140px",
+    overflowY: "auto",
+    background: "rgba(0, 0, 0, 0.56)",
+  },
 };
 
 const CriarEquipe = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState("");
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [activeStep, setActiveStep] = useState(1);
+  const [activeStep, setActiveStep] = useState(2);
   const [openModal, setOpenModal] = useState(false);
   const [openModalEdit, setOpenModalEdit] = useState(false);
   const [openModalDelete, setOpenModalDelete] = useState(false);
@@ -516,6 +531,8 @@ const CriarEquipe = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [programacoes, setProgramacoes] = useState([]);
   const [positionProgramacao, setPositionProgramacao] = useState("");
+  const [tags, setTags] = useState([]);
+  const [valueTag, setValueTag] = useState("");
 
   useEffect(() => {
     if (diaDaSemana && horario && servindo && tituloCulto) {
@@ -526,16 +543,28 @@ const CriarEquipe = () => {
   }, [diaDaSemana, horario, servindo, tituloCulto]);
 
   useEffect(() => {
-    if (
-      nomeEquipe.trim().length > 0 &&
-      descricaoEquipe.trim().length > 0 &&
-      programacoes.length > 0
-    ) {
-      setDisableStepperButton(false);
-    } else {
-      setDisableStepperButton(true);
+    if (activeStep === 0) {
+      if (
+        nomeEquipe.trim().length > 0 &&
+        descricaoEquipe.trim().length > 0 &&
+        programacoes.length > 0
+      ) {
+        setDisableStepperButton(false);
+      } else {
+        setDisableStepperButton(true);
+      }
     }
-  }, [nomeEquipe, descricaoEquipe, programacoes]);
+  }, [nomeEquipe, descricaoEquipe, programacoes, activeStep]);
+
+  useEffect(() => {
+    if (activeStep === 1) {
+      if (tags.length > 0) {
+        setDisableStepperButton(false);
+      } else {
+        setDisableStepperButton(true);
+      }
+    }
+  }, [tags, activeStep]);
 
   const handleSnackbarClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -662,6 +691,25 @@ const CriarEquipe = () => {
     setServindo("");
     setTituloCulto("");
     setPositionProgramacao("");
+  }
+
+  function handleAddChip() {
+    if (valueTag.trim() !== "") {
+      if (!tags.some((tag) => tag.tag === valueTag)) {
+        let newTag = { tag: valueTag };
+        let newArrayTags = [...tags, newTag];
+        setTags(newArrayTags);
+        setValueTag("");
+        console.log(newArrayTags);
+      } else {
+        setSnackbar("warning", "Tag existente");
+      }
+    }
+  }
+
+  function handleDeleteChip(positionTag) {
+    let novoArrayTags = tags.filter((tag, index) => index !== positionTag);
+    setTags(novoArrayTags);
   }
 
   const handlenProximoStep = () => {
@@ -1001,7 +1049,74 @@ const CriarEquipe = () => {
             </Box>
           </Box>
           <Box sx={styles.box2Stepper1}>
-            {"lalalalalalalalalalalalalalalalalalalala"}
+            <TextField
+              value={valueTag}
+              onChange={(event) => {
+                setValueTag(event.target.value);
+              }}
+              sx={{
+                ...styles.textField,
+                "&.MuiFormControl-root.MuiTextField-root .MuiInputLabel-root.MuiInputLabel-shrink":
+                  {
+                    color: "#F3A913",
+                  },
+                "&.MuiFormControl-root-MuiTextField-root.MuiInputBase-root-MuiFilledInput-root:hover":
+                  {
+                    backgroundColor: "rgba(0, 0, 0, 0.56)",
+                  },
+                "& .MuiInputBase-root.MuiFilledInput-root:after": {
+                  borderBottom: "none",
+                },
+                "& .MuiInputBase-root.MuiFilledInput-root:hover": {
+                  backgroundColor: "rgba(0, 0, 0, 0.56)",
+                },
+                "& .MuiInputBase-root.MuiFilledInput-root": {
+                  backgroundColor: "rgba(0, 0, 0, 0.56)",
+                },
+              }}
+              label="Nome da tag"
+              variant="filled"
+              InputProps={{
+                sx: {
+                  borderBottom: "2px solid #F3A913",
+                  background: "rgba(0, 0, 0, 0.56)",
+                },
+              }}
+            />
+            <Box sx={styles.boxChipAdd}>
+              {tags.map((tag, index) => (
+                <Chip
+                  label={tag.tag}
+                  variant="outlined"
+                  onDelete={() => {
+                    handleDeleteChip(index);
+                  }}
+                  sx={{
+                    ...styles.chipDefault,
+                    backgroundColor: "rgba(0, 0, 0, 0.56)",
+                    "&.MuiButtonBase-root.MuiChip-root .MuiChip-deleteIcon": {
+                      color: "rgba(243, 169, 19, 0.7)",
+                    },
+                  }}
+                />
+              ))}
+            </Box>
+            <Button
+              sx={{
+                ...styles.botaoDefault,
+                width: "100%",
+                height: "42px",
+                borderRadius: "4px",
+                fontSize: "14px",
+                lineHeight: "26px",
+                letterSpacing: "0.46px",
+              }}
+              onClick={() => {
+                handleAddChip();
+              }}
+            >
+              Adicionar Tag
+            </Button>
           </Box>
         </Box>,
       ],
