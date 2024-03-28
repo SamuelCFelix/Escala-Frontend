@@ -32,6 +32,10 @@ import {
   TextField,
   Typography,
   stepConnectorClasses,
+  Pagination,
+  Tab,
+  Tabs,
+  tabsClasses,
 } from "@mui/material";
 import { motion } from "framer-motion";
 import "../../../src/style.css";
@@ -182,7 +186,6 @@ const styles = {
     },
   },
   boxStepperBase: {
-    /* background: "red", */
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -510,6 +513,71 @@ const styles = {
     overflowY: "auto",
     background: "rgba(0, 0, 0, 0.56)",
   },
+  box1Stepper2: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+    height: "100%",
+  },
+  boxTabs: {
+    display: "flex",
+    width: "800px",
+    height: "42px",
+  },
+  estiloTabs: {
+    [`& .${tabsClasses.scrollButtons}`]: {
+      color: "#F3A913",
+      "&.Mui-disabled": { opacity: 0.3 },
+    },
+    "& .MuiTabs-indicator": {
+      backgroundColor: "#F3A913",
+    },
+    "& .MuiTab-root.Mui-selected": {
+      color: "#F3A913",
+    },
+  },
+  boxConteudoTabs: {
+    background: "rgba(0, 0, 0, 0.38)",
+    width: "800px",
+    height: "274px",
+    mt: "10px",
+  },
+  boxRadapeTabs: {
+    width: "800px",
+    height: "24px",
+  },
+  boxProgramacaoCards: {
+    /* background: "blue", */
+    display: "flex",
+    width: "100%",
+    height: "242px",
+  },
+  boxPaginacao: {
+    display: "flex",
+    width: "100%",
+    height: "32px",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  estiloPaginacao: {
+    "& .MuiPaginationItem-root": {
+      color: "#ffffff",
+      height: "26px",
+      minWidth: "26px",
+    },
+    "& .MuiPaginationItem-root.Mui-selected": {
+      backgroundColor: "#F3A913",
+      color: "#ffffff",
+      "&:hover": {
+        backgroundColor: "#F3A913",
+      },
+    },
+    "& .MuiPaginationItem-root:not(.Mui-selected):hover": {
+      backgroundColor: "rgba(243, 169, 19, 0.6)",
+    },
+  },
 };
 
 const CriarEquipe = () => {
@@ -533,6 +601,7 @@ const CriarEquipe = () => {
   const [positionProgramacao, setPositionProgramacao] = useState("");
   const [tags, setTags] = useState([]);
   const [valueTag, setValueTag] = useState("");
+  const [valueTab, setValueTab] = useState(0);
 
   useEffect(() => {
     if (diaDaSemana && horario && servindo && tituloCulto) {
@@ -711,6 +780,10 @@ const CriarEquipe = () => {
     let novoArrayTags = tags.filter((tag, index) => index !== positionTag);
     setTags(novoArrayTags);
   }
+
+  const handleChangeTabs = (event, newValue) => {
+    setValueTab(newValue);
+  };
 
   const handlenProximoStep = () => {
     if (activeStep < 2) {
@@ -1123,7 +1196,56 @@ const CriarEquipe = () => {
     },
     {
       label: "Escala de Serviço",
-      conteudo: [<Box sx={styles.boxStepperBase}></Box>],
+      conteudo: [
+        <Box sx={styles.boxStepperBase}>
+          <Box sx={styles.box1Stepper2}>
+            <Box sx={styles.boxTabs}>
+              <Tabs
+                value={valueTab}
+                onChange={handleChangeTabs}
+                variant="scrollable"
+                scrollButtons
+                indicatorColor="#F3A913"
+                sx={styles.estiloTabs}
+              >
+                <Tab label="Domingo" sx={{ color: "#ffffff" }} />
+                <Tab label="Segunda-Feira" sx={{ color: "#ffffff" }} />
+                <Tab label="Terça-Feira" sx={{ color: "#ffffff" }} />
+                <Tab label="Quarta-Feira" sx={{ color: "#ffffff" }} />
+                <Tab label="Quinta-Feira" sx={{ color: "#ffffff" }} />
+                <Tab label="Sexta-Feira" sx={{ color: "#ffffff" }} />
+                <Tab label="Sábado" sx={{ color: "#ffffff" }} />
+              </Tabs>
+            </Box>
+            <Box sx={styles.boxConteudoTabs}>
+              <Box sx={styles.boxProgramacaoCards}></Box>
+              <Box sx={styles.boxPaginacao}>
+                <Pagination
+                  count={2}
+                  shape="rounded"
+                  sx={styles.estiloPaginacao}
+                />
+              </Box>
+            </Box>
+            <Box sx={styles.boxRadapeTabs}>
+              <List>
+                <ListItem sx={{ mt: "-18px" }}>
+                  <FiberManualRecordIcon
+                    sx={{ width: "8px", mr: "5px", color: "#ffffff" }}
+                  />
+                  <ListItemText
+                    primaryTypographyProps={{
+                      ...styles.textoTabelaVazio,
+                      fontSize: "14px",
+                    }}
+                    primary="Adicione as TAGS para cada culto e depois clique no botão Criar"
+                  />
+                </ListItem>
+              </List>
+            </Box>
+          </Box>
+        </Box>,
+      ],
     },
   ];
 
