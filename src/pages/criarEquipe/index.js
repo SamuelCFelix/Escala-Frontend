@@ -55,6 +55,7 @@ import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import { format } from "date-fns-tz";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
 
 const styles = {
   container: {
@@ -553,6 +554,65 @@ const styles = {
     display: "flex",
     width: "100%",
     height: "242px",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  CardProgramacao: {
+    display: "flex",
+    flexDirection: "column",
+    background: "#1B1B1B",
+    width: "225px",
+    height: "225px",
+    border: "1px solid #F3A913",
+    borderRadius: "10px",
+    mt: "5px",
+    paddingTop: "5px",
+    gap: "5px",
+  },
+  boxInfoCard: {
+    /* background: "blue", */
+    position: "relative",
+    display: "flex",
+    width: "100%",
+    height: "25px",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  boxLimiteTextInfo: {
+    display: "flex",
+    width: "172px",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  boxIconeCardInfoLeft: {
+    position: "absolute",
+    left: "0",
+    top: "calc(50% + 2px)",
+    transform: "translateY(-50%)",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    ml: "5px",
+  },
+  boxIconeCardInfoRight: {
+    position: "absolute",
+    right: "0",
+    top: "calc(50% + 2px)",
+    transform: "translateY(-50%)",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    mr: "5px",
+  },
+  boxListChipsCardInfo: {
+    background: "blue",
+    display: "flex",
+    flexDirection: "column",
+    width: "100%",
+    height: "100px",
+    maxHeight: "100px",
+    alignItems: "center",
+    justifyContent: "center",
+    overflowY: "auto",
+    gap: "3px",
   },
   boxPaginacao: {
     display: "flex",
@@ -1218,7 +1278,93 @@ const CriarEquipe = () => {
               </Tabs>
             </Box>
             <Box sx={styles.boxConteudoTabs}>
-              <Box sx={styles.boxProgramacaoCards}></Box>
+              <Box sx={styles.boxProgramacaoCards}>
+                <Box sx={styles.CardProgramacao}>
+                  <Box sx={styles.boxInfoCard}>
+                    <Box sx={styles.boxIconeCardInfoLeft}>
+                      <ChurchOutlinedIcon sx={styles.estiloIcones} />
+                    </Box>
+                    <Box sx={styles.boxLimiteTextInfo}>
+                      <Typography
+                        sx={{
+                          ...styles.textoTabelaVazio,
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        Culto Celebração - ZS10
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Box sx={styles.boxInfoCard}>
+                    <Box sx={styles.boxIconeCardInfoLeft}>
+                      <AccessTimeOutlinedIcon sx={styles.estiloIcones} />
+                    </Box>
+                    <Typography sx={styles.textoTabelaVazio}>10:00</Typography>
+                  </Box>
+                  <Box sx={styles.boxInfoCard}>
+                    <Box sx={styles.boxIconeCardInfoLeft}>
+                      <GroupsOutlinedIcon sx={styles.estiloIcones} />
+                    </Box>
+                    <Typography sx={styles.textoTabelaVazio}>3</Typography>
+                  </Box>
+                  <Box sx={styles.boxInfoCard}>
+                    <Box
+                      sx={{
+                        ...styles.boxIconeCardInfoLeft,
+                        top: "calc(50% + 3px)",
+                      }}
+                    >
+                      <LocalOfferOutlinedIcon sx={styles.estiloIcones} />
+                    </Box>
+                    <Typography sx={styles.textoTabelaVazio}>Tags</Typography>
+                    <Box sx={styles.boxIconeCardInfoRight}>
+                      <IconButton
+                        onClick={() => {
+                          /* setOpenModal(true); */
+                        }}
+                      >
+                        <AddCircleOutlineOutlinedIcon
+                          sx={{ ...styles.estiloIcones, fontSize: "18px" }}
+                        />
+                      </IconButton>
+                    </Box>
+                  </Box>
+                  <Box sx={styles.boxListChipsCardInfo}>
+                    <Chip
+                      label="Cortes de Câmera"
+                      variant="outlined"
+                      sx={styles.chipDefault}
+                    />
+                    <Chip
+                      label="Gimball"
+                      variant="outlined"
+                      sx={styles.chipDefault}
+                    />
+                    <Chip
+                      label="Câmera Central"
+                      variant="outlined"
+                      sx={styles.chipDefault}
+                    />
+                    <Chip
+                      label="Cortes de Câmera"
+                      variant="outlined"
+                      sx={styles.chipDefault}
+                    />
+                    <Chip
+                      label="Gimball"
+                      variant="outlined"
+                      sx={styles.chipDefault}
+                    />
+                    <Chip
+                      label="Câmera Central"
+                      variant="outlined"
+                      sx={styles.chipDefault}
+                    />
+                  </Box>
+                </Box>
+              </Box>
               <Box sx={styles.boxPaginacao}>
                 <Pagination
                   count={2}
