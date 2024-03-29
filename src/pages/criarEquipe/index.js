@@ -500,6 +500,8 @@ const styles = {
     border: "2px solid #F3A913",
     borderRadius: "10px",
     color: "#ffffff",
+    height: "32px",
+    minHeight: "32px",
   },
   boxChipAdd: {
     display: "flex",
@@ -556,6 +558,7 @@ const styles = {
     height: "242px",
     alignItems: "center",
     justifyContent: "center",
+    gap: "20px",
   },
   CardProgramacao: {
     display: "flex",
@@ -603,16 +606,15 @@ const styles = {
     mr: "5px",
   },
   boxListChipsCardInfo: {
-    background: "blue",
     display: "flex",
     flexDirection: "column",
     width: "100%",
-    height: "100px",
-    maxHeight: "100px",
+    height: "70px",
+    maxHeight: "70px",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "flex-start",
     overflowY: "auto",
-    gap: "3px",
+    gap: "5px",
   },
   boxPaginacao: {
     display: "flex",
@@ -662,6 +664,7 @@ const CriarEquipe = () => {
   const [tags, setTags] = useState([]);
   const [valueTag, setValueTag] = useState("");
   const [valueTab, setValueTab] = useState(0);
+  const [cardsCulto, setCardsCulto] = useState([]);
 
   useEffect(() => {
     if (diaDaSemana && horario && servindo && tituloCulto) {
@@ -741,6 +744,14 @@ const CriarEquipe = () => {
     setAnchorEl(event.currentTarget);
   };
 
+  function normalizeTag(tag) {
+    return tag
+      .trim()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+  }
+
   function handleGerarProgramacao() {
     let novaProgramacao = {
       dia: diaDaSemana,
@@ -758,7 +769,7 @@ const CriarEquipe = () => {
           item.dia === novaProgramacao.dia &&
           item.horario === novaProgramacao.horario &&
           item.servindo === novaProgramacao.servindo &&
-          item.culto === novaProgramacao.culto
+          normalizeTag(item.culto) === normalizeTag(novaProgramacao.culto)
       )
     ) {
       let novoArrayProgramacoes = [...programacoes, novaProgramacao];
@@ -786,13 +797,16 @@ const CriarEquipe = () => {
       culto: tituloCulto,
     };
 
+    let normalizedEditProgramacaoCulto = normalizeTag(editProgramacao.culto);
+
     if (
       !programacoes.some(
-        (item) =>
+        (item, index) =>
+          index !== positionEdit &&
           item.dia === editProgramacao.dia &&
           item.horario === editProgramacao.horario &&
           item.servindo === editProgramacao.servindo &&
-          item.culto === editProgramacao.culto
+          normalizeTag(item.culto) === normalizedEditProgramacaoCulto
       )
     ) {
       let novoArrayProgramacoes = [...programacoes];
@@ -823,8 +837,12 @@ const CriarEquipe = () => {
   }
 
   function handleAddChip() {
-    if (valueTag.trim() !== "") {
-      if (!tags.some((tag) => tag.tag === valueTag)) {
+    if (valueTag !== "") {
+      let tagExists = tags.some(
+        (tag) => normalizeTag(tag.tag) === normalizeTag(valueTag)
+      );
+
+      if (!tagExists) {
         let newTag = { tag: valueTag };
         let newArrayTags = [...tags, newTag];
         setTags(newArrayTags);
@@ -848,6 +866,12 @@ const CriarEquipe = () => {
   const handlenProximoStep = () => {
     if (activeStep < 2) {
       setActiveStep((proximo) => proximo + 1);
+    }
+    if (activeStep === 1) {
+      let programacoesCard = [...programacoes];
+      setCardsCulto(programacoesCard);
+      console.log(programacoes);
+      console.log(programacoesCard);
     }
   };
 
@@ -1279,91 +1303,95 @@ const CriarEquipe = () => {
             </Box>
             <Box sx={styles.boxConteudoTabs}>
               <Box sx={styles.boxProgramacaoCards}>
-                <Box sx={styles.CardProgramacao}>
-                  <Box sx={styles.boxInfoCard}>
-                    <Box sx={styles.boxIconeCardInfoLeft}>
-                      <ChurchOutlinedIcon sx={styles.estiloIcones} />
+                {cardsCulto.map((card) => (
+                  <Box sx={styles.CardProgramacao}>
+                    <Box sx={styles.boxInfoCard}>
+                      <Box sx={styles.boxIconeCardInfoLeft}>
+                        <ChurchOutlinedIcon sx={styles.estiloIcones} />
+                      </Box>
+                      <Box sx={styles.boxLimiteTextInfo}>
+                        <Typography
+                          sx={{
+                            ...styles.textoTabelaVazio,
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {card.culto}
+                        </Typography>
+                      </Box>
                     </Box>
-                    <Box sx={styles.boxLimiteTextInfo}>
-                      <Typography
-                        sx={{
-                          ...styles.textoTabelaVazio,
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          whiteSpace: "nowrap",
-                        }}
-                      >
-                        Culto Celebração - ZS10
+                    <Box sx={styles.boxInfoCard}>
+                      <Box sx={styles.boxIconeCardInfoLeft}>
+                        <CalendarMonthOutlinedIcon sx={styles.estiloIcones} />
+                      </Box>
+                      <Typography sx={styles.textoTabelaVazio}>
+                        {card.dia}
                       </Typography>
                     </Box>
-                  </Box>
-                  <Box sx={styles.boxInfoCard}>
-                    <Box sx={styles.boxIconeCardInfoLeft}>
-                      <AccessTimeOutlinedIcon sx={styles.estiloIcones} />
+                    <Box sx={styles.boxInfoCard}>
+                      <Box sx={styles.boxIconeCardInfoLeft}>
+                        <AccessTimeOutlinedIcon sx={styles.estiloIcones} />
+                      </Box>
+                      <Typography sx={styles.textoTabelaVazio}>
+                        {card.horario}
+                      </Typography>
                     </Box>
-                    <Typography sx={styles.textoTabelaVazio}>10:00</Typography>
-                  </Box>
-                  <Box sx={styles.boxInfoCard}>
-                    <Box sx={styles.boxIconeCardInfoLeft}>
-                      <GroupsOutlinedIcon sx={styles.estiloIcones} />
+                    <Box sx={styles.boxInfoCard}>
+                      <Box sx={styles.boxIconeCardInfoLeft}>
+                        <GroupsOutlinedIcon sx={styles.estiloIcones} />
+                      </Box>
+                      <Typography sx={styles.textoTabelaVazio}>
+                        {card.servindo}
+                      </Typography>
                     </Box>
-                    <Typography sx={styles.textoTabelaVazio}>3</Typography>
-                  </Box>
-                  <Box sx={styles.boxInfoCard}>
-                    <Box
-                      sx={{
-                        ...styles.boxIconeCardInfoLeft,
-                        top: "calc(50% + 3px)",
-                      }}
-                    >
-                      <LocalOfferOutlinedIcon sx={styles.estiloIcones} />
-                    </Box>
-                    <Typography sx={styles.textoTabelaVazio}>Tags</Typography>
-                    <Box sx={styles.boxIconeCardInfoRight}>
-                      <IconButton
-                        onClick={() => {
-                          /* setOpenModal(true); */
+                    <Box sx={styles.boxInfoCard}>
+                      <Box
+                        sx={{
+                          ...styles.boxIconeCardInfoLeft,
+                          top: "calc(50% + 3px)",
                         }}
                       >
-                        <AddCircleOutlineOutlinedIcon
-                          sx={{ ...styles.estiloIcones, fontSize: "18px" }}
-                        />
-                      </IconButton>
+                        <LocalOfferOutlinedIcon sx={styles.estiloIcones} />
+                      </Box>
+                      <Typography sx={styles.textoTabelaVazio}>Tags</Typography>
+                      <Box sx={styles.boxIconeCardInfoRight}>
+                        <IconButton
+                          onClick={() => {
+                            /* setOpenModal(true); */
+                          }}
+                        >
+                          <AddCircleOutlineOutlinedIcon
+                            sx={{ ...styles.estiloIcones, fontSize: "18px" }}
+                          />
+                        </IconButton>
+                      </Box>
+                    </Box>
+                    <Box sx={styles.boxListChipsCardInfo}>
+                      <Chip
+                        label="Cortes de Câmera"
+                        variant="outlined"
+                        sx={styles.chipDefault}
+                      />
+                      <Chip
+                        label="Câmera Lateral - Esquerda"
+                        variant="outlined"
+                        sx={styles.chipDefault}
+                      />
+                      <Chip
+                        label="Gimball"
+                        variant="outlined"
+                        sx={styles.chipDefault}
+                      />
+                      <Chip
+                        label="Câmera Central"
+                        variant="outlined"
+                        sx={styles.chipDefault}
+                      />
                     </Box>
                   </Box>
-                  <Box sx={styles.boxListChipsCardInfo}>
-                    <Chip
-                      label="Cortes de Câmera"
-                      variant="outlined"
-                      sx={styles.chipDefault}
-                    />
-                    <Chip
-                      label="Gimball"
-                      variant="outlined"
-                      sx={styles.chipDefault}
-                    />
-                    <Chip
-                      label="Câmera Central"
-                      variant="outlined"
-                      sx={styles.chipDefault}
-                    />
-                    <Chip
-                      label="Cortes de Câmera"
-                      variant="outlined"
-                      sx={styles.chipDefault}
-                    />
-                    <Chip
-                      label="Gimball"
-                      variant="outlined"
-                      sx={styles.chipDefault}
-                    />
-                    <Chip
-                      label="Câmera Central"
-                      variant="outlined"
-                      sx={styles.chipDefault}
-                    />
-                  </Box>
-                </Box>
+                ))}
               </Box>
               <Box sx={styles.boxPaginacao}>
                 <Pagination
