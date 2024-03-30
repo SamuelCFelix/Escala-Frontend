@@ -663,8 +663,10 @@ const CriarEquipe = () => {
   const [positionProgramacao, setPositionProgramacao] = useState("");
   const [tags, setTags] = useState([]);
   const [valueTag, setValueTag] = useState("");
-  const [valueTab, setValueTab] = useState(0);
+  const [valueTab, setValueTab] = useState("Domingo");
   const [cardsCulto, setCardsCulto] = useState([]);
+  const [page, setPage] = useState(1);
+  const cardsPerPage = 3;
 
   useEffect(() => {
     if (diaDaSemana && horario && servindo && tituloCulto) {
@@ -847,7 +849,6 @@ const CriarEquipe = () => {
         let newArrayTags = [...tags, newTag];
         setTags(newArrayTags);
         setValueTag("");
-        console.log(newArrayTags);
       } else {
         setSnackbar("warning", "Tag existente");
       }
@@ -863,6 +864,38 @@ const CriarEquipe = () => {
     setValueTab(newValue);
   };
 
+  // Filtra e divide os cards em grupos de 3 e ordena cada grupo por horário
+  const groupedCards = cardsCulto
+    .filter((card) => card.dia === valueTab)
+    .sort((a, b) => {
+      const timeA = new Date(`2000-01-01T${a.horario}`);
+      const timeB = new Date(`2000-01-01T${b.horario}`);
+      return timeA - timeB;
+    })
+    .reduce((acc, curr, index) => {
+      // acc é o acumulador que armazena o resultado atual da redução
+      // curr é o valor atual sendo processado no array
+      // index é o índice atual do valor sendo processado
+
+      // Calcula o índice da página atual
+      const pageIndex = Math.floor(index / cardsPerPage);
+
+      // Se a página atual ainda não existe no acumulador, cria um novo array para ela
+      if (!acc[pageIndex]) {
+        acc[pageIndex] = [];
+      }
+
+      // Adiciona o valor atual (card) ao array da página atual
+      acc[pageIndex].push(curr);
+
+      // Retorna o acumulador atualizado para a próxima iteração
+      return acc;
+    }, []);
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
   const handlenProximoStep = () => {
     if (activeStep < 2) {
       setActiveStep((proximo) => proximo + 1);
@@ -870,8 +903,6 @@ const CriarEquipe = () => {
     if (activeStep === 1) {
       let programacoesCard = [...programacoes];
       setCardsCulto(programacoesCard);
-      console.log(programacoes);
-      console.log(programacoesCard);
     }
   };
 
@@ -1292,110 +1323,151 @@ const CriarEquipe = () => {
                 indicatorColor="#F3A913"
                 sx={styles.estiloTabs}
               >
-                <Tab label="Domingo" sx={{ color: "#ffffff" }} />
-                <Tab label="Segunda-Feira" sx={{ color: "#ffffff" }} />
-                <Tab label="Terça-Feira" sx={{ color: "#ffffff" }} />
-                <Tab label="Quarta-Feira" sx={{ color: "#ffffff" }} />
-                <Tab label="Quinta-Feira" sx={{ color: "#ffffff" }} />
-                <Tab label="Sexta-Feira" sx={{ color: "#ffffff" }} />
-                <Tab label="Sábado" sx={{ color: "#ffffff" }} />
+                <Tab
+                  label="Domingo"
+                  value="Domingo"
+                  sx={{ color: "#ffffff" }}
+                />
+                <Tab
+                  label="Segunda-Feira"
+                  value="Segunda-Feira"
+                  sx={{ color: "#ffffff" }}
+                />
+                <Tab
+                  label="Terça-Feira"
+                  value="Terça-Feira"
+                  sx={{ color: "#ffffff" }}
+                />
+                <Tab
+                  label="Quarta-Feira"
+                  value="Quarta-Feira"
+                  sx={{ color: "#ffffff" }}
+                />
+                <Tab
+                  label="Quinta-Feira"
+                  value="Quinta-Feira"
+                  sx={{ color: "#ffffff" }}
+                />
+                <Tab
+                  label="Sexta-Feira"
+                  value="Sexta-Feira"
+                  sx={{ color: "#ffffff" }}
+                />
+                <Tab label="Sábado" value="Sábado" sx={{ color: "#ffffff" }} />
               </Tabs>
             </Box>
             <Box sx={styles.boxConteudoTabs}>
               <Box sx={styles.boxProgramacaoCards}>
-                {cardsCulto.map((card) => (
-                  <Box sx={styles.CardProgramacao}>
-                    <Box sx={styles.boxInfoCard}>
-                      <Box sx={styles.boxIconeCardInfoLeft}>
-                        <ChurchOutlinedIcon sx={styles.estiloIcones} />
-                      </Box>
-                      <Box sx={styles.boxLimiteTextInfo}>
-                        <Typography
-                          sx={{
-                            ...styles.textoTabelaVazio,
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            whiteSpace: "nowrap",
-                          }}
-                        >
-                          {card.culto}
-                        </Typography>
-                      </Box>
-                    </Box>
-                    <Box sx={styles.boxInfoCard}>
-                      <Box sx={styles.boxIconeCardInfoLeft}>
-                        <CalendarMonthOutlinedIcon sx={styles.estiloIcones} />
-                      </Box>
-                      <Typography sx={styles.textoTabelaVazio}>
-                        {card.dia}
-                      </Typography>
-                    </Box>
-                    <Box sx={styles.boxInfoCard}>
-                      <Box sx={styles.boxIconeCardInfoLeft}>
-                        <AccessTimeOutlinedIcon sx={styles.estiloIcones} />
-                      </Box>
-                      <Typography sx={styles.textoTabelaVazio}>
-                        {card.horario}
-                      </Typography>
-                    </Box>
-                    <Box sx={styles.boxInfoCard}>
-                      <Box sx={styles.boxIconeCardInfoLeft}>
-                        <GroupsOutlinedIcon sx={styles.estiloIcones} />
-                      </Box>
-                      <Typography sx={styles.textoTabelaVazio}>
-                        {card.servindo}
-                      </Typography>
-                    </Box>
-                    <Box sx={styles.boxInfoCard}>
-                      <Box
-                        sx={{
-                          ...styles.boxIconeCardInfoLeft,
-                          top: "calc(50% + 3px)",
-                        }}
-                      >
-                        <LocalOfferOutlinedIcon sx={styles.estiloIcones} />
-                      </Box>
-                      <Typography sx={styles.textoTabelaVazio}>Tags</Typography>
-                      <Box sx={styles.boxIconeCardInfoRight}>
-                        <IconButton
-                          onClick={() => {
-                            /* setOpenModal(true); */
-                          }}
-                        >
-                          <AddCircleOutlineOutlinedIcon
-                            sx={{ ...styles.estiloIcones, fontSize: "18px" }}
+                {groupedCards.length > 0 ? (
+                  <>
+                    {groupedCards[page - 1].map((card) => (
+                      <Box sx={styles.CardProgramacao}>
+                        <Box sx={styles.boxInfoCard}>
+                          <Box sx={styles.boxIconeCardInfoLeft}>
+                            <ChurchOutlinedIcon sx={styles.estiloIcones} />
+                          </Box>
+                          <Box sx={styles.boxLimiteTextInfo}>
+                            <Typography
+                              sx={{
+                                ...styles.textoTabelaVazio,
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap",
+                              }}
+                            >
+                              {card.culto}
+                            </Typography>
+                          </Box>
+                        </Box>
+                        <Box sx={styles.boxInfoCard}>
+                          <Box sx={styles.boxIconeCardInfoLeft}>
+                            <CalendarMonthOutlinedIcon
+                              sx={styles.estiloIcones}
+                            />
+                          </Box>
+                          <Typography sx={styles.textoTabelaVazio}>
+                            {card.dia}
+                          </Typography>
+                        </Box>
+                        <Box sx={styles.boxInfoCard}>
+                          <Box sx={styles.boxIconeCardInfoLeft}>
+                            <AccessTimeOutlinedIcon sx={styles.estiloIcones} />
+                          </Box>
+                          <Typography sx={styles.textoTabelaVazio}>
+                            {card.horario}
+                          </Typography>
+                        </Box>
+                        <Box sx={styles.boxInfoCard}>
+                          <Box sx={styles.boxIconeCardInfoLeft}>
+                            <GroupsOutlinedIcon sx={styles.estiloIcones} />
+                          </Box>
+                          <Typography sx={styles.textoTabelaVazio}>
+                            {card.servindo}
+                          </Typography>
+                        </Box>
+                        <Box sx={styles.boxInfoCard}>
+                          <Box
+                            sx={{
+                              ...styles.boxIconeCardInfoLeft,
+                              top: "calc(50% + 3px)",
+                            }}
+                          >
+                            <LocalOfferOutlinedIcon sx={styles.estiloIcones} />
+                          </Box>
+                          <Typography sx={styles.textoTabelaVazio}>
+                            Tags
+                          </Typography>
+                          <Box sx={styles.boxIconeCardInfoRight}>
+                            <IconButton
+                              onClick={() => {
+                                /* setOpenModal(true); */
+                              }}
+                            >
+                              <AddCircleOutlineOutlinedIcon
+                                sx={{
+                                  ...styles.estiloIcones,
+                                  fontSize: "18px",
+                                }}
+                              />
+                            </IconButton>
+                          </Box>
+                        </Box>
+                        <Box sx={styles.boxListChipsCardInfo}>
+                          <Chip
+                            label="Cortes de Câmera"
+                            variant="outlined"
+                            sx={styles.chipDefault}
                           />
-                        </IconButton>
+                          <Chip
+                            label="Câmera Lateral - Esquerda"
+                            variant="outlined"
+                            sx={styles.chipDefault}
+                          />
+                          <Chip
+                            label="Gimball"
+                            variant="outlined"
+                            sx={styles.chipDefault}
+                          />
+                          <Chip
+                            label="Câmera Central"
+                            variant="outlined"
+                            sx={styles.chipDefault}
+                          />
+                        </Box>
                       </Box>
-                    </Box>
-                    <Box sx={styles.boxListChipsCardInfo}>
-                      <Chip
-                        label="Cortes de Câmera"
-                        variant="outlined"
-                        sx={styles.chipDefault}
-                      />
-                      <Chip
-                        label="Câmera Lateral - Esquerda"
-                        variant="outlined"
-                        sx={styles.chipDefault}
-                      />
-                      <Chip
-                        label="Gimball"
-                        variant="outlined"
-                        sx={styles.chipDefault}
-                      />
-                      <Chip
-                        label="Câmera Central"
-                        variant="outlined"
-                        sx={styles.chipDefault}
-                      />
-                    </Box>
-                  </Box>
-                ))}
+                    ))}
+                  </>
+                ) : (
+                  <Typography sx={styles.textoTabelaVazio}>
+                    Nenhuma programação cadastrada para esse dia...
+                  </Typography>
+                )}
               </Box>
               <Box sx={styles.boxPaginacao}>
                 <Pagination
-                  count={2}
+                  count={groupedCards.length > 0 ? groupedCards.length : 1}
+                  page={page}
+                  onChange={handleChangePage}
                   shape="rounded"
                   sx={styles.estiloPaginacao}
                 />
