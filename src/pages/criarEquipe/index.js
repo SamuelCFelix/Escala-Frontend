@@ -36,6 +36,9 @@ import {
   Tab,
   Tabs,
   tabsClasses,
+  FormControlLabel,
+  Checkbox,
+  FormGroup,
 } from "@mui/material";
 import { motion } from "framer-motion";
 import "../../../src/style.css";
@@ -659,12 +662,19 @@ const CriarEquipe = () => {
   const [servindo, setServindo] = useState("");
   const [tituloCulto, setTituloCulto] = useState("");
   const [anchorEl, setAnchorEl] = useState(null);
-  const [programacoes, setProgramacoes] = useState([]);
+  const [anchorElTags, setAnchorElTags] = useState(null);
+  const [programacoes, setProgramacoes] = useState([
+    {
+      culto: "Culto celebração - ZS17",
+      dia: "Domingo",
+      horario: "17:00",
+      servindo: 4,
+    },
+  ]);
   const [positionProgramacao, setPositionProgramacao] = useState("");
   const [tags, setTags] = useState([]);
   const [valueTag, setValueTag] = useState("");
   const [valueTab, setValueTab] = useState("Domingo");
-  const [cardsCulto, setCardsCulto] = useState([]);
   const [page, setPage] = useState(1);
   const cardsPerPage = 3;
 
@@ -865,7 +875,7 @@ const CriarEquipe = () => {
   };
 
   // Filtra e divide os cards em grupos de 3 e ordena cada grupo por horário
-  const groupedCards = cardsCulto
+  const groupedCards = programacoes
     .filter((card) => card.dia === valueTab)
     .sort((a, b) => {
       const timeA = new Date(`2000-01-01T${a.horario}`);
@@ -900,10 +910,6 @@ const CriarEquipe = () => {
     if (activeStep < 2) {
       setActiveStep((proximo) => proximo + 1);
     }
-    if (activeStep === 1) {
-      let programacoesCard = [...programacoes];
-      setCardsCulto(programacoesCard);
-    }
   };
 
   const handlenVoltarStep = () => {
@@ -924,6 +930,10 @@ const CriarEquipe = () => {
     setServindo("");
     setTituloCulto("");
     setAnchorEl(null);
+  };
+
+  const handleCloseMenuTags = () => {
+    setAnchorElTags(null);
   };
 
   const CustomInputComponent = forwardRef(({ value, onChange }, ref) => (
@@ -1007,7 +1017,10 @@ const CriarEquipe = () => {
                       { dia, horario, horarioTimePicker, servindo, culto },
                       index
                     ) => (
-                      <Box sx={styles.boxCulto} key={`${dia}-${horario}`}>
+                      <Box
+                        sx={styles.boxCulto}
+                        key={`${dia}-${horario}-${index}`}
+                      >
                         <Box sx={styles.boxCardCulto}>
                           <Box sx={styles.conteudoCardCulto}>
                             <Typography sx={styles.textoTabelaVazio}>
@@ -1274,6 +1287,7 @@ const CriarEquipe = () => {
             <Box sx={styles.boxChipAdd}>
               {tags.map((tag, index) => (
                 <Chip
+                  key={tag + index}
                   label={tag.tag}
                   variant="outlined"
                   onDelete={() => {
@@ -1358,10 +1372,10 @@ const CriarEquipe = () => {
             </Box>
             <Box sx={styles.boxConteudoTabs}>
               <Box sx={styles.boxProgramacaoCards}>
-                {groupedCards.length > 0 ? (
-                  <>
-                    {groupedCards[page - 1].map((card) => (
-                      <Box sx={styles.CardProgramacao}>
+                <>
+                  {groupedCards[page - 1] ? (
+                    groupedCards[page - 1].map((card, index) => (
+                      <Box sx={styles.CardProgramacao} key={card + index}>
                         <Box sx={styles.boxInfoCard}>
                           <Box sx={styles.boxIconeCardInfoLeft}>
                             <ChurchOutlinedIcon sx={styles.estiloIcones} />
@@ -1419,8 +1433,8 @@ const CriarEquipe = () => {
                           </Typography>
                           <Box sx={styles.boxIconeCardInfoRight}>
                             <IconButton
-                              onClick={() => {
-                                /* setOpenModal(true); */
+                              onClick={(event) => {
+                                setAnchorElTags(event.currentTarget);
                               }}
                             >
                               <AddCircleOutlineOutlinedIcon
@@ -1430,6 +1444,63 @@ const CriarEquipe = () => {
                                 }}
                               />
                             </IconButton>
+
+                            <Menu
+                              id={index}
+                              anchorEl={anchorElTags}
+                              open={Boolean(anchorElTags)}
+                              onClose={handleCloseMenuTags}
+                              PaperProps={{
+                                sx: {
+                                  backgroundColor: "#1B1B1B",
+                                  border: "1px solid #F3A913",
+                                  maxHeight: "152px",
+                                  maxWidth: "286px",
+                                },
+                              }}
+                              MenuListProps={{
+                                "aria-labelledby": "basic-button",
+                              }}
+                            >
+                              <MenuList
+                                sx={{ paddingTop: "4px", paddingBottom: "4px" }}
+                              >
+                                {tags.map((tag) => (
+                                  <MenuItem
+                                    key={tag.tag}
+                                    sx={{
+                                      color: "#ffffff",
+                                      height: "42px",
+                                    }}
+                                    onClick={() => {
+                                      /* setAnchorElTags(false); */
+                                    }}
+                                  >
+                                    <FormGroup
+                                    /* sx={{
+                                        overflow: "hidden",
+                                        textOverflow: "ellipsis",
+                                        whiteSpace: "nowrap",
+                                      }} */
+                                    >
+                                      <FormControlLabel
+                                        control={
+                                          <Checkbox
+                                            sx={{
+                                              color: "#565656",
+                                              "&.Mui-checked": {
+                                                color: "#F3A913",
+                                              },
+                                            }}
+                                          />
+                                        }
+                                        label={tag.tag}
+                                      />
+                                    </FormGroup>
+                                  </MenuItem>
+                                ))}
+                              </MenuList>
+                            </Menu>
                           </Box>
                         </Box>
                         <Box sx={styles.boxListChipsCardInfo}>
@@ -1438,30 +1509,15 @@ const CriarEquipe = () => {
                             variant="outlined"
                             sx={styles.chipDefault}
                           />
-                          <Chip
-                            label="Câmera Lateral - Esquerda"
-                            variant="outlined"
-                            sx={styles.chipDefault}
-                          />
-                          <Chip
-                            label="Gimball"
-                            variant="outlined"
-                            sx={styles.chipDefault}
-                          />
-                          <Chip
-                            label="Câmera Central"
-                            variant="outlined"
-                            sx={styles.chipDefault}
-                          />
                         </Box>
                       </Box>
-                    ))}
-                  </>
-                ) : (
-                  <Typography sx={styles.textoTabelaVazio}>
-                    Nenhuma programação cadastrada para esse dia...
-                  </Typography>
-                )}
+                    ))
+                  ) : (
+                    <Typography sx={styles.textoTabelaVazio}>
+                      Nenhuma programação cadastrada para esse dia...
+                    </Typography>
+                  )}
+                </>
               </Box>
               <Box sx={styles.boxPaginacao}>
                 <Pagination
