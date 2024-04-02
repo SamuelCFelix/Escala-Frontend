@@ -129,9 +129,18 @@ const styles = {
     "& .MuiSvgIcon-root.MuiStepIcon-root.Mui-completed": {
       color: "#F3A913", // circle color (ACTIVE)
     },
-    "& .MuiStepConnector-line": {
-      borderColor: "#F3A913", // Cor padrão da linha
-    },
+    "& .MuiStepConnector-root.MuiStepConnector-alternativeLabel.Mui-disabled .MuiStepConnector-line":
+      {
+        borderColor: "#565656", // Cor padrão da linha quando ainda não completado
+      },
+    "& .MuiStepConnector-root.MuiStepConnector-alternativeLabel.Mui-active .MuiStepConnector-line":
+      {
+        borderColor: "#F3A913", // Cor padrão da linha quando ativado
+      },
+    "& .MuiStepConnector-root.MuiStepConnector-alternativeLabel.Mui-completed .MuiStepConnector-line":
+      {
+        borderColor: "#F3A913", // Cor padrão da linha quando completado
+      },
   },
   boxConteudo: {
     display: "flex",
@@ -649,7 +658,7 @@ const CriarEquipe = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState("");
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [activeStep, setActiveStep] = useState(2);
+  const [activeStep, setActiveStep] = useState(0);
   const [openModal, setOpenModal] = useState(false);
   const [openModalEdit, setOpenModalEdit] = useState(false);
   const [openModalDelete, setOpenModalDelete] = useState(false);
@@ -663,34 +672,9 @@ const CriarEquipe = () => {
   const [tituloCulto, setTituloCulto] = useState("");
   const [anchorEl, setAnchorEl] = useState(null);
   const [anchorElTags, setAnchorElTags] = useState(null);
-  const [programacoes, setProgramacoes] = useState([
-    {
-      culto: "Culto celebração - ZS17",
-      dia: "Domingo",
-      horario: "17:00",
-      servindo: 4,
-      tagsCulto: [],
-    },
-    {
-      culto: "Culto celebração - ZS17",
-      dia: "Domingo",
-      horario: "18:00",
-      servindo: 2,
-      tagsCulto: [],
-    },
-  ]);
+  const [programacoes, setProgramacoes] = useState([]);
   const [positionProgramacao, setPositionProgramacao] = useState("");
-  const [tags, setTags] = useState([
-    {
-      tag: "Cortes de Câmera",
-    },
-    {
-      tag: "Câmera Lateral Esquerda",
-    },
-    {
-      tag: "Gimball",
-    },
-  ]);
+  const [tags, setTags] = useState([]);
   const [valueTag, setValueTag] = useState("");
   const [valueTab, setValueTab] = useState("Domingo");
   const [page, setPage] = useState(1);
@@ -920,7 +904,6 @@ const CriarEquipe = () => {
         card.horario === horario &&
         card.servindo === servindo
     );
-    console.log(tag, culto, dia, horario, servindo);
 
     programacoes[getIndexCard].tagsCulto.push(tag);
     setProgramacoes([...programacoes]);
@@ -1609,6 +1592,11 @@ const CriarEquipe = () => {
                                               "&.Mui-checked": {
                                                 color: "#F3A913",
                                               },
+                                              "&.MuiButtonBase-root.MuiCheckbox-root:hover":
+                                                {
+                                                  backgroundColor:
+                                                    "rgba(243, 169, 19, 0.1)",
+                                                },
                                             }}
                                           />
                                         }

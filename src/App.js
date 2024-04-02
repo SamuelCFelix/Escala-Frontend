@@ -18,6 +18,7 @@ import CriarEquipe from "./pages/criarEquipe";
   primary: {
     main: "#F3A913",
     hoverMain: "#FEBC36",
+    hoverSecundary: "rgba(243, 169, 19, 0.7)",
     disabled: "#565656",
     disabledHover: "#666666",
     delete: "#D32F2F",
