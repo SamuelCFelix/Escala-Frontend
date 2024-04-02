@@ -22,6 +22,8 @@ import CriarEquipe from "./pages/criarEquipe";
     disabledHover: "#666666",
     delete: "#D32F2F",
     deleteHover: "#E63737",
+    erro: "#ff0000",
+    corret: "#4CAF50",
     placehold: "#BDBDBD",
   },
   secondary: {

@@ -555,7 +555,6 @@ const styles = {
     height: "24px",
   },
   boxProgramacaoCards: {
-    /* background: "blue", */
     display: "flex",
     width: "100%",
     height: "242px",
@@ -574,9 +573,10 @@ const styles = {
     mt: "5px",
     paddingTop: "5px",
     gap: "5px",
+    alignItems: "center",
+    justifyContent: "center",
   },
   boxInfoCard: {
-    /* background: "blue", */
     position: "relative",
     display: "flex",
     width: "100%",
@@ -612,8 +612,8 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     width: "100%",
-    height: "70px",
-    maxHeight: "70px",
+    height: "72px",
+    maxHeight: "72px",
     alignItems: "center",
     justifyContent: "flex-start",
     overflowY: "auto",
@@ -669,10 +669,28 @@ const CriarEquipe = () => {
       dia: "Domingo",
       horario: "17:00",
       servindo: 4,
+      tagsCulto: [],
+    },
+    {
+      culto: "Culto celebração - ZS17",
+      dia: "Domingo",
+      horario: "18:00",
+      servindo: 2,
+      tagsCulto: [],
     },
   ]);
   const [positionProgramacao, setPositionProgramacao] = useState("");
-  const [tags, setTags] = useState([]);
+  const [tags, setTags] = useState([
+    {
+      tag: "Cortes de Câmera",
+    },
+    {
+      tag: "Câmera Lateral Esquerda",
+    },
+    {
+      tag: "Gimball",
+    },
+  ]);
   const [valueTag, setValueTag] = useState("");
   const [valueTab, setValueTab] = useState("Domingo");
   const [page, setPage] = useState(1);
@@ -703,12 +721,33 @@ const CriarEquipe = () => {
   useEffect(() => {
     if (activeStep === 1) {
       if (tags.length > 0) {
-        setDisableStepperButton(false);
+        let quantidadeMinimaTags = 0;
+        programacoes.map((culto) => {
+          if (culto.servindo > quantidadeMinimaTags) {
+            quantidadeMinimaTags = culto.servindo;
+          }
+        });
+        if (tags.length >= quantidadeMinimaTags) {
+          setDisableStepperButton(false);
+        } else {
+          setDisableStepperButton(true);
+        }
       } else {
         setDisableStepperButton(true);
       }
     }
   }, [tags, activeStep]);
+
+  useEffect(() => {
+    if (activeStep === 2) {
+      setDisableStepperButton(false);
+      programacoes.map((culto) => {
+        if (culto.tagsCulto.length !== culto.servindo) {
+          setDisableStepperButton(true);
+        }
+      });
+    }
+  }, [programacoes, activeStep]);
 
   const handleSnackbarClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -766,13 +805,14 @@ const CriarEquipe = () => {
 
   function handleGerarProgramacao() {
     let novaProgramacao = {
+      culto: tituloCulto,
       dia: diaDaSemana,
       horario: format(new Date(horario), "HH:mm", {
         timeZone: "America/Sao_Paulo",
       }),
       horarioTimePicker: horario,
       servindo: servindo,
-      culto: tituloCulto,
+      tagsCulto: [],
     };
 
     if (
@@ -800,13 +840,13 @@ const CriarEquipe = () => {
     let positionEdit = positionProgramacao;
 
     let editProgramacao = {
+      culto: tituloCulto,
       dia: diaDaSemana,
       horario: format(new Date(horario), "HH:mm", {
         timeZone: "America/Sao_Paulo",
       }),
       horarioTimePicker: horario,
       servindo: servindo,
-      culto: tituloCulto,
     };
 
     let normalizedEditProgramacaoCulto = normalizeTag(editProgramacao.culto);
@@ -822,7 +862,9 @@ const CriarEquipe = () => {
       )
     ) {
       let novoArrayProgramacoes = [...programacoes];
+      let armazenarTagsEdit = novoArrayProgramacoes[positionEdit].tagsCulto;
       novoArrayProgramacoes[positionEdit] = editProgramacao;
+      novoArrayProgramacoes[positionEdit].tagsCulto = armazenarTagsEdit || [];
       setProgramacoes(novoArrayProgramacoes);
       handleCloseModal();
       setDiaDaSemana("");
@@ -868,6 +910,35 @@ const CriarEquipe = () => {
   function handleDeleteChip(positionTag) {
     let novoArrayTags = tags.filter((tag, index) => index !== positionTag);
     setTags(novoArrayTags);
+  }
+
+  function handleAddChipInCard(tag, culto, dia, horario, servindo) {
+    let getIndexCard = programacoes.findIndex(
+      (card) =>
+        card.culto === culto &&
+        card.dia === dia &&
+        card.horario === horario &&
+        card.servindo === servindo
+    );
+    console.log(tag, culto, dia, horario, servindo);
+
+    programacoes[getIndexCard].tagsCulto.push(tag);
+    setProgramacoes([...programacoes]);
+  }
+
+  function handleRemoveChipInCard(tag, culto, dia, horario, servindo) {
+    let getIndexCard = programacoes.findIndex(
+      (card) =>
+        card.culto === culto &&
+        card.dia === dia &&
+        card.horario === horario &&
+        card.servindo === servindo
+    );
+
+    programacoes[getIndexCard].tagsCulto = programacoes[
+      getIndexCard
+    ].tagsCulto.filter((tagFilter) => tagFilter !== tag);
+    setProgramacoes([...programacoes]);
   }
 
   const handleChangeTabs = (event, newValue) => {
@@ -932,8 +1003,20 @@ const CriarEquipe = () => {
     setAnchorEl(null);
   };
 
-  const handleCloseMenuTags = () => {
-    setAnchorElTags(null);
+  const [anchorElTagsArray, setAnchorElTagsArray] = useState(
+    Array(groupedCards.length).fill(null)
+  );
+
+  const handleOpenMenuTags = (event, index) => {
+    const newAnchorElTagsArray = [...anchorElTagsArray];
+    newAnchorElTagsArray[index] = event.currentTarget;
+    setAnchorElTagsArray(newAnchorElTagsArray);
+  };
+
+  const handleCloseMenuTags = (index) => {
+    const newAnchorElTagsArray = [...anchorElTagsArray];
+    newAnchorElTagsArray[index] = null;
+    setAnchorElTagsArray(newAnchorElTagsArray);
   };
 
   const CustomInputComponent = forwardRef(({ value, onChange }, ref) => (
@@ -1428,14 +1511,24 @@ const CriarEquipe = () => {
                           >
                             <LocalOfferOutlinedIcon sx={styles.estiloIcones} />
                           </Box>
-                          <Typography sx={styles.textoTabelaVazio}>
+                          <Typography
+                            sx={{
+                              ...styles.textoTabelaVazio,
+                              color:
+                                card.servindo === card.tagsCulto.length
+                                  ? "#4CAF50"
+                                  : card.tagsCulto.length > 0
+                                  ? "#D32F2F"
+                                  : "#ffffff",
+                            }}
+                          >
                             Tags
                           </Typography>
                           <Box sx={styles.boxIconeCardInfoRight}>
                             <IconButton
-                              onClick={(event) => {
-                                setAnchorElTags(event.currentTarget);
-                              }}
+                              onClick={(event) =>
+                                handleOpenMenuTags(event, index)
+                              }
                             >
                               <AddCircleOutlineOutlinedIcon
                                 sx={{
@@ -1446,10 +1539,9 @@ const CriarEquipe = () => {
                             </IconButton>
 
                             <Menu
-                              id={index}
-                              anchorEl={anchorElTags}
-                              open={Boolean(anchorElTags)}
-                              onClose={handleCloseMenuTags}
+                              anchorEl={anchorElTagsArray[index]}
+                              open={Boolean(anchorElTagsArray[index])}
+                              onClose={() => handleCloseMenuTags(index)}
                               PaperProps={{
                                 sx: {
                                   backgroundColor: "#1B1B1B",
@@ -1472,20 +1564,46 @@ const CriarEquipe = () => {
                                       color: "#ffffff",
                                       height: "42px",
                                     }}
-                                    onClick={() => {
-                                      /* setAnchorElTags(false); */
-                                    }}
                                   >
-                                    <FormGroup
-                                    /* sx={{
-                                        overflow: "hidden",
-                                        textOverflow: "ellipsis",
-                                        whiteSpace: "nowrap",
-                                      }} */
-                                    >
+                                    <FormGroup>
                                       <FormControlLabel
                                         control={
                                           <Checkbox
+                                            checked={programacoes.some(
+                                              (programacao) =>
+                                                programacao.culto ===
+                                                  card.culto &&
+                                                programacao.dia === card.dia &&
+                                                programacao.horario ===
+                                                  card.horario &&
+                                                programacao.servindo ===
+                                                  card.servindo &&
+                                                programacao.tagsCulto?.includes(
+                                                  tag.tag
+                                                )
+                                            )}
+                                            onChange={(event) => {
+                                              if (event.target.checked) {
+                                                handleAddChipInCard(
+                                                  tag.tag,
+                                                  card.culto,
+                                                  card.dia,
+                                                  card.horario,
+                                                  card.servindo
+                                                );
+                                              } else {
+                                                handleRemoveChipInCard(
+                                                  tag.tag,
+                                                  card.culto,
+                                                  card.dia,
+                                                  card.horario,
+                                                  card.servindo
+                                                );
+                                              }
+                                              setProgramacoes([
+                                                ...programacoes,
+                                              ]);
+                                            }}
                                             sx={{
                                               color: "#565656",
                                               "&.Mui-checked": {
@@ -1494,7 +1612,19 @@ const CriarEquipe = () => {
                                             }}
                                           />
                                         }
-                                        label={tag.tag}
+                                        label={
+                                          <Typography
+                                            variant="body1"
+                                            sx={{
+                                              maxWidth: "240px",
+                                              overflow: "hidden",
+                                              textOverflow: "ellipsis",
+                                              whiteSpace: "nowrap",
+                                            }}
+                                          >
+                                            {tag.tag}
+                                          </Typography>
+                                        }
                                       />
                                     </FormGroup>
                                   </MenuItem>
@@ -1504,11 +1634,31 @@ const CriarEquipe = () => {
                           </Box>
                         </Box>
                         <Box sx={styles.boxListChipsCardInfo}>
-                          <Chip
-                            label="Cortes de Câmera"
-                            variant="outlined"
-                            sx={styles.chipDefault}
-                          />
+                          {card.tagsCulto && card.tagsCulto.length > 0 ? (
+                            card.tagsCulto.map((tagName, index) => (
+                              <Chip
+                                key={index}
+                                label={tagName}
+                                variant="outlined"
+                                sx={{
+                                  ...styles.chipDefault,
+                                  maxWidth: "190px",
+                                  mr: "-10px",
+                                }}
+                              />
+                            ))
+                          ) : (
+                            <Typography
+                              sx={{
+                                ...styles.textoTabelaVazio,
+                                mt: "20px",
+                                ml: "11px",
+                                color: "#ff0000",
+                              }}
+                            >
+                              Nenhuma Tag Cadastrada
+                            </Typography>
+                          )}
                         </Box>
                       </Box>
                     ))
