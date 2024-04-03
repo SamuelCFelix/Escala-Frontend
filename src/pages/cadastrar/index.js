@@ -14,6 +14,7 @@ import { Link, json, useNavigate } from "react-router-dom";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
 import { useAuth } from "../../components/authContext";
+import api from "../../api";
 
 const styles = {
   container: {
@@ -272,21 +273,17 @@ const Cadastrar = () => {
       handleOpenPopUpError();
     } else {
       try {
-        const response = await axios.post(
-          "http://localhost:3000/createPerfil",
-          {
-            nome: nome.toUpperCase(),
-            cpf: cpf,
-            dataNascimento: dataNascimento,
-            numeroTelefone: telefone,
-            email: email,
-            senha: password,
-          }
-        );
+        const response = await api.post("/createPerfil", {
+          nome: nome.toUpperCase(),
+          cpf: cpf,
+          dataNascimento: dataNascimento,
+          numeroTelefone: telefone,
+          email: email,
+          senha: password,
+        });
 
         if (response.status === 201) {
           showPopup();
-          console.log("PERFIL CRIADO COM SUCESSO!!!");
           navigate("/login");
         } else {
           console.error("erro ao criar perfil", response.data);

@@ -1,11 +1,11 @@
 import { Box, Button, Snackbar, TextField, Typography } from "@mui/material";
 import BackgroundImage from "../../img/Foto Produção Samuel.jpeg";
 import { forwardRef, useState } from "react";
-import axios from "axios";
 import LogoRodape from "../../img/Logo ZS.png";
 import { Link, useNavigate } from "react-router-dom";
 import MuiAlert from "@mui/material/Alert";
 import { useAuth } from "../../components/authContext";
+import api from "../../api";
 
 const styles = {
   container: {
@@ -254,7 +254,7 @@ const Login = () => {
       handleOpenPopUpError();
     } else {
       try {
-        const response = await axios.post("http://localhost:3000/loginAuth", {
+        const response = await api.post("/loginAuth", {
           email: email,
           senha: password,
         });

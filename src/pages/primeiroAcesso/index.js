@@ -1,10 +1,13 @@
 import {
+  Backdrop,
   Box,
   Button,
   ButtonBase,
   Fade,
+  Modal,
   Slide,
   Stack,
+  TextField,
   Typography,
   styled,
 } from "@mui/material";
@@ -13,6 +16,8 @@ import "../../../src/style.css";
 import imagemLider from "../../img/zs-lider.JPG";
 import imagemServo from "../../img/zs-servo.JPG";
 import { Fragment, useEffect, useState } from "react";
+import api from "../../api";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 
 const styles = {
   container: {
@@ -170,11 +175,124 @@ const styles = {
       background: "#FEBC36",
     },
   },
+  botaoDefault: {
+    display: "flex",
+    width: "140px",
+    height: "30px",
+    padding: "0px 40px",
+    borderRadius: "10px",
+    fontFamily: "Roboto, sans-serif",
+    fontSize: "12px",
+    lineHeight: "36px",
+    letterSpacing: "1.25px",
+    color: "#ffffff",
+    background: "#F3A913",
+    "&:hover": {
+      background: "#FEBC36",
+    },
+  },
+  textoDefault: {
+    fontSize: "14px",
+    color: "#ffffff",
+    lineHeight: "24px",
+    letterSpacing: "0.17px",
+  },
+  textField: {
+    display: "flex",
+    width: "100%",
+    "& input": {
+      color: "#ffffff",
+    },
+    "& .MuiInputLabel-root": {
+      color: "#BDBDBD",
+      "&.MuiInputLabel-shrink": {
+        color: "#ffffff",
+      },
+    },
+    "& .MuiSelect-icon": {
+      color: "#ffffff",
+    },
+    "& .MuiOutlinedInput-root": {
+      "& fieldset": {
+        borderColor: "#F3A913",
+      },
+      "&:hover fieldset": {
+        borderColor: "#F3A913",
+      },
+      "&.Mui-focused fieldset": {
+        borderColor: "#F3A913",
+      },
+      "& .MuiInputBase-input": {
+        color: "#ffffff",
+      },
+    },
+    "& .MuiMenuItem-root.Mui-selected": {
+      color: "#ffffff",
+    },
+    "& .MuiSvgIcon-root": {
+      color: "#ffffff",
+    },
+    "& .MuiOutlinedInput-root .MuiSelect-select": {
+      textAlign: "center",
+    },
+  },
+  boxModalAutorizacao: {
+    backgroundColor: "#1B1B1B",
+    border: "1px solid #F3A913",
+    borderRadius: "10px",
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: "290px",
+    height: "280px",
+    boxShadow: 24,
+  },
+  boxConteudoModalAutorizacao: {
+    width: "100%",
+    height: "100%",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    gap: "10px",
+  },
+  boxAreaTituloModalAutorizacao: {
+    width: "100%",
+    height: "25%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    mt: "-6px",
+  },
+  boxTituloModalAutorizacao: {
+    width: "220px",
+    height: "100%",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  tituloModalAutorizacao: {
+    color: "#ffffff",
+    textTransform: "uppercase",
+    fontSize: "14px",
+    lineHeight: "16px",
+    letterSpacing: "1.25px",
+    margin: "6% 0%",
+  },
+  baseTituloModalAutorizacao: {
+    background: "#F3A913",
+    width: "100%",
+    height: "3.5%",
+  },
 };
 
 const PrimerioAcesso = () => {
   const [selectLider, setSelectLider] = useState(false);
   const [selectServo, setSelectServo] = useState(false);
+  const [openModalAutorizacao, setOpenModalAutorizacao] = useState(false);
+  const [valuePassword, setValuePassword] = useState("");
 
   const handleSelectLider = () => {
     setSelectLider(!selectLider);
@@ -188,6 +306,18 @@ const PrimerioAcesso = () => {
       setSelectLider(false);
     }
   };
+
+  const handleCloseModal = () => {
+    setOpenModalAutorizacao(false);
+  };
+
+  async function handleApiPasswordAutorization() {
+    try {
+      const response = await api.post("/createHostAutorization", {
+        senha: valuePassword,
+      });
+    } catch {}
+  }
 
   return (
     <Box sx={styles.container}>
@@ -253,7 +383,8 @@ const PrimerioAcesso = () => {
                       disabled={!selectLider}
                       sx={styles.botaoSelecionar}
                       onClick={() => {
-                        window.location.href = "/primeiroAcesso/criarequipe";
+                        /* window.location.href = "/primeiroAcesso/criarequipe"; */
+                        setOpenModalAutorizacao(true);
                       }}
                     >
                       Escolher
@@ -326,6 +457,136 @@ const PrimerioAcesso = () => {
           </Box>
         </Stack>
       </Box>
+      <Modal
+        open={openModalAutorizacao}
+        onClose={() => {
+          handleCloseModal();
+        }}
+        closeAfterTransition
+        slots={{ backdrop: Backdrop }}
+        slotProps={{
+          backdrop: {
+            timeout: 500,
+          },
+        }}
+      >
+        <Fade in={openModalAutorizacao}>
+          <Box sx={styles.boxModalAutorizacao}>
+            <Box sx={styles.boxConteudoModalAutorizacao}>
+              <Box sx={styles.boxAreaTituloModalAutorizacao}>
+                <Box sx={styles.boxTituloModalAutorizacao}>
+                  <Typography sx={styles.tituloModalAutorizacao}>
+                    Autorização
+                  </Typography>
+                  <Box sx={styles.baseTituloModalAutorizacao} />
+                </Box>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  width: "220px",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexDirection: "column",
+                  mt: "5px",
+                }}
+              >
+                <Typography
+                  sx={{
+                    ...styles.textoDefault,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: "100%",
+                  }}
+                >
+                  Digite a senha de autorização
+                </Typography>
+                <Typography
+                  sx={{
+                    ...styles.textoDefault,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: "100%",
+                  }}
+                >
+                  para criação de um Perfil Líder
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  width: "220px",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  mt: "10px",
+                }}
+              >
+                <TextField
+                  value={valuePassword}
+                  onChange={(event) => {
+                    setValuePassword(event.target.value);
+                  }}
+                  sx={{
+                    ...styles.textField,
+                    "&.MuiFormControl-root.MuiTextField-root .MuiInputLabel-root.MuiInputLabel-shrink":
+                      {
+                        color: "#F3A913",
+                      },
+                    "&.MuiFormControl-root-MuiTextField-root.MuiInputBase-root-MuiFilledInput-root:hover":
+                      {
+                        backgroundColor: "#1B1B1B",
+                      },
+                    "& .MuiInputBase-root.MuiFilledInput-root:after": {
+                      borderBottom: "none",
+                    },
+                    "& .MuiInputBase-root.MuiFilledInput-root:hover": {
+                      backgroundColor: "#1B1B1B",
+                    },
+                    "& .MuiInputBase-root.MuiFilledInput-root": {
+                      backgroundColor: "#1B1B1B",
+                    },
+                  }}
+                  type="password"
+                  variant="filled"
+                  placeholder="Digite a senha..."
+                  InputProps={{
+                    endAdornment: (
+                      <LockOutlinedIcon
+                        sx={{ color: "#F3A913", marginRight: "8px" }}
+                      />
+                    ),
+                    sx: {
+                      borderBottom: "2px solid #F3A913",
+                      background: "#1B1B1B",
+                    },
+                  }}
+                />
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  width: "220px",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  height: "40px",
+                  mt: "15px",
+                }}
+              >
+                <Button
+                  sx={{ ...styles.botaoDefault, width: "100%" }}
+                  onClick={() => {
+                    handleApiPasswordAutorization();
+                  }}
+                >
+                  Enviar
+                </Button>
+              </Box>
+            </Box>
+          </Box>
+        </Fade>
+      </Modal>
     </Box>
   );
 };

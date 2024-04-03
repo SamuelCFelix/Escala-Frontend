@@ -303,7 +303,7 @@ const styles = {
     width: "100%",
     height: "275px",
   },
-  textoTabelaVazio: {
+  textoDefault: {
     fontSize: "14px",
     color: "#ffffff",
     lineHeight: "24px",
@@ -1089,24 +1089,24 @@ const CriarEquipe = () => {
                       >
                         <Box sx={styles.boxCardCulto}>
                           <Box sx={styles.conteudoCardCulto}>
-                            <Typography sx={styles.textoTabelaVazio}>
+                            <Typography sx={styles.textoDefault}>
                               {dia}
                             </Typography>
                           </Box>
                           <Box sx={styles.conteudoCardCulto}>
-                            <Typography sx={styles.textoTabelaVazio}>
+                            <Typography sx={styles.textoDefault}>
                               {horario}
                             </Typography>
                           </Box>
                           <Box sx={styles.conteudoCardCulto}>
-                            <Typography sx={styles.textoTabelaVazio}>
+                            <Typography sx={styles.textoDefault}>
                               {servindo}
                             </Typography>
                           </Box>
                           <Box sx={styles.conteudoCardCulto2}>
                             <Typography
                               sx={{
-                                ...styles.textoTabelaVazio,
+                                ...styles.textoDefault,
                                 overflow: "hidden",
                                 textOverflow: "ellipsis",
                                 whiteSpace: "nowrap",
@@ -1195,7 +1195,7 @@ const CriarEquipe = () => {
                   )}
                 </Box>
               ) : (
-                <Typography sx={styles.textoTabelaVazio}>
+                <Typography sx={styles.textoDefault}>
                   Aqui será inserido as programações padrões da sua equipe...
                   <br />
                   <br />
@@ -1245,7 +1245,7 @@ const CriarEquipe = () => {
           <Box sx={styles.box1Stepper1}>
             <Typography
               sx={{
-                ...styles.textoTabelaVazio,
+                ...styles.textoDefault,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -1253,37 +1253,33 @@ const CriarEquipe = () => {
             >
               Agora vamos criar as TAGS:
             </Typography>
-            <Typography sx={{ ...styles.textoTabelaVazio, mt: "12px" }}>
+            <Typography sx={{ ...styles.textoDefault, mt: "12px" }}>
               As tags são identificações que serão necessárias para criação das
               escalas. Elas também serão atribuídas por você aos servos da sua
               equipe de forma individual futuramente.
             </Typography>
-            <Typography sx={{ ...styles.textoTabelaVazio, mt: "12px" }}>
+            <Typography sx={{ ...styles.textoDefault, mt: "12px" }}>
               Todos os cultos tem uma quantidade de pessoas servindo, e será
               através das tags que será informado a necessidade de cada culto.
             </Typography>
-            <Typography
-              sx={{ ...styles.textoTabelaVazio, mt: "12px", mb: "5px" }}
-            >
+            <Typography sx={{ ...styles.textoDefault, mt: "12px", mb: "5px" }}>
               Exemplo:
             </Typography>
 
             <Box sx={{ ...styles.boxCardCulto, width: "100%" }}>
               <Box sx={styles.conteudoCardCulto}>
-                <Typography sx={styles.textoTabelaVazio}>
-                  Quinta-Feira
-                </Typography>
+                <Typography sx={styles.textoDefault}>Quinta-Feira</Typography>
               </Box>
               <Box sx={styles.conteudoCardCulto}>
-                <Typography sx={styles.textoTabelaVazio}>19:30</Typography>
+                <Typography sx={styles.textoDefault}>19:30</Typography>
               </Box>
               <Box sx={styles.conteudoCardCulto}>
-                <Typography sx={styles.textoTabelaVazio}>3</Typography>
+                <Typography sx={styles.textoDefault}>3</Typography>
               </Box>
               <Box sx={styles.conteudoCardCulto2}>
                 <Typography
                   sx={{
-                    ...styles.textoTabelaVazio,
+                    ...styles.textoDefault,
                     overflow: "hidden",
                     textOverflow: "ellipsis",
                     whiteSpace: "nowrap",
@@ -1294,7 +1290,7 @@ const CriarEquipe = () => {
               </Box>
             </Box>
 
-            <Typography sx={{ ...styles.textoTabelaVazio, mt: "5px" }}>
+            <Typography sx={{ ...styles.textoDefault, mt: "5px" }}>
               Nesse culto precisa de 3 servos e suas TAGS serão:
             </Typography>
             <Box sx={styles.boxChipDefault}>
@@ -1449,7 +1445,7 @@ const CriarEquipe = () => {
                           <Box sx={styles.boxLimiteTextInfo}>
                             <Typography
                               sx={{
-                                ...styles.textoTabelaVazio,
+                                ...styles.textoDefault,
                                 overflow: "hidden",
                                 textOverflow: "ellipsis",
                                 whiteSpace: "nowrap",
@@ -1465,7 +1461,7 @@ const CriarEquipe = () => {
                               sx={styles.estiloIcones}
                             />
                           </Box>
-                          <Typography sx={styles.textoTabelaVazio}>
+                          <Typography sx={styles.textoDefault}>
                             {card.dia}
                           </Typography>
                         </Box>
@@ -1473,7 +1469,7 @@ const CriarEquipe = () => {
                           <Box sx={styles.boxIconeCardInfoLeft}>
                             <AccessTimeOutlinedIcon sx={styles.estiloIcones} />
                           </Box>
-                          <Typography sx={styles.textoTabelaVazio}>
+                          <Typography sx={styles.textoDefault}>
                             {card.horario}
                           </Typography>
                         </Box>
@@ -1481,7 +1477,7 @@ const CriarEquipe = () => {
                           <Box sx={styles.boxIconeCardInfoLeft}>
                             <GroupsOutlinedIcon sx={styles.estiloIcones} />
                           </Box>
-                          <Typography sx={styles.textoTabelaVazio}>
+                          <Typography sx={styles.textoDefault}>
                             {card.servindo}
                           </Typography>
                         </Box>
@@ -1496,7 +1492,7 @@ const CriarEquipe = () => {
                           </Box>
                           <Typography
                             sx={{
-                              ...styles.textoTabelaVazio,
+                              ...styles.textoDefault,
                               color:
                                 card.servindo === card.tagsCulto.length
                                   ? "#4CAF50"
@@ -1638,7 +1634,7 @@ const CriarEquipe = () => {
                           ) : (
                             <Typography
                               sx={{
-                                ...styles.textoTabelaVazio,
+                                ...styles.textoDefault,
                                 mt: "20px",
                                 ml: "11px",
                                 color: "#ff0000",
@@ -1651,7 +1647,7 @@ const CriarEquipe = () => {
                       </Box>
                     ))
                   ) : (
-                    <Typography sx={styles.textoTabelaVazio}>
+                    <Typography sx={styles.textoDefault}>
                       Nenhuma programação cadastrada para esse dia...
                     </Typography>
                   )}
@@ -1675,7 +1671,7 @@ const CriarEquipe = () => {
                   />
                   <ListItemText
                     primaryTypographyProps={{
-                      ...styles.textoTabelaVazio,
+                      ...styles.textoDefault,
                       fontSize: "14px",
                     }}
                     primary="Adicione as TAGS para cada culto e depois clique no botão Criar"
