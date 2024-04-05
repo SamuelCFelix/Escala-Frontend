@@ -39,6 +39,7 @@ import {
   FormControlLabel,
   Checkbox,
   FormGroup,
+  CircularProgress,
 } from "@mui/material";
 import { motion } from "framer-motion";
 import "../../../src/style.css";
@@ -59,6 +60,7 @@ import { format } from "date-fns-tz";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
+import api from "../../api";
 
 const styles = {
   container: {
@@ -655,6 +657,7 @@ const styles = {
 };
 
 const CriarEquipe = () => {
+  const [usuarioHostId, setUsuarioHostId] = useState("");
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState("");
   const [snackbarMessage, setSnackbarMessage] = useState("");
@@ -668,7 +671,7 @@ const CriarEquipe = () => {
   const [descricaoEquipe, setDescricaoEquipe] = useState("");
   const [diaDaSemana, setDiaDaSemana] = useState("");
   const [horario, setHorario] = useState(null);
-  const [servindo, setServindo] = useState("");
+  const [servindo, setServindo] = useState();
   const [tituloCulto, setTituloCulto] = useState("");
   const [anchorEl, setAnchorEl] = useState(null);
   const [anchorElTags, setAnchorElTags] = useState(null);
@@ -677,8 +680,21 @@ const CriarEquipe = () => {
   const [tags, setTags] = useState([]);
   const [valueTag, setValueTag] = useState("");
   const [valueTab, setValueTab] = useState("Domingo");
+  const [loadingApi, setLoadingApi] = useState(false);
   const [page, setPage] = useState(1);
   const cardsPerPage = 3;
+
+  useEffect(() => {
+    const storedData = localStorage.getItem("login");
+
+    const userData = JSON.parse(storedData);
+
+    if (userData?.usuarioHostId) {
+      setUsuarioHostId(userData.usuarioHostId);
+    } else {
+      window.location.href = "/login";
+    }
+  }, []);
 
   useEffect(() => {
     if (diaDaSemana && horario && servindo && tituloCulto) {
@@ -732,6 +748,26 @@ const CriarEquipe = () => {
       });
     }
   }, [programacoes, activeStep]);
+
+  async function handleApiCriarEquipe() {
+    try {
+      setLoadingApi(true);
+      const response = await api.post("/criarEquipe", {
+        usuarioHostId,
+        nomeEquipe,
+        descricaoEquipe,
+        programacoes,
+        tags,
+      });
+      if (response) {
+        window.location.href = "/home";
+      }
+    } catch (error) {
+      setSnackbar("error", "Erro ao conectar com o servidor");
+    } finally {
+      setLoadingApi(false);
+    }
+  }
 
   const handleSnackbarClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -1729,6 +1765,10 @@ const CriarEquipe = () => {
               }}
               onClick={() => {
                 handlenProximoStep();
+
+                if (activeStep === 2) {
+                  handleApiCriarEquipe();
+                }
               }}
             >
               {activeStep === 2 ? "Criar" : "Próximo"}
@@ -2192,6 +2232,12 @@ const CriarEquipe = () => {
           {snackbarMessage}
         </Alert>
       </Snackbar>
+      <Backdrop
+        sx={{ color: "#F3A913", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={loadingApi}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </Box>
   );
 };

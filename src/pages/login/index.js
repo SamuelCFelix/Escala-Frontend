@@ -6,6 +6,8 @@ import { Link, useNavigate } from "react-router-dom";
 import MuiAlert from "@mui/material/Alert";
 import { useAuth } from "../../components/authContext";
 import api from "../../api";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 
 const styles = {
   container: {
@@ -200,7 +202,9 @@ const styles = {
 };
 
 const Login = () => {
-  const navigate = useNavigate();
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarSeverity, setSnackbarSeverity] = useState("");
+  const [snackbarMessage, setSnackbarMessage] = useState("");
   const { hidePopup } = useAuth();
   const { showCadastroFeitoPopup } = useAuth();
   const [showPopup, setShowPopup] = useState(showCadastroFeitoPopup);
@@ -237,6 +241,18 @@ const Login = () => {
     setOpenPopUpError(false);
   };
 
+  const setSnackbar = (severity, message) => {
+    setSnackbarSeverity(severity);
+    setSnackbarMessage(message);
+    setSnackbarOpen(true);
+  };
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbarOpen(false);
+  };
+
   //Botão de Login
   const handleLogin = async (event) => {
     if (
@@ -259,11 +275,19 @@ const Login = () => {
           senha: password,
         });
         if (response.status === 200 && response.data) {
-          localStorage.setItem("token", response.data);
-          navigate("/home");
+          const data = response.data;
+          localStorage.setItem("token", JSON.stringify(data.token));
+          localStorage.setItem("login", JSON.stringify(data));
+          if (data.primeiroAcesso === true) {
+            window.location.href = "/primeiroAcesso";
+          } else if (!data?.equipe[0]?.id) {
+            window.location.href = `/primeiroAcesso/criarequipe`;
+          } else {
+            window.location.href = "/home";
+          }
         }
       } catch (error) {
-        console.error("Erro ao conectar com o servidor: ", error);
+        setSnackbar("error", "Login ou senha incorreta");
       }
     }
   };
@@ -333,6 +357,9 @@ const Login = () => {
               onKeyDown={handleKeyDown}
               sx={styles.inputLogin}
               onBlur={handleBlurEmail}
+              InputProps={{
+                endAdornment: <EmailOutlinedIcon sx={{ color: "#F3A913" }} />,
+              }}
             />
             <TextField
               error={errorPassword}
@@ -347,6 +374,9 @@ const Login = () => {
               onKeyDown={handleKeyDown}
               sx={styles.inputLogin}
               onBlur={handleBlurPassword}
+              InputProps={{
+                endAdornment: <LockOutlinedIcon sx={{ color: "#F3A913" }} />,
+              }}
             />
           </Box>
           <Button sx={styles.botaoEqueciSenha}>Esqueci minha senha</Button>
@@ -409,6 +439,25 @@ const Login = () => {
           alt="LogoRodape"
         />
       </Box>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={handleSnackbarClose}
+        style={{
+          bottom: "20px",
+          left: "50%",
+          transform: "translateX(-50%)",
+        }}
+      >
+        <Alert
+          elevation={6}
+          variant="filled"
+          onClose={handleSnackbarClose}
+          severity={snackbarSeverity}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

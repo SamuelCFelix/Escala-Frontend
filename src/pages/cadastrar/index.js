@@ -190,7 +190,6 @@ const Cadastrar = () => {
   const [nome, setNome] = useState("");
   const [cpf, setCpf] = useState("");
   const [dataNascimento, setDataNascimento] = useState("");
-  const [telefone, setTelefone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -199,7 +198,6 @@ const Cadastrar = () => {
   const [errorNome, setErrorNome] = useState(false);
   const [errorCpf, setErrorCpf] = useState(false);
   const [errorDataNascimento, setErrorDataNascimento] = useState(false);
-  const [errorTelefone, setErrorTelefone] = useState(false);
   const [errorEmail, setErrorEmail] = useState(false);
   const [errorPassword, setErrorPassword] = useState(false);
   const [errorConfirmPassword, setErrorConfirmPassword] = useState(false);
@@ -227,7 +225,6 @@ const Cadastrar = () => {
       nome === "" ||
       cpf === "" ||
       dataNascimento === "" ||
-      telefone === "" ||
       email === "" ||
       password === "" ||
       confirmPassword === "" ||
@@ -236,7 +233,6 @@ const Cadastrar = () => {
       errorNome === true ||
       errorCpf === true ||
       errorDataNascimento === true ||
-      errorTelefone === true ||
       errorEmail === true ||
       errorPassword === true ||
       errorConfirmPassword === true ||
@@ -250,9 +246,6 @@ const Cadastrar = () => {
       }
       if (dataNascimento === "") {
         setErrorDataNascimento(true);
-      }
-      if (telefone === "") {
-        setErrorTelefone(true);
       }
       if (email === "") {
         setErrorEmail(true);
@@ -277,9 +270,9 @@ const Cadastrar = () => {
           nome: nome.toUpperCase(),
           cpf: cpf,
           dataNascimento: dataNascimento,
-          numeroTelefone: telefone,
           email: email,
           senha: password,
+          termos: checked,
         });
 
         if (response.status === 201) {
@@ -421,47 +414,6 @@ const Cadastrar = () => {
     return formattedPartial;
   };
 
-  const handleInputTelefone = (event) => {
-    const inputTelefone = event.target.value;
-    const formattedTelefone = formatarTelefone(inputTelefone);
-    setTelefone(formattedTelefone);
-  };
-
-  const handleBlurTelefone = (event) => {
-    const inputTelefone = event.target.value;
-    const formattedTelefone = formatarTelefone(inputTelefone);
-
-    if (formattedTelefone.length === 15) {
-      setTelefone(formattedTelefone);
-      setErrorTelefone(false);
-    } else if (formattedTelefone.length === 0) {
-      setErrorTelefone(false);
-    } else {
-      setErrorTelefone(true);
-    }
-  };
-
-  const formatarTelefone = (input) => {
-    const cleaned = ("" + input).replace(/\D/g, ""); // Remove caracteres não numéricos
-
-    // Limita a 11 números
-    const maxLength = 11;
-    const formatted = cleaned.slice(0, maxLength);
-
-    // Aplica a formatação durante a digitação
-    const firstPart = formatted.slice(0, 2);
-    const secondPart = formatted.slice(2, 7);
-    const thirdPart = formatted.slice(7, 11);
-
-    let formattedPartial = "";
-
-    if (firstPart) formattedPartial += `(${firstPart})`;
-    if (secondPart) formattedPartial += ` ${secondPart}`;
-    if (thirdPart) formattedPartial += `-${thirdPart}`;
-
-    return formattedPartial;
-  };
-
   const validarEmail = (email) => {
     const regex = /^[^\s@]+@adpaz-zs\.com\.br$/;
     return regex.test(email);
@@ -578,26 +530,6 @@ const Cadastrar = () => {
                   onKeyDown={handleKeyDown}
                   sx={styles.inputCadastro}
                   onBlur={handleBlurDataNascimento}
-                />
-                <TextField
-                  error={errorTelefone}
-                  id="numeroDeTelefone"
-                  label="Número de telefone"
-                  value={telefone}
-                  placeholder="(__) _____-____"
-                  variant="outlined"
-                  inputProps={{
-                    inputMode: "numeric",
-                    pattern: "[0-9]*",
-                    maxLength: 15,
-                  }}
-                  onChange={(event) => {
-                    handleInputTelefone(event);
-                    setErrorTelefone(false);
-                  }}
-                  onKeyDown={handleKeyDown}
-                  sx={styles.inputCadastro}
-                  onBlur={handleBlurTelefone}
                 />
               </Box>
 

@@ -43,7 +43,10 @@ function App() {
           <Route path="/cadastrar" element={<Cadastrar />} />
           <Route path="/home" element={<Home />} />
           <Route path="/primeiroacesso" element={<PrimerioAcesso />} />
-          <Route path="/primeiroacesso/criarequipe" element={<CriarEquipe />} />
+          <Route
+            path="/primeiroacesso/criarequipe/*"
+            element={<CriarEquipe />}
+          />
         </Routes>
       </Router>
       {/*       </ThemeProvider> */}

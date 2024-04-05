@@ -1,4 +1,5 @@
 import {
+  Alert,
   Backdrop,
   Box,
   Button,
@@ -6,6 +7,7 @@ import {
   Fade,
   Modal,
   Slide,
+  Snackbar,
   Stack,
   TextField,
   Typography,
@@ -289,10 +291,40 @@ const styles = {
 };
 
 const PrimerioAcesso = () => {
+  const [loadingPage, setLoadingPage] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarSeverity, setSnackbarSeverity] = useState("");
+  const [snackbarMessage, setSnackbarMessage] = useState("");
   const [selectLider, setSelectLider] = useState(false);
   const [selectServo, setSelectServo] = useState(false);
   const [openModalAutorizacao, setOpenModalAutorizacao] = useState(false);
   const [valuePassword, setValuePassword] = useState("");
+  const [usuarioPerfilId, setUsuarioPerfilId] = useState("");
+
+  useEffect(() => {
+    const storedData = localStorage.getItem("login");
+
+    const userData = JSON.parse(storedData);
+    if (userData?.usuarioPerfilId) {
+      setUsuarioPerfilId(userData.usuarioPerfilId);
+      setLoadingPage(true);
+    } else {
+      window.location.href = "/login";
+    }
+  }, []);
+
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbarOpen(false);
+  };
+
+  const setSnackbar = (severity, message) => {
+    setSnackbarSeverity(severity);
+    setSnackbarMessage(message);
+    setSnackbarOpen(true);
+  };
 
   const handleSelectLider = () => {
     setSelectLider(!selectLider);
@@ -309,14 +341,22 @@ const PrimerioAcesso = () => {
 
   const handleCloseModal = () => {
     setOpenModalAutorizacao(false);
+    setValuePassword("");
   };
 
   async function handleApiPasswordAutorization() {
     try {
-      const response = await api.post("/createHostAutorization", {
+      const response = await api.post("/usuario/createUsuarioHost", {
         senha: valuePassword,
+        usuarioPerfilId,
       });
-    } catch {}
+      if (response.status === 201) {
+        localStorage.setItem("login", JSON.stringify(response.data));
+        window.location.href = "/primeiroAcesso/criarequipe";
+      }
+    } catch (error) {
+      setSnackbar("error", "Acesso negado");
+    }
   }
 
   return (
@@ -553,9 +593,7 @@ const PrimerioAcesso = () => {
                   placeholder="Digite a senha..."
                   InputProps={{
                     endAdornment: (
-                      <LockOutlinedIcon
-                        sx={{ color: "#F3A913", marginRight: "8px" }}
-                      />
+                      <LockOutlinedIcon sx={{ mr: "-16px", mt: "16px" }} />
                     ),
                     sx: {
                       borderBottom: "2px solid #F3A913",
@@ -587,6 +625,25 @@ const PrimerioAcesso = () => {
           </Box>
         </Fade>
       </Modal>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={handleSnackbarClose}
+        style={{
+          bottom: "20px",
+          left: "50%",
+          transform: "translateX(-50%)",
+        }}
+      >
+        <Alert
+          elevation={6}
+          variant="filled"
+          onClose={handleSnackbarClose}
+          severity={snackbarSeverity}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
