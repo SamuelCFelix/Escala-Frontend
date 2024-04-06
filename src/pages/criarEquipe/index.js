@@ -210,7 +210,7 @@ const styles = {
   box1Stepper0: {
     display: "flex",
     flexDirection: "column",
-    width: "305px",
+    width: "249px",
     height: "100%",
     mr: "25px",
     ml: "40px",
@@ -449,7 +449,7 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     width: "528px",
-    maxHeight: "275px",
+    maxHeight: "250px",
     overflowY: "auto",
   },
   boxCulto: {
@@ -1065,11 +1065,13 @@ const CriarEquipe = () => {
             <TextField
               value={descricaoEquipe}
               onChange={(event) => {
-                setDescricaoEquipe(event.target.value);
+                if (event.target.value.length <= 204) {
+                  setDescricaoEquipe(event.target.value);
+                }
               }}
               label="Descrição da equipe"
               multiline
-              rows={10}
+              rows={9}
               sx={styles.textField}
             />
           </Box>
