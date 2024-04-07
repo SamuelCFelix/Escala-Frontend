@@ -1750,7 +1750,7 @@ const CriarEquipe = () => {
                 if (activeStep !== 0) {
                   handlenVoltarStep();
                 } else {
-                  window.location.href = "/primeiroAcesso";
+                  window.location.href = "/login";
                 }
               }}
             >
