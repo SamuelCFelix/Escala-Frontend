@@ -238,7 +238,7 @@ const styles = {
       textAlign: "center",
     },
   },
-  boxModalAutorizacao: {
+  boxModalAvisos: {
     backgroundColor: "#1B1B1B",
     border: "1px solid #F3A913",
     borderRadius: "10px",
@@ -250,7 +250,7 @@ const styles = {
     height: "280px",
     boxShadow: 24,
   },
-  boxConteudoModalAutorizacao: {
+  boxConteudoModalAvisos: {
     width: "100%",
     height: "100%",
     display: "flex",
@@ -259,7 +259,7 @@ const styles = {
     justifyContent: "flex-start",
     gap: "10px",
   },
-  boxAreaTituloModalAutorizacao: {
+  boxAreaTituloModalAvisos: {
     width: "100%",
     height: "25%",
     display: "flex",
@@ -267,7 +267,7 @@ const styles = {
     justifyContent: "center",
     mt: "-6px",
   },
-  boxTituloModalAutorizacao: {
+  boxTituloModalAvisos: {
     width: "220px",
     height: "100%",
     display: "flex",
@@ -275,7 +275,7 @@ const styles = {
     alignItems: "center",
     justifyContent: "center",
   },
-  tituloModalAutorizacao: {
+  tituloModalAvisos: {
     color: "#ffffff",
     textTransform: "uppercase",
     fontSize: "14px",
@@ -283,7 +283,7 @@ const styles = {
     letterSpacing: "1.25px",
     margin: "6% 0%",
   },
-  baseTituloModalAutorizacao: {
+  baseTituloModalAvisos: {
     background: "#F3A913",
     width: "100%",
     height: "3.5%",
@@ -298,6 +298,7 @@ const PrimerioAcesso = () => {
   const [selectLider, setSelectLider] = useState(false);
   const [selectServo, setSelectServo] = useState(false);
   const [openModalAutorizacao, setOpenModalAutorizacao] = useState(false);
+  const [openModalSelectServo, setOpenModalSelectServo] = useState(false);
   const [valuePassword, setValuePassword] = useState("");
   const [usuarioPerfilId, setUsuarioPerfilId] = useState("");
 
@@ -312,6 +313,37 @@ const PrimerioAcesso = () => {
       window.location.href = "/login";
     }
   }, []);
+
+  async function handleApiPasswordAutorization() {
+    try {
+      const response = await api.post("/usuario/createUsuarioHost", {
+        senha: valuePassword,
+        usuarioPerfilId,
+      });
+      if (response.status === 201) {
+        localStorage.setItem("login", JSON.stringify(response.data));
+        window.location.href = "/primeiroAcesso/criarequipe";
+      }
+    } catch (error) {
+      setSnackbar("error", "Acesso negado");
+    }
+  }
+
+  async function handleApiSelectServo() {
+    try {
+      /* const response = await api.post("/usuario/createUsuarioHost", {
+        senha: valuePassword,
+        usuarioPerfilId,
+      });
+      if (response.status === 201) {
+        localStorage.setItem("login", JSON.stringify(response.data));
+        window.location.href = "/primeiroAcesso/criarequipe";
+      } */
+      window.location.href = "/primeiroAcesso/escolherequipe";
+    } catch (error) {
+      setSnackbar("error", "Acesso negado");
+    }
+  }
 
   const handleSnackbarClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -341,23 +373,9 @@ const PrimerioAcesso = () => {
 
   const handleCloseModal = () => {
     setOpenModalAutorizacao(false);
+    setOpenModalSelectServo(false);
     setValuePassword("");
   };
-
-  async function handleApiPasswordAutorization() {
-    try {
-      const response = await api.post("/usuario/createUsuarioHost", {
-        senha: valuePassword,
-        usuarioPerfilId,
-      });
-      if (response.status === 201) {
-        localStorage.setItem("login", JSON.stringify(response.data));
-        window.location.href = "/primeiroAcesso/criarequipe";
-      }
-    } catch (error) {
-      setSnackbar("error", "Acesso negado");
-    }
-  }
 
   return (
     <Box sx={styles.container}>
@@ -423,7 +441,6 @@ const PrimerioAcesso = () => {
                       disabled={!selectLider}
                       sx={styles.botaoSelecionar}
                       onClick={() => {
-                        /* window.location.href = "/primeiroAcesso/criarequipe"; */
                         setOpenModalAutorizacao(true);
                       }}
                     >
@@ -487,7 +504,12 @@ const PrimerioAcesso = () => {
                         : { delay: 0, ease: "easeInOut" }
                     }
                   >
-                    <Button sx={styles.botaoSelecionar} onClick={() => {}}>
+                    <Button
+                      sx={styles.botaoSelecionar}
+                      onClick={() => {
+                        setOpenModalSelectServo(true);
+                      }}
+                    >
                       Escolher
                     </Button>
                   </motion.div>
@@ -511,14 +533,14 @@ const PrimerioAcesso = () => {
         }}
       >
         <Fade in={openModalAutorizacao}>
-          <Box sx={styles.boxModalAutorizacao}>
-            <Box sx={styles.boxConteudoModalAutorizacao}>
-              <Box sx={styles.boxAreaTituloModalAutorizacao}>
-                <Box sx={styles.boxTituloModalAutorizacao}>
-                  <Typography sx={styles.tituloModalAutorizacao}>
+          <Box sx={styles.boxModalAvisos}>
+            <Box sx={styles.boxConteudoModalAvisos}>
+              <Box sx={styles.boxAreaTituloModalAvisos}>
+                <Box sx={styles.boxTituloModalAvisos}>
+                  <Typography sx={styles.tituloModalAvisos}>
                     Autorização
                   </Typography>
-                  <Box sx={styles.baseTituloModalAutorizacao} />
+                  <Box sx={styles.baseTituloModalAvisos} />
                 </Box>
               </Box>
               <Box
@@ -534,24 +556,12 @@ const PrimerioAcesso = () => {
                 <Typography
                   sx={{
                     ...styles.textoDefault,
+                    textAlign: "center",
                     display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
                     width: "100%",
                   }}
                 >
-                  Digite a senha de autorização
-                </Typography>
-                <Typography
-                  sx={{
-                    ...styles.textoDefault,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    width: "100%",
-                  }}
-                >
-                  para criação de um Perfil Líder
+                  Digite a senha de autorização para criação de um Perfil Líder
                 </Typography>
               </Box>
               <Box
@@ -619,6 +629,74 @@ const PrimerioAcesso = () => {
                   }}
                 >
                   Enviar
+                </Button>
+              </Box>
+            </Box>
+          </Box>
+        </Fade>
+      </Modal>
+      <Modal
+        open={openModalSelectServo}
+        onClose={() => {
+          handleCloseModal();
+        }}
+        closeAfterTransition
+        slots={{ backdrop: Backdrop }}
+        slotProps={{
+          backdrop: {
+            timeout: 500,
+          },
+        }}
+      >
+        <Fade in={openModalSelectServo}>
+          <Box sx={{ ...styles.boxModalAvisos, height: "250px" }}>
+            <Box sx={styles.boxConteudoModalAvisos}>
+              <Box sx={styles.boxAreaTituloModalAvisos}>
+                <Box sx={styles.boxTituloModalAvisos}>
+                  <Typography sx={styles.tituloModalAvisos}>
+                    Confirmar Perfil
+                  </Typography>
+                  <Box sx={styles.baseTituloModalAvisos} />
+                </Box>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  width: "220px",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexDirection: "column",
+                  mt: "5px",
+                }}
+              >
+                <Typography
+                  sx={{
+                    ...styles.textoDefault,
+                    textAlign: "center",
+                    width: "100%",
+                  }}
+                >
+                  Ao confirmar a sua escolha de perfil você será redirecionado
+                  para solicitar a entrada em uma equipe
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  width: "220px",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  height: "40px",
+                  mt: "15px",
+                }}
+              >
+                <Button
+                  sx={{ ...styles.botaoDefault, width: "100%" }}
+                  onClick={() => {
+                    handleApiSelectServo();
+                  }}
+                >
+                  Confirmar
                 </Button>
               </Box>
             </Box>

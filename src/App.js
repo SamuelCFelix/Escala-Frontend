@@ -12,7 +12,8 @@ import Login from "./pages/login/index";
 import Cadastrar from "./pages/cadastrar/index";
 import Home from "./pages/home/index";
 import PrimerioAcesso from "./pages/primeiroAcesso";
-import CriarEquipe from "./pages/criarEquipe";
+import CriarEquipe from "./pages/primeiroAcesso/criarEquipe";
+import EscolherEquipe from "./pages/primeiroAcesso/escolherEquipe";
 
 /* const theme = createTheme({
   primary: {
@@ -46,6 +47,10 @@ function App() {
           <Route
             path="/primeiroacesso/criarequipe/*"
             element={<CriarEquipe />}
+          />
+          <Route
+            path="/primeiroacesso/escolherequipe/*"
+            element={<EscolherEquipe />}
           />
         </Routes>
       </Router>

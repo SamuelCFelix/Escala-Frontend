@@ -23,6 +23,7 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+    overflow: "auto",
   },
   boxLogin: {
     display: "flex",

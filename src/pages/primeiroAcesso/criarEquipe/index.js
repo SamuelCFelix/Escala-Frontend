@@ -42,7 +42,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { motion } from "framer-motion";
-import "../../../src/style.css";
+import "../../../../src/style.css";
 import { Fragment, forwardRef, useEffect, useState } from "react";
 import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
 import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
@@ -60,7 +60,7 @@ import { format } from "date-fns-tz";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
-import api from "../../api";
+import api from "../../../api";
 
 const styles = {
   container: {
