@@ -14,6 +14,7 @@ import Home from "./pages/home/index";
 import PrimerioAcesso from "./pages/primeiroAcesso";
 import CriarEquipe from "./pages/primeiroAcesso/criarEquipe";
 import EscolherEquipe from "./pages/primeiroAcesso/escolherEquipe";
+import SalaDeEspera from "./pages/primeiroAcesso/escolherEquipe/salaDeEspera";
 
 /* const theme = createTheme({
   primary: {
@@ -51,6 +52,10 @@ function App() {
           <Route
             path="/primeiroacesso/escolherequipe/*"
             element={<EscolherEquipe />}
+          />
+          <Route
+            path="/primeiroacesso/escolherequipe/saladeespera/*"
+            element={<SalaDeEspera />}
           />
         </Routes>
       </Router>
