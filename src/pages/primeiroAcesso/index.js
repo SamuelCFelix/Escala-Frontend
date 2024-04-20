@@ -331,17 +331,15 @@ const PrimerioAcesso = () => {
 
   async function handleApiSelectServo() {
     try {
-      /* const response = await api.post("/usuario/createUsuarioHost", {
-        senha: valuePassword,
+      const response = await api.post("/usuario/createUsuarioDefault", {
         usuarioPerfilId,
       });
       if (response.status === 201) {
         localStorage.setItem("login", JSON.stringify(response.data));
-        window.location.href = "/primeiroAcesso/criarequipe";
-      } */
-      window.location.href = "/primeiroAcesso/escolherequipe";
+        window.location.href = "/primeiroAcesso/escolherequipe";
+      }
     } catch (error) {
-      setSnackbar("error", "Acesso negado");
+      setSnackbar("error", "Erro ao conectar com o servidor");
     }
   }
 

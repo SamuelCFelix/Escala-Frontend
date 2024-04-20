@@ -277,14 +277,23 @@ const Login = () => {
         });
         if (response.status === 200 && response.data) {
           const data = response.data;
+          console.log(data);
           localStorage.setItem("token", JSON.stringify(data.token));
           localStorage.setItem("login", JSON.stringify(data));
           if (data.primeiroAcesso === true) {
             window.location.href = "/primeiroAcesso";
-          } else if (!data?.equipe[0]?.id) {
-            window.location.href = `/primeiroAcesso/criarequipe`;
-          } else {
-            window.location.href = "/home";
+          } else if (data.usuarioHostId) {
+            if (!data?.equipe[0]?.id) {
+              window.location.href = `/primeiroAcesso/criarequipe`;
+            } else {
+              window.location.href = "/home";
+            }
+          } else if (data.usuarioDefaultId) {
+            if (!data?.equipeId) {
+              window.location.href = `/primeiroAcesso/escolherequipe`;
+            } else {
+              window.location.href = "/home";
+            }
           }
         }
       } catch (error) {
