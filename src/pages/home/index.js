@@ -1,5 +1,5 @@
 import { Box } from "@mui/material";
-import BackgroundImage from "../../img/Foto Produção Samuel.jpeg";
+import BackgroundImage from "../../img/fotoProducaoSamuel.jpeg";
 import { useEffect } from "react";
 
 const styles = {
@@ -23,7 +23,7 @@ const Home = () => {
 
   useEffect(() => {
     if (!autenticated) {
-      window.location.href = "/";
+      window.location.href = "/login";
     }
   }, [autenticated]);
 

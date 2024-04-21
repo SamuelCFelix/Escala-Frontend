@@ -1,4 +1,5 @@
 import { Box, Typography } from "@mui/material";
+import { useEffect } from "react";
 
 const styles = {
   container: {
@@ -63,6 +64,18 @@ const styles = {
   },
 };
 const SalaDeEspera = () => {
+  useEffect(() => {
+    const storedData = localStorage.getItem("login");
+
+    const userData = JSON.parse(storedData);
+    if (
+      !userData?.usuarioDefaultId ||
+      !(userData?.equipeId === "solicitacao enviada")
+    ) {
+      window.location.href = "/login";
+    }
+  }, []);
+
   return (
     <Box sx={styles.container}>
       <Box sx={styles.boxTitulo}>

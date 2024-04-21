@@ -1,7 +1,7 @@
 import { Box, Button, Snackbar, TextField, Typography } from "@mui/material";
-import BackgroundImage from "../../img/Foto Produção Samuel.jpeg";
+import BackgroundImage from "../../img/fotoProducaoSamuel.jpeg";
 import { forwardRef, useState } from "react";
-import LogoRodape from "../../img/Logo ZS.png";
+import LogoRodape from "../../img/logoZS.png";
 import { Link, useNavigate } from "react-router-dom";
 import MuiAlert from "@mui/material/Alert";
 import { useAuth } from "../../components/authContext";
@@ -277,20 +277,23 @@ const Login = () => {
         });
         if (response.status === 200 && response.data) {
           const data = response.data;
-          console.log(data);
+
           localStorage.setItem("token", JSON.stringify(data.token));
           localStorage.setItem("login", JSON.stringify(data));
           if (data.primeiroAcesso === true) {
             window.location.href = "/primeiroAcesso";
           } else if (data.usuarioHostId) {
-            if (!data?.equipe[0]?.id) {
+            if (data?.equipe[0] === "sem equipe") {
               window.location.href = `/primeiroAcesso/criarequipe`;
             } else {
               window.location.href = "/home";
             }
           } else if (data.usuarioDefaultId) {
-            if (!data?.equipeId) {
+            if (data?.equipeId === "sem equipe") {
               window.location.href = `/primeiroAcesso/escolherequipe`;
+            } else if (data?.equipeId === "solicitacao enviada") {
+              window.location.href =
+                "/primeiroAcesso/escolherequipe/saladeespera";
             } else {
               window.location.href = "/home";
             }

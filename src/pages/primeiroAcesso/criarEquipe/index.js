@@ -689,7 +689,7 @@ const CriarEquipe = () => {
 
     const userData = JSON.parse(storedData);
 
-    if (userData?.usuarioHostId && !userData?.equipe[0]?.id) {
+    if (userData?.usuarioHostId && userData?.equipe[0] === "sem equipe") {
       setUsuarioHostId(userData.usuarioHostId);
     } else {
       window.location.href = "/login";

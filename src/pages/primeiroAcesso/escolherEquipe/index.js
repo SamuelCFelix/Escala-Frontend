@@ -196,7 +196,7 @@ const styles = {
 
 const EscolherEquipe = () => {
   const [loadingPage, setLoadingPage] = useState(false);
-  const [openModalEquipe, setOpenModalEquipe] = useState(false);
+  const [openModalEquipe, setOpenModalEquipe] = useState({});
   const [usuarioDefaultId, setUsuarioDefaultId] = useState("");
   const [arrayEquipes, setArrayEquipes] = useState([]);
 
@@ -204,9 +204,11 @@ const EscolherEquipe = () => {
     const storedData = localStorage.getItem("login");
 
     const userData = JSON.parse(storedData);
-    if (userData?.usuarioDefaultId && !userData?.equipeId) {
+    if (userData?.usuarioDefaultId && userData?.equipeId === "sem equipe") {
       setUsuarioDefaultId(userData.usuarioDefaultId);
       setLoadingPage(true);
+    } else if (userData?.equipeId === "solicitacao enviada") {
+      window.location.href = "/primeiroAcesso/escolherequipe/saladeespera";
     } else {
       window.location.href = "/login";
     }
@@ -228,8 +230,27 @@ const EscolherEquipe = () => {
     }
   }
 
-  const handleCloseModal = () => {
-    setOpenModalEquipe(false);
+  async function handleApiEnviarSolicitacao(equipeId) {
+    try {
+      const response = await api.post("/solicitacaoEquipe", {
+        usuarioDefaultId,
+        equipeId,
+      });
+
+      if (response.status === 201) {
+        localStorage.setItem("login", JSON.stringify(response.data));
+        window.location.href = "/primeiroAcesso/escolherequipe/saladeespera";
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  const handleCloseModal = (equipeId) => {
+    setOpenModalEquipe((prevState) => ({
+      ...prevState,
+      [equipeId]: false,
+    }));
   };
 
   return (
@@ -248,14 +269,17 @@ const EscolherEquipe = () => {
                   initial={{ opacity: 0 }}
                   animate={{
                     opacity: 1,
-                    transition: { delay: 0.5 + 0.1 * index, ease: "easeInOut" },
+                    transition: { delay: 0.5 + 0.2 * index, ease: "easeInOut" },
                   }}
                   whileHover={{ scale: 1.04 }}
                 >
                   <Card
                     sx={styles.boxEquipe}
                     onClick={() => {
-                      setOpenModalEquipe(true);
+                      setOpenModalEquipe((prevState) => ({
+                        ...prevState,
+                        [equipe.id]: true,
+                      }));
                     }}
                   >
                     <Box sx={styles.blurBackground} />
@@ -304,9 +328,9 @@ const EscolherEquipe = () => {
 
               <Modal
                 key={equipe.id + index}
-                open={openModalEquipe}
+                open={openModalEquipe[equipe.id]}
                 onClose={() => {
-                  handleCloseModal();
+                  handleCloseModal(equipe.id);
                 }}
                 closeAfterTransition
                 slots={{ backdrop: Backdrop }}
@@ -316,7 +340,7 @@ const EscolherEquipe = () => {
                   },
                 }}
               >
-                <Fade in={openModalEquipe}>
+                <Fade in={openModalEquipe[equipe.id]}>
                   <Box
                     sx={{
                       ...styles.boxModalAvisos,
@@ -445,13 +469,13 @@ const EscolherEquipe = () => {
                           alignItems: "center",
                           justifyContent: "center",
                           height: "40px",
+                          mb: "10px",
                         }}
                       >
                         <Button
                           sx={{ ...styles.botaoDefault, width: "100%" }}
                           onClick={() => {
-                            window.location.href =
-                              "/primeiroAcesso/escolherequipe/saladeespera";
+                            handleApiEnviarSolicitacao(equipe.id);
                           }}
                         >
                           Enviar solicitação

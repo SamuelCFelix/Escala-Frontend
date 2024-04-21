@@ -6,10 +6,9 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import BackgroundImage from "../../img/Foto Produção Samuel.jpeg";
+import BackgroundImage from "../../img/fotoProducaoSamuel.jpeg";
 import { useState, forwardRef } from "react";
-import axios from "axios";
-import LogoRodape from "../../img/Logo ZS.png";
+import LogoRodape from "../../img/logoZS.png";
 import { Link, json, useNavigate } from "react-router-dom";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
