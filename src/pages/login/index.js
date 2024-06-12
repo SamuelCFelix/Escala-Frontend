@@ -4,7 +4,7 @@ import { forwardRef, useState } from "react";
 import LogoRodape from "../../img/logoZS.png";
 import { Link, useNavigate } from "react-router-dom";
 import MuiAlert from "@mui/material/Alert";
-import { useAuth } from "../../components/authContext";
+import { useAuth } from "../../components/popUpCadastro/authContext";
 import api from "../../api";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";

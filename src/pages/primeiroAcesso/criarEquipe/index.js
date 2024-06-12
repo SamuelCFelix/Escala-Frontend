@@ -544,7 +544,7 @@ const styles = {
     height: "42px",
   },
   estiloTabs: {
-    [`& .${tabsClasses.scrollButtons}`]: {
+    [`& .${tabsClasses?.scrollButtons}`]: {
       color: "#F3A913",
       "&.Mui-disabled": { opacity: 0.3 },
     },

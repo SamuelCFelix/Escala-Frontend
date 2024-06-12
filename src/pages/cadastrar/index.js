@@ -12,7 +12,7 @@ import LogoRodape from "../../img/logoZS.png";
 import { Link, json, useNavigate } from "react-router-dom";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
-import { useAuth } from "../../components/authContext";
+import { useAuth } from "../../components/popUpCadastro/authContext";
 import api from "../../api";
 
 const styles = {
