@@ -141,7 +141,7 @@ const styles = {
   botaoEntrar: {
     width: 210,
     height: 40,
-    borderRadius: "10px",
+    borderRadius: "5px",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -149,6 +149,7 @@ const styles = {
     marginTop: "20px",
     fontFamily: "Roboto, sans-serif",
     fontSize: "14px",
+    color: "#ffffff",
     background: "#F3A913",
     "&:hover": {
       background: "#FEBC36",

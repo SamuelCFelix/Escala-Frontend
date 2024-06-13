@@ -1,4 +1,15 @@
-import { Box, Button, Divider, Typography } from "@mui/material";
+import {
+  CalendarMonthOutlined,
+  PersonRemoveAlt1Outlined,
+} from "@mui/icons-material";
+import {
+  Avatar,
+  Box,
+  Button,
+  Divider,
+  IconButton,
+  Typography,
+} from "@mui/material";
 
 const styles = {
   configBox: {
@@ -22,7 +33,7 @@ const styles = {
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "flex-start",
-    width: "446px",
+    minWidth: "446px",
     height: "70vh",
     borderRadius: "10px",
   },
@@ -31,7 +42,7 @@ const styles = {
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "space-between",
-    width: "446px",
+    minWidth: "446px",
     height: "70vh",
     borderRadius: "10px",
   },
@@ -63,13 +74,22 @@ const styles = {
     justifyContent: "flex-end",
     gap: "10px",
   },
-  titulo: {
+  textTitulo: {
     color: "#ffffff",
     textTransform: "uppercase",
+    textAlign: "center",
     fontSize: "14px",
     lineHeight: "16px",
     letterSpacing: "1.25px",
     padding: "0px 20px",
+  },
+  textPerfilProximoCulto: {
+    color: "#ffffff",
+    textAlign: "center",
+    fontSize: "16px",
+    lineHeight: "150%",
+    letterSpacing: "0.15px",
+    paddingLeft: "6px",
   },
   baseTitulo: {
     background: "#F3A913",
@@ -77,13 +97,12 @@ const styles = {
     height: "3.5%",
   },
   areaConteudoCard: {
-    /* background: "red", */
     display: "flex",
     flexDirection: "column",
     width: "100%",
     height: "calc(100% - 100px)",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "flex-start",
   },
   boxAreaBotaoCard: {
     display: "flex",
@@ -111,18 +130,55 @@ const styles = {
   },
   divider: {
     borderColor: "#565656",
-    width: "378px",
+    width: "95%",
     height: "1px",
   },
-  /* boxBotaoCard: {
-    background: "blue",
+  boxInfoProximoCulto: {
+    /*  background: "blue", */
+    position: "relative",
     display: "flex",
     flexDirection: "column",
     width: "100%",
-    height: "100%",
     alignItems: "center",
+    justifyContent: "flex-start",
+    height: "70px",
+    gap: "10px",
+    paddingTop: "10px",
+  },
+  boxEscalaProximoCulto: {
+    /* background: "green", */
+    display: "flex",
+    flexDirection: "column",
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    height: "calc(100% - 80px)",
+    gap: "10px",
+    overflowY: "auto",
+  },
+  areaPerfilEscalado: {
+    /* background: "red", */
+    position: "relative",
+    display: "flex",
+    width: "calc(100% - 24px)",
+    height: "66px",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    overflow: "hidden",
+  },
+  avatarProximoCulto: {
+    background: "#F3A913",
+    width: "50px",
+    height: "50px",
+  },
+  boxInfoPerfilProximoCulto: {
+    /* background: "blue", */
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
     justifyContent: "center",
-  }, */
+    width: "calc(100% - 90px)",
+  },
 };
 
 const PaginaGeral = () => {
@@ -130,7 +186,7 @@ const PaginaGeral = () => {
     return (
       <Box sx={styles.areaBoxTitulo}>
         <Box sx={styles.boxTitulo}>
-          <Typography sx={styles.titulo}>{titulo}</Typography>
+          <Typography sx={styles.textTitulo}>{titulo}</Typography>
           <Box sx={styles.baseTitulo} />
         </Box>
       </Box>
@@ -152,7 +208,73 @@ const PaginaGeral = () => {
     <Box sx={styles.container}>
       <Box sx={styles.boxCardDefault}>
         {boxTituloCards("Próximo Culto")}
-        <Box sx={styles.areaConteudoCard}> </Box>
+        <Box sx={styles.areaConteudoCard}>
+          <Box sx={styles.boxInfoProximoCulto}>
+            <Typography
+              sx={{ ...styles.textTitulo, fontSize: "18px", fontWeight: 600 }}
+            >
+              CULTO CELEBRAÇÃO
+            </Typography>
+            <Typography sx={{ ...styles.textTitulo, fontSize: "18px" }}>
+              17:00
+            </Typography>
+            <Typography
+              sx={{
+                ...styles.textTitulo,
+                alignSelf: "flex-start",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: "4px",
+              }}
+            >
+              <CalendarMonthOutlined
+                sx={{ color: "#F3A913", fontSize: "16px" }}
+              />
+              19/05/24 - DOMINGO
+            </Typography>
+            <Divider
+              sx={{
+                ...styles.divider,
+                justifySelf: "flex-start",
+                position: "absolute",
+                bottom: 0,
+              }}
+            />
+          </Box>
+          <Box sx={styles.boxEscalaProximoCulto}>
+            <Box sx={styles.areaPerfilEscalado}>
+              <Avatar sx={styles.avatarProximoCulto} />
+              <Box sx={styles.boxInfoPerfilProximoCulto}>
+                <Typography sx={styles.textPerfilProximoCulto}>
+                  João Vinícius
+                </Typography>
+                <Typography
+                  sx={{
+                    ...styles.textPerfilProximoCulto,
+                    color: "#F3CE24",
+                    fontSize: "14px",
+                  }}
+                >
+                  Cortes de Câmera
+                </Typography>
+              </Box>
+              <IconButton>
+                <PersonRemoveAlt1Outlined
+                  sx={{ color: "#D32F2F", fontSize: "24px" }}
+                />
+              </IconButton>
+              <Divider
+                sx={{
+                  ...styles.divider,
+                  width: "100%",
+                  position: "absolute",
+                  bottom: 0,
+                }}
+              />
+            </Box>
+          </Box>
+        </Box>
         {boxBotaoCards("Editar escala")}
       </Box>
       <Box sx={styles.areaBoxMid}>
