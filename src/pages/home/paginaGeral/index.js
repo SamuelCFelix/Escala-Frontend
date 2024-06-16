@@ -1,15 +1,24 @@
 import {
   CalendarMonthOutlined,
+  Close,
+  EditCalendarOutlined,
+  Person,
+  PersonAddAlt1Outlined,
   PersonRemoveAlt1Outlined,
+  ReportProblemOutlined,
+  SaveOutlined,
 } from "@mui/icons-material";
 import {
   Avatar,
   Box,
   Button,
+  Chip,
   Divider,
   IconButton,
   Typography,
 } from "@mui/material";
+import { useState } from "react";
+import ModalEscalarMembro from "./modais/modalEscalarMembro";
 
 const styles = {
   configBox: {
@@ -128,6 +137,22 @@ const styles = {
       background: "#FEBC36",
     },
   },
+  botaoDefaultCancelar: {
+    display: "flex",
+    width: "auto",
+    height: "30px",
+    padding: "0px 40px",
+    borderRadius: "5px",
+    fontFamily: "Roboto, sans-serif",
+    fontSize: "12px",
+    lineHeight: "36px",
+    letterSpacing: "1.25px",
+    color: "#ffffff",
+    background: "#D32F2F",
+    "&:hover": {
+      background: "#E63737",
+    },
+  },
   divider: {
     borderColor: "#565656",
     width: "95%",
@@ -153,7 +178,6 @@ const styles = {
     alignItems: "center",
     justifyContent: "flex-start",
     height: "calc(100% - 80px)",
-    gap: "10px",
     overflowY: "auto",
   },
   areaPerfilEscalado: {
@@ -161,7 +185,7 @@ const styles = {
     position: "relative",
     display: "flex",
     width: "calc(100% - 24px)",
-    height: "66px",
+    minHeight: "66px",
     alignItems: "center",
     justifyContent: "flex-start",
     overflow: "hidden",
@@ -179,9 +203,41 @@ const styles = {
     justifyContent: "center",
     width: "calc(100% - 90px)",
   },
+  chipName: {
+    border: "1px solid #F3A913",
+    borderRadius: "10px",
+    color: "#ffffff",
+    height: "14px",
+    fontSize: "10px",
+  },
 };
 
 const PaginaGeral = () => {
+  const [userLogin, setUserLogin] = useState(true); // Simula se o usuário logado está na escala
+
+  const [proximaEscala, setProximaEscala] = useState([
+    {
+      membro: "João Vinícius Soares",
+      tag: "Cortes de Câmera",
+      possuiTag: true,
+    },
+    {
+      membro: "Samuel Cardoso Félix",
+      tag: "Câmera Lateral - Direita",
+      possuiTag: true,
+    },
+    {
+      membro: "Hatus Yodes Santos",
+      tag: "Câmera Lateral - Esquerda",
+      possuiTag: false,
+    },
+    { membro: "NÃO PREENCHIDO", tag: "Câmera Central", possuiTag: null },
+    { membro: "Renata Xavier Silva", tag: "Gimball 1", possuiTag: true },
+    { membro: "Samuel Silva Xavier", tag: "Gimball 2", possuiTag: true },
+  ]);
+  const [editarEscala, setEditarEscala] = useState(false);
+  const [OpenModalEscalarMembro, setOpenModalEscalarMembro] = useState(false);
+
   const boxTituloCards = (titulo) => {
     return (
       <Box sx={styles.areaBoxTitulo}>
@@ -213,10 +269,10 @@ const PaginaGeral = () => {
             <Typography
               sx={{ ...styles.textTitulo, fontSize: "18px", fontWeight: 600 }}
             >
-              CULTO CELEBRAÇÃO
+              CULTO CELEBRAÇÃO - ZS16
             </Typography>
             <Typography sx={{ ...styles.textTitulo, fontSize: "18px" }}>
-              17:00
+              16:00
             </Typography>
             <Typography
               sx={{
@@ -243,39 +299,132 @@ const PaginaGeral = () => {
             />
           </Box>
           <Box sx={styles.boxEscalaProximoCulto}>
-            <Box sx={styles.areaPerfilEscalado}>
-              <Avatar sx={styles.avatarProximoCulto} />
-              <Box sx={styles.boxInfoPerfilProximoCulto}>
-                <Typography sx={styles.textPerfilProximoCulto}>
-                  João Vinícius
-                </Typography>
-                <Typography
+            {proximaEscala?.map(({ membro, tag, possuiTag }, index) => (
+              <Box key={index} sx={styles.areaPerfilEscalado}>
+                <Avatar
                   sx={{
-                    ...styles.textPerfilProximoCulto,
-                    color: "#F3CE24",
-                    fontSize: "14px",
+                    ...styles.avatarProximoCulto,
+                    background:
+                      membro !== "NÃO PREENCHIDO" ? "#F3A913" : "#D32F2F",
                   }}
                 >
-                  Cortes de Câmera
-                </Typography>
-              </Box>
-              <IconButton>
-                <PersonRemoveAlt1Outlined
-                  sx={{ color: "#D32F2F", fontSize: "24px" }}
+                  {membro !== "NÃO PREENCHIDO" ? (
+                    <Person sx={{ fontSize: "24px" }} />
+                  ) : (
+                    <ReportProblemOutlined
+                      sx={{ fontSize: "24px", color: "#F3A913" }}
+                    />
+                  )}{" "}
+                </Avatar>
+                <Box sx={styles.boxInfoPerfilProximoCulto}>
+                  <Typography
+                    sx={{
+                      ...styles.textPerfilProximoCulto,
+                      ...styles.configBox,
+                      width: "auto",
+                      gap: "4px",
+                      color:
+                        membro !== "NÃO PREENCHIDO" ? "#ffffff" : "#D32F2F",
+                    }}
+                  >
+                    {membro}
+                    {!possuiTag && membro !== "NÃO PREENCHIDO" && (
+                      <Chip
+                        label="Sem TAG"
+                        variant="outlined"
+                        sx={{ ...styles.chipName, borderColor: "#D32F2F" }}
+                      />
+                    )}
+                    {userLogin && index === 1 && (
+                      <Chip
+                        label="Eu"
+                        variant="outlined"
+                        sx={styles.chipName}
+                      />
+                    )}
+                  </Typography>
+                  <Typography
+                    sx={{
+                      ...styles.textPerfilProximoCulto,
+                      color: "#F3CE24",
+                      fontSize: "14px",
+                    }}
+                  >
+                    {tag}
+                  </Typography>
+                </Box>
+                {editarEscala && membro !== "NÃO PREENCHIDO" && (
+                  <IconButton>
+                    <PersonRemoveAlt1Outlined
+                      sx={{ color: "#D32F2F", fontSize: "24px" }}
+                    />
+                  </IconButton>
+                )}
+                {membro === "NÃO PREENCHIDO" && (
+                  <IconButton
+                    onClick={() => {
+                      setOpenModalEscalarMembro(true);
+                    }}
+                  >
+                    <PersonAddAlt1Outlined
+                      sx={{ color: "#F3A913", fontSize: "24px" }}
+                    />
+                  </IconButton>
+                )}
+                <Divider
+                  sx={{
+                    ...styles.divider,
+                    width: "100%",
+                    position: "absolute",
+                    bottom: 0,
+                  }}
                 />
-              </IconButton>
-              <Divider
-                sx={{
-                  ...styles.divider,
-                  width: "100%",
-                  position: "absolute",
-                  bottom: 0,
-                }}
-              />
-            </Box>
+              </Box>
+            ))}
           </Box>
         </Box>
-        {boxBotaoCards("Editar escala")}
+        <Box sx={styles.boxAreaBotaoCard}>
+          <Divider sx={styles.divider} />
+          {editarEscala ? (
+            <Box sx={{ ...styles.configBox, gap: "16px" }}>
+              <Button
+                variant="contained"
+                sx={{
+                  ...styles.botaoDefaultCancelar,
+                  mb: "8px",
+                  gap: "4px",
+                  padding: "0px 20px",
+                }}
+                onClick={() => setEditarEscala(false)}
+              >
+                <Close sx={{ fontSize: "18px" }} />
+                Cancelar
+              </Button>
+              <Button
+                variant="contained"
+                sx={{
+                  ...styles.botaoDefault,
+                  mb: "8px",
+                  gap: "4px",
+                  padding: "0px 20px",
+                }}
+                onClick={() => setEditarEscala(false)}
+              >
+                <SaveOutlined sx={{ fontSize: "18px" }} />
+                Salvar
+              </Button>
+            </Box>
+          ) : (
+            <Button
+              variant="contained"
+              sx={{ ...styles.botaoDefault, mb: "8px", gap: "4px" }}
+              onClick={() => setEditarEscala(true)}
+            >
+              <EditCalendarOutlined sx={{ fontSize: "18px" }} />
+              Editar Escala
+            </Button>
+          )}
+        </Box>
       </Box>
       <Box sx={styles.areaBoxMid}>
         <Box sx={styles.boxCardDefaultMid}>
@@ -294,6 +443,10 @@ const PaginaGeral = () => {
         <Box sx={styles.areaConteudoCard}> </Box>
         {boxBotaoCards("Cadastrar disponibilidade")}
       </Box>
+      <ModalEscalarMembro
+        OpenModalEscalarMembro={OpenModalEscalarMembro}
+        setOpenModalEscalarMembro={setOpenModalEscalarMembro}
+      />
     </Box>
   );
 };
