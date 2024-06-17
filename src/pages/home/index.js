@@ -26,6 +26,7 @@ const styles = {
     display: "flex",
     overflow: "auto",
     position: "relative",
+    overflow: "auto",
   },
   boxHome: {
     width: "100%",
@@ -67,11 +68,11 @@ const Home = () => {
   const [valueTab, setValueTab] = useState("Geral");
   const autenticated = localStorage?.getItem("token");
 
-  useEffect(() => {
+  /* useEffect(() => {
     if (!autenticated) {
       window.location.href = "/login";
     }
-  }, [autenticated]);
+  }, [autenticated]); */
 
   const handleChangeTabs = (event, newValue) => {
     setValueTab(newValue);

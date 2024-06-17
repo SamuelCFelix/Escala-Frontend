@@ -1,7 +1,15 @@
-import { Close, Search } from "@mui/icons-material";
 import {
+  Close,
+  KeyboardArrowRightOutlined,
+  Person,
+  Search,
+} from "@mui/icons-material";
+import {
+  Avatar,
   Backdrop,
   Box,
+  Button,
+  Chip,
   Fade,
   IconButton,
   Modal,
@@ -83,6 +91,13 @@ const styles = {
     bottom: -3,
     right: -3,
   },
+  textNamePerfil: {
+    color: "#ffffff",
+    fontSize: "14px",
+    lineHeight: "150%px",
+    letterSpacing: "0.15px",
+    textAlign: "center",
+  },
   dataText: {
     color: "#ffffff",
     fontSize: "14px",
@@ -140,10 +155,108 @@ const styles = {
       textAlign: "center",
     },
   },
+  boxInfoProgramacao: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    justifyContent: "center",
+    width: "90%",
+    gap: "10px",
+    mb: "6px",
+  },
+  boxDoubleIcon: {
+    position: "relative",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  boxOpcoesPerfil: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    width: "90%",
+    height: "calc(100% - 220px)",
+    gap: "10px",
+    mb: "10px",
+    overflowY: "auto",
+  },
+  botaoCardPerfil: {
+    background: "#1B1B1B",
+    border: "1px solid #F3A913",
+    borderRadius: "5px",
+    display: "flex",
+    width: "100%",
+    height: "50px",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    position: "relative",
+    textTransform: "none",
+  },
+  avatarMembro: {
+    width: "40px",
+    height: "40px",
+    background: "#F3A913",
+  },
+  boxInfoPerfilCard: {
+    width: "calc(100% - 72px)",
+    height: "100%",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    ml: "6px",
+  },
+  iconCardPerfil: {
+    color: "#F3A913",
+    fontSize: "24px",
+    position: "absolute",
+    right: "2px",
+    top: "50%",
+    transform: "translateY(-50%)",
+  },
+  boxChipPerfil: {
+    display: "flex",
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    gap: "4px",
+  },
+  chipPerfil: {
+    background: "#2E7D32",
+    color: "#ffffff",
+    fontSize: "9px",
+    height: "12px",
+    display: "flex",
+    "& .MuiChip-label": {
+      paddingTop: "2px",
+    },
+  },
 };
 
 const ModalEscalarMembro = (params) => {
   const { OpenModalEscalarMembro, setOpenModalEscalarMembro } = params;
+
+  const [membros, setMembros] = useState([
+    {
+      membro: "João Vinícius Soares",
+      disponivel: true,
+      possuiTag: true,
+    },
+    {
+      membro: "Samuel Cardoso Félix",
+      disponivel: true,
+      possuiTag: true,
+    },
+    {
+      membro: "Hatus Yodes Santos",
+      disponivel: true,
+      possuiTag: false,
+    },
+    { membro: "Gabriela Santos Eugênio", disponivel: true, possuiTag: false },
+    { membro: "Renata Xavier Silva", disponivel: false, possuiTag: true },
+    { membro: "Samuel Silva Xavier", disponivel: false, possuiTag: false },
+  ]);
 
   const boxTituloCards = (titulo) => {
     return (
@@ -182,30 +295,13 @@ const ModalEscalarMembro = (params) => {
             >
               <Close sx={{ fontSize: "26px", color: "#ffffff" }} />
             </IconButton>
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "flex-start",
-                justifyContent: "center",
-                width: "90%",
-                gap: "10px",
-                mb: "16px",
-              }}
-            >
+            <Box sx={styles.boxInfoProgramacao}>
               <Typography sx={styles.dataText}>
                 <ChurchOutlinedIcon sx={styles.dataIcon} />
                 Culto Celebração - ZS16
               </Typography>
               <Typography sx={styles.dataText}>
-                <Box
-                  sx={{
-                    position: "relative",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
+                <Box sx={styles.boxDoubleIcon}>
                   <CalendarMonthOutlinedIcon sx={styles.dataIcon} />
                   <AccessTimeOutlinedIcon sx={styles.dataIconInsid} />
                 </Box>
@@ -224,6 +320,42 @@ const ModalEscalarMembro = (params) => {
                   startAdornment: <Search sx={styles.dataIcon} />,
                 }}
               />
+            </Box>
+            <Box sx={styles.boxOpcoesPerfil}>
+              {membros?.map(({ membro, disponivel, possuiTag }, index) => (
+                <Button
+                  onClick={() => {
+                    setOpenModalEscalarMembro(false);
+                  }}
+                  sx={styles.botaoCardPerfil}
+                >
+                  <Avatar sx={styles.avatarMembro}>
+                    <Person sx={{ fontSize: "24px" }} />
+                  </Avatar>
+                  <Box sx={styles.boxInfoPerfilCard}>
+                    <Typography sx={styles.textNamePerfil}>{membro}</Typography>
+                    <Box sx={styles.boxChipPerfil}>
+                      {disponivel ? (
+                        <Chip label="Disponível" sx={styles.chipPerfil} />
+                      ) : (
+                        <Chip
+                          label="Indisponível"
+                          sx={{ ...styles.chipPerfil, background: "#D32F2F" }}
+                        />
+                      )}
+                      {possuiTag ? (
+                        <Chip label="Câmera Central" sx={styles.chipPerfil} />
+                      ) : (
+                        <Chip
+                          label="Câmera Central"
+                          sx={{ ...styles.chipPerfil, background: "#D32F2F" }}
+                        />
+                      )}
+                    </Box>
+                  </Box>
+                  <KeyboardArrowRightOutlined sx={styles.iconCardPerfil} />
+                </Button>
+              ))}
             </Box>
           </Box>
         </Box>
