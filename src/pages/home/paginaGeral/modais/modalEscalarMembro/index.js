@@ -232,10 +232,28 @@ const styles = {
       paddingTop: "2px",
     },
   },
+  botaoDefault: {
+    display: "flex",
+    width: "auto",
+    height: "25px",
+    padding: "0px 20px",
+    borderRadius: "5px",
+    fontFamily: "Roboto, sans-serif",
+    fontSize: "12px",
+    lineHeight: "36px",
+    letterSpacing: "1.25px",
+    color: "#ffffff",
+    background: "#F3A913",
+    "&:hover": {
+      background: "#FEBC36",
+    },
+  },
 };
 
 const ModalEscalarMembro = (params) => {
   const { OpenModalEscalarMembro, setOpenModalEscalarMembro } = params;
+  const [OpenModalConfirmarEscolha, setOpenModalConfirmarEscolha] =
+    useState(false);
 
   const [membros, setMembros] = useState([
     {
@@ -270,97 +288,171 @@ const ModalEscalarMembro = (params) => {
   };
 
   return (
-    <Modal
-      open={OpenModalEscalarMembro}
-      onClose={() => {
-        setOpenModalEscalarMembro(false);
-      }}
-      closeAfterTransition
-      slots={{ backdrop: Backdrop }}
-      slotProps={{
-        backdrop: {
-          timeout: 500,
-        },
-      }}
-    >
-      <Fade in={OpenModalEscalarMembro}>
-        <Box sx={styles.boxModal}>
-          <Box sx={styles.boxConteudoModal}>
-            {boxTituloCards("Escalar Membro")}
-            <IconButton
-              onClick={() => {
-                setOpenModalEscalarMembro(false);
-              }}
-              sx={{ position: "absolute", top: 4, right: 0 }}
-            >
-              <Close sx={{ fontSize: "26px", color: "#ffffff" }} />
-            </IconButton>
-            <Box sx={styles.boxInfoProgramacao}>
-              <Typography sx={styles.dataText}>
-                <ChurchOutlinedIcon sx={styles.dataIcon} />
-                Culto Celebração - ZS16
-              </Typography>
-              <Typography sx={styles.dataText}>
-                <Box sx={styles.boxDoubleIcon}>
-                  <CalendarMonthOutlinedIcon sx={styles.dataIcon} />
-                  <AccessTimeOutlinedIcon sx={styles.dataIconInsid} />
-                </Box>
-                Domingo - 16:00
-              </Typography>
-              <Typography sx={styles.dataText}>
-                <SellOutlinedIcon sx={styles.dataIcon} />
-                Câmera Central
-              </Typography>
-              <TextField
-                focused
-                variant="filled"
-                placeholder="Procurar membro"
-                sx={styles.textFieldSearch}
-                InputProps={{
-                  startAdornment: <Search sx={styles.dataIcon} />,
+    <>
+      <Modal
+        open={OpenModalEscalarMembro}
+        onClose={() => {
+          setOpenModalEscalarMembro(false);
+        }}
+        closeAfterTransition
+        slots={{ backdrop: Backdrop }}
+        slotProps={{
+          backdrop: {
+            timeout: 500,
+          },
+        }}
+      >
+        <Fade in={OpenModalEscalarMembro}>
+          <Box sx={styles.boxModal}>
+            <Box sx={styles.boxConteudoModal}>
+              {boxTituloCards("Escalar Membro")}
+              <IconButton
+                onClick={() => {
+                  setOpenModalEscalarMembro(false);
                 }}
-              />
-            </Box>
-            <Box sx={styles.boxOpcoesPerfil}>
-              {membros?.map(({ membro, disponivel, possuiTag }, index) => (
-                <Button
-                  onClick={() => {
-                    setOpenModalEscalarMembro(false);
-                  }}
-                  sx={styles.botaoCardPerfil}
-                >
-                  <Avatar sx={styles.avatarMembro}>
-                    <Person sx={{ fontSize: "24px" }} />
-                  </Avatar>
-                  <Box sx={styles.boxInfoPerfilCard}>
-                    <Typography sx={styles.textNamePerfil}>{membro}</Typography>
-                    <Box sx={styles.boxChipPerfil}>
-                      {disponivel ? (
-                        <Chip label="Disponível" sx={styles.chipPerfil} />
-                      ) : (
-                        <Chip
-                          label="Indisponível"
-                          sx={{ ...styles.chipPerfil, background: "#D32F2F" }}
-                        />
-                      )}
-                      {possuiTag ? (
-                        <Chip label="Câmera Central" sx={styles.chipPerfil} />
-                      ) : (
-                        <Chip
-                          label="Câmera Central"
-                          sx={{ ...styles.chipPerfil, background: "#D32F2F" }}
-                        />
-                      )}
-                    </Box>
+                sx={{ position: "absolute", top: 4, right: 0 }}
+              >
+                <Close sx={{ fontSize: "26px", color: "#ffffff" }} />
+              </IconButton>
+              <Box sx={styles.boxInfoProgramacao}>
+                <Typography sx={styles.dataText}>
+                  <ChurchOutlinedIcon sx={styles.dataIcon} />
+                  Culto Celebração - ZS16
+                </Typography>
+                <Typography sx={styles.dataText}>
+                  <Box sx={styles.boxDoubleIcon}>
+                    <CalendarMonthOutlinedIcon sx={styles.dataIcon} />
+                    <AccessTimeOutlinedIcon sx={styles.dataIconInsid} />
                   </Box>
-                  <KeyboardArrowRightOutlined sx={styles.iconCardPerfil} />
-                </Button>
-              ))}
+                  Domingo - 16:00
+                </Typography>
+                <Typography sx={styles.dataText}>
+                  <SellOutlinedIcon sx={styles.dataIcon} />
+                  Câmera Central
+                </Typography>
+                <TextField
+                  focused
+                  variant="filled"
+                  placeholder="Procurar membro"
+                  sx={styles.textFieldSearch}
+                  InputProps={{
+                    startAdornment: <Search sx={styles.dataIcon} />,
+                  }}
+                />
+              </Box>
+              <Box sx={styles.boxOpcoesPerfil}>
+                {membros?.map(({ membro, disponivel, possuiTag }, index) => (
+                  <Button
+                    onClick={() => {
+                      if (!disponivel || !possuiTag) {
+                        setOpenModalConfirmarEscolha(true);
+                      } else {
+                        setOpenModalEscalarMembro(false);
+                      }
+                    }}
+                    sx={styles.botaoCardPerfil}
+                  >
+                    <Avatar sx={styles.avatarMembro}>
+                      <Person sx={{ fontSize: "24px" }} />
+                    </Avatar>
+                    <Box sx={styles.boxInfoPerfilCard}>
+                      <Typography sx={styles.textNamePerfil}>
+                        {membro}
+                      </Typography>
+                      <Box sx={styles.boxChipPerfil}>
+                        {disponivel ? (
+                          <Chip label="Disponível" sx={styles.chipPerfil} />
+                        ) : (
+                          <Chip
+                            label="Indisponível"
+                            sx={{ ...styles.chipPerfil, background: "#D32F2F" }}
+                          />
+                        )}
+                        {possuiTag ? (
+                          <Chip label="Câmera Central" sx={styles.chipPerfil} />
+                        ) : (
+                          <Chip
+                            label="Câmera Central"
+                            sx={{ ...styles.chipPerfil, background: "#D32F2F" }}
+                          />
+                        )}
+                      </Box>
+                    </Box>
+                    <KeyboardArrowRightOutlined sx={styles.iconCardPerfil} />
+                  </Button>
+                ))}
+              </Box>
             </Box>
           </Box>
-        </Box>
-      </Fade>
-    </Modal>
+        </Fade>
+      </Modal>
+      <Modal
+        open={OpenModalConfirmarEscolha}
+        onClose={() => {
+          setOpenModalConfirmarEscolha(false);
+        }}
+        closeAfterTransition
+        slots={{ backdrop: Backdrop }}
+        slotProps={{
+          backdrop: {
+            timeout: 500,
+          },
+        }}
+      >
+        <Fade in={OpenModalConfirmarEscolha}>
+          <Box
+            sx={{
+              ...styles.boxModal,
+              background: "#1B1B1B",
+              width: "400px",
+              height: "auto",
+              top: "25%",
+            }}
+          >
+            <Box sx={{ ...styles.boxConteudoModal, gap: "0px" }}>
+              {boxTituloCards("Confirmar Escolha")}
+              <Typography sx={styles.dataText}>
+                Confirme a sua escolha de membro para essa função
+              </Typography>
+              <Typography sx={{ ...styles.dataText, color: "#D32F2F" }}>
+                Obs.: Membro sem Disponibilidade ou Tag necessária
+              </Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  width: "100%",
+                  gap: "6px",
+                  alignItems: "center",
+                  justifyContent: "flex-end",
+                  margin: "10px 0px",
+                  mr: "20px",
+                }}
+              >
+                <Button
+                  onClick={() => {
+                    setOpenModalConfirmarEscolha(false);
+                  }}
+                  sx={styles.botaoDefault}
+                >
+                  {" "}
+                  Cancelar
+                </Button>
+                <Button
+                  onClick={() => {
+                    setOpenModalConfirmarEscolha(false);
+                    setOpenModalEscalarMembro(false);
+                  }}
+                  sx={styles.botaoDefault}
+                >
+                  {" "}
+                  Confirmar
+                </Button>
+              </Box>
+            </Box>
+          </Box>
+        </Fade>
+      </Modal>
+    </>
   );
 };
 export default ModalEscalarMembro;

@@ -1,4 +1,5 @@
 import {
+  AssignmentLateOutlined,
   CalendarMonthOutlined,
   Close,
   EditCalendarOutlined,
@@ -190,7 +191,7 @@ const styles = {
     justifyContent: "flex-start",
     overflow: "hidden",
   },
-  avatarProximoCulto: {
+  avatarIcon: {
     background: "#F3A913",
     width: "50px",
     height: "50px",
@@ -209,6 +210,67 @@ const styles = {
     color: "#ffffff",
     height: "14px",
     fontSize: "10px",
+  },
+  boxAviso: {
+    background: "#1B1B1B",
+    display: "flex",
+    width: "376px",
+    height: "70px",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    gap: "6px",
+    textTransform: "none",
+    mb: "10px",
+  },
+  boxAreaConteudoAviso: {
+    display: "flex",
+    flexDirection: "column",
+    width: "calc(100% - 46px)",
+    height: "100%",
+    alignItems: "center",
+    justifyContent: "flex-start",
+  },
+  boxAreaTituloDate: {
+    width: "100%",
+    height: "20px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-start",
+  },
+  dataTextTituloAviso: {
+    color: "#F3A913",
+    fontSize: "12px",
+    lineHeight: "24px",
+    letterSpacing: "0.17px",
+    textAlign: "left",
+    width: "calc(100% - 70px)",
+  },
+  dataTextAviso: {
+    color: "#BDBDBD",
+    fontSize: "11px",
+    lineHeight: "12px",
+    letterSpacing: "0.17px",
+    textAlign: "left",
+  },
+  dataTextDateAviso: {
+    color: "#ffffff",
+    fontSize: "9px",
+    lineHeight: "24px",
+    letterSpacing: "0.17px",
+  },
+  boxNumeroAvisos: {
+    position: "absolute",
+    top: "43%",
+    left: "59%",
+    transform: "translate(-50%, -50%)",
+  },
+  numeroAvisos: {
+    color: "#ffffff",
+    background: "#F3A913",
+    borderRadius: "50%",
+    fontSize: "10px",
+    padding: "1px 5px",
+    paddingTop: "2px",
   },
 };
 
@@ -262,6 +324,7 @@ const PaginaGeral = () => {
 
   return (
     <Box sx={styles.container}>
+      {/* Tabela PRÓXIMO CULTO */}
       <Box sx={styles.boxCardDefault}>
         {boxTituloCards("Próximo Culto")}
         <Box sx={styles.areaConteudoCard}>
@@ -303,7 +366,7 @@ const PaginaGeral = () => {
               <Box key={index} sx={styles.areaPerfilEscalado}>
                 <Avatar
                   sx={{
-                    ...styles.avatarProximoCulto,
+                    ...styles.avatarIcon,
                     background:
                       membro !== "NÃO PREENCHIDO" ? "#F3A913" : "#D32F2F",
                   }}
@@ -426,12 +489,78 @@ const PaginaGeral = () => {
           )}
         </Box>
       </Box>
+
       <Box sx={styles.areaBoxMid}>
+        {/* Tabela AVISOS */}
         <Box sx={styles.boxCardDefaultMid}>
-          {boxTituloCards("Avisos")}
-          <Box sx={styles.areaConteudoCard}> </Box>
-          {boxBotaoCards("Criar aviso")}
+          <Box sx={{ ...styles.areaBoxTitulo, position: "relative" }}>
+            <Box sx={styles.boxTitulo}>
+              <Typography sx={styles.textTitulo}>Avisos</Typography>
+              <Box sx={styles.baseTitulo} />
+            </Box>
+            <Box sx={styles.boxNumeroAvisos}>
+              <Typography sx={styles.numeroAvisos}>7</Typography>
+            </Box>
+          </Box>
+          <Box sx={{ ...styles.areaConteudoCard, overflowY: "auto" }}>
+            <Button sx={styles.boxAviso}>
+              <Avatar
+                sx={{ ...styles.avatarIcon, width: "40px", height: "40px" }}
+              >
+                <Person sx={{ fontSize: "24px" }} />
+              </Avatar>
+              <Box sx={styles.boxAreaConteudoAviso}>
+                <Box sx={styles.boxAreaTituloDate}>
+                  <Typography sx={styles.dataTextTituloAviso}>
+                    AVISO IMPORTANTE DO PASTOR!!!
+                  </Typography>
+                  <Typography sx={styles.dataTextDateAviso}>
+                    17:26 - 28/02/24
+                  </Typography>
+                </Box>
+                <Typography sx={styles.dataTextAviso}>
+                  O pastor está convocando todos os servos apaixonados para
+                  comparecerem na igreja 4.0 para uma reunião de alinhamento.
+                  Sua presença é indispensável, pois bla bl...
+                </Typography>
+              </Box>
+            </Button>
+            <Button sx={styles.boxAviso}>
+              <Avatar
+                sx={{ ...styles.avatarIcon, width: "40px", height: "40px" }}
+              >
+                <Person sx={{ fontSize: "24px" }} />
+              </Avatar>
+              <Box sx={styles.boxAreaConteudoAviso}>
+                <Box sx={styles.boxAreaTituloDate}>
+                  <Typography sx={styles.dataTextTituloAviso}>
+                    AVISO IMPORTANTE DO PASTOR!!!
+                  </Typography>
+                  <Typography sx={styles.dataTextDateAviso}>
+                    17:26 - 28/02/24
+                  </Typography>
+                </Box>
+                <Typography sx={styles.dataTextAviso}>
+                  O pastor está convocando todos os servos apaixonados para
+                  comparecerem na igreja 4.0 para uma reunião de alinhamento.
+                  Sua presença é indispensável, pois bla bl...
+                </Typography>
+              </Box>
+            </Button>
+          </Box>
+          <Box sx={styles.boxAreaBotaoCard}>
+            <Divider sx={styles.divider} />
+            <Button
+              variant="contained"
+              sx={{ ...styles.botaoDefault, mb: "8px", gap: "4px" }}
+              onClick={() => {}}
+            >
+              <AssignmentLateOutlined sx={{ fontSize: "18px" }} />
+              Criar Aviso
+            </Button>
+          </Box>
         </Box>
+        {/* Tabela EVENTOS */}
         <Box sx={styles.boxCardDefaultMid}>
           {boxTituloCards("Eventos")}
           <Box sx={styles.areaConteudoCard}> </Box>
@@ -443,6 +572,8 @@ const PaginaGeral = () => {
         <Box sx={styles.areaConteudoCard}> </Box>
         {boxBotaoCards("Cadastrar disponibilidade")}
       </Box>
+
+      {/* Modais */}
       <ModalEscalarMembro
         OpenModalEscalarMembro={OpenModalEscalarMembro}
         setOpenModalEscalarMembro={setOpenModalEscalarMembro}
