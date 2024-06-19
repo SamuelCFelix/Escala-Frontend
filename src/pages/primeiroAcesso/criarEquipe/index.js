@@ -794,7 +794,7 @@ const CriarEquipe = () => {
 
   const titulosCultoDefault = [
     "Culto Celebração - ZS10",
-    "Culto Celebração - ZS17",
+    "Culto Celebração - ZS16",
     "Culto Terça-Feira",
     "Culto de Doutrina",
   ];

@@ -35,6 +35,16 @@ const styles = {
     height: "70vh",
     boxShadow: 24,
   },
+  boxConteudoModal: {
+    position: "relative",
+    width: "100%",
+    height: "100%",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    gap: "10px",
+  },
   areaBoxTitulo: {
     display: "flex",
     flexDirection: "column",
@@ -66,16 +76,6 @@ const styles = {
     background: "#F3A913",
     width: "100%",
     height: "3.5%",
-  },
-  boxConteudoModal: {
-    position: "relative",
-    width: "100%",
-    height: "100%",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "flex-start",
-    gap: "10px",
   },
   dataIcon: {
     color: "#F3A913",
@@ -251,7 +251,7 @@ const styles = {
 };
 
 const ModalEscalarMembro = (params) => {
-  const { OpenModalEscalarMembro, setOpenModalEscalarMembro } = params;
+  const { openModalEscalarMembro, setOpenModalEscalarMembro } = params;
   const [OpenModalConfirmarEscolha, setOpenModalConfirmarEscolha] =
     useState(false);
 
@@ -290,7 +290,7 @@ const ModalEscalarMembro = (params) => {
   return (
     <>
       <Modal
-        open={OpenModalEscalarMembro}
+        open={openModalEscalarMembro}
         onClose={() => {
           setOpenModalEscalarMembro(false);
         }}
@@ -302,7 +302,7 @@ const ModalEscalarMembro = (params) => {
           },
         }}
       >
-        <Fade in={OpenModalEscalarMembro}>
+        <Fade in={openModalEscalarMembro}>
           <Box sx={styles.boxModal}>
             <Box sx={styles.boxConteudoModal}>
               {boxTituloCards("Escalar Membro")}

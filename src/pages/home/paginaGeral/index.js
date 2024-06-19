@@ -20,6 +20,7 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import ModalEscalarMembro from "./modais/modalEscalarMembro";
+import ModalCriarAviso from "./modais/modalCriarAviso";
 
 const styles = {
   configBox: {
@@ -298,7 +299,8 @@ const PaginaGeral = () => {
     { membro: "Samuel Silva Xavier", tag: "Gimball 2", possuiTag: true },
   ]);
   const [editarEscala, setEditarEscala] = useState(false);
-  const [OpenModalEscalarMembro, setOpenModalEscalarMembro] = useState(false);
+  const [openModalEscalarMembro, setOpenModalEscalarMembro] = useState(false);
+  const [openModalCriarAviso, setOpenModalCriarAviso] = useState(false);
 
   const boxTituloCards = (titulo) => {
     return (
@@ -553,7 +555,9 @@ const PaginaGeral = () => {
             <Button
               variant="contained"
               sx={{ ...styles.botaoDefault, mb: "8px", gap: "4px" }}
-              onClick={() => {}}
+              onClick={() => {
+                setOpenModalCriarAviso(true);
+              }}
             >
               <AssignmentLateOutlined sx={{ fontSize: "18px" }} />
               Criar Aviso
@@ -575,8 +579,12 @@ const PaginaGeral = () => {
 
       {/* Modais */}
       <ModalEscalarMembro
-        OpenModalEscalarMembro={OpenModalEscalarMembro}
+        openModalEscalarMembro={openModalEscalarMembro}
         setOpenModalEscalarMembro={setOpenModalEscalarMembro}
+      />
+      <ModalCriarAviso
+        openModalCriarAviso={openModalCriarAviso}
+        setOpenModalCriarAviso={setOpenModalCriarAviso}
       />
     </Box>
   );
