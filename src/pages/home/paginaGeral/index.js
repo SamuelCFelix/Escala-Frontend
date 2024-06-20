@@ -21,6 +21,7 @@ import {
 import { useState } from "react";
 import ModalEscalarMembro from "./modais/modalEscalarMembro";
 import ModalCriarAviso from "./modais/modalCriarAviso";
+import ModalAviso from "./modais/modalAviso";
 
 const styles = {
   configBox: {
@@ -301,6 +302,7 @@ const PaginaGeral = () => {
   const [editarEscala, setEditarEscala] = useState(false);
   const [openModalEscalarMembro, setOpenModalEscalarMembro] = useState(false);
   const [openModalCriarAviso, setOpenModalCriarAviso] = useState(false);
+  const [openModalAviso, setOpenModalAviso] = useState(false);
 
   const boxTituloCards = (titulo) => {
     return (
@@ -505,7 +507,12 @@ const PaginaGeral = () => {
             </Box>
           </Box>
           <Box sx={{ ...styles.areaConteudoCard, overflowY: "auto" }}>
-            <Button sx={styles.boxAviso}>
+            <Button
+              onClick={() => {
+                setOpenModalAviso(true);
+              }}
+              sx={styles.boxAviso}
+            >
               <Avatar
                 sx={{ ...styles.avatarIcon, width: "40px", height: "40px" }}
               >
@@ -585,6 +592,10 @@ const PaginaGeral = () => {
       <ModalCriarAviso
         openModalCriarAviso={openModalCriarAviso}
         setOpenModalCriarAviso={setOpenModalCriarAviso}
+      />
+      <ModalAviso
+        openModalAviso={openModalAviso}
+        setOpenModalAviso={setOpenModalAviso}
       />
     </Box>
   );

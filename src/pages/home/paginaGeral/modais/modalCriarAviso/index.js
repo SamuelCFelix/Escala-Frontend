@@ -1,17 +1,13 @@
-import {
-  Close,
-  KeyboardArrowRightOutlined,
-  Person,
-  Search,
-} from "@mui/icons-material";
+import { Close, Person, Search } from "@mui/icons-material";
 import {
   Avatar,
   Backdrop,
   Box,
   Button,
-  Chip,
+  Checkbox,
   Divider,
   Fade,
+  FormControlLabel,
   IconButton,
   Modal,
   Step,
@@ -21,10 +17,6 @@ import {
   Typography,
 } from "@mui/material";
 import { useState } from "react";
-import ChurchOutlinedIcon from "@mui/icons-material/ChurchOutlined";
-import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
-import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
-import SellOutlinedIcon from "@mui/icons-material/SellOutlined";
 
 const styles = {
   boxModal: {
@@ -36,7 +28,7 @@ const styles = {
     left: "50%",
     transform: "translate(-50%, -50%)",
     width: "446px",
-    height: "370px",
+    height: "auto",
     boxShadow: 24,
   },
   boxConteudoModal: {
@@ -90,7 +82,8 @@ const styles = {
     "& .MuiInputLabel-root": {
       color: "#BDBDBD",
       "&.MuiInputLabel-shrink": {
-        color: "#ffffff",
+        color: "#F3A913",
+        ml: "-12px",
       },
     },
     "& .MuiSelect-icon": {
@@ -129,8 +122,8 @@ const styles = {
     },
   },
   avatarMembro: {
-    width: "40px",
-    height: "40px",
+    width: "30px",
+    height: "30px",
     background: "#F3A913",
   },
   botaoDefault: {
@@ -218,11 +211,141 @@ const styles = {
     gap: "8px",
     mr: "20px",
   },
+  checkbox: {
+    color: "#F3A913",
+    "&.Mui-checked": {
+      color: "#F3A913",
+    },
+    "& .MuiSvgIcon-root": {
+      width: "0.8em",
+    },
+  },
+  textFieldSearch: {
+    display: "flex",
+    width: "52%",
+    height: "28px",
+    "& .MuiInputBase-root.MuiFilledInput-root": {
+      height: "30px",
+      paddingLeft: "0px",
+    },
+    "& input": {
+      color: "#ffffff",
+      p: "0px",
+      ml: "6px",
+    },
+    "& .MuiInputLabel-root": {
+      color: "#BDBDBD",
+      "&.MuiInputLabel-shrink": {
+        color: "#ffffff",
+      },
+    },
+    "& .MuiSelect-icon": {
+      color: "#ffffff",
+    },
+    "& .MuiOutlinedInput-root": {
+      "& fieldset": {
+        borderColor: "#F3A913",
+      },
+      "&:hover fieldset": {
+        borderColor: "#F3A913",
+      },
+      "&.Mui-focused fieldset": {
+        borderColor: "#F3A913",
+      },
+      "& .MuiInputBase-input": {
+        color: "#ffffff",
+      },
+    },
+    "& .MuiMenuItem-root.Mui-selected": {
+      color: "#ffffff",
+    },
+    "& .MuiSvgIcon-root": {
+      color: "#F3A913",
+    },
+    "& .MuiOutlinedInput-root .MuiSelect-select": {
+      textAlign: "center",
+    },
+  },
+  boxAreaConteudoStepper: {
+    display: "flex",
+    flexDirection: "column",
+    width: "90%",
+    height: "100%",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    gap: "10px",
+  },
+  boxPerfis: {
+    display: "flex",
+    width: "100%",
+    height: "40px",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    mb: "8px",
+  },
+  boxInfoPerfil: {
+    display: "flex",
+    flexDirection: "column",
+    width: "auto",
+    height: "100%",
+    alignItems: "flex-start",
+    justifyContent: "center",
+  },
+  textInfoPerfil: {
+    color: "#ffffff",
+    textAlign: "center",
+    fontSize: "12px",
+    lineHeight: "150%",
+    letterSpacing: "0.15px",
+    paddingLeft: "6px",
+  },
+  boxAreaMembros: {
+    display: "flex",
+    flexDirection: "column",
+    width: "100%",
+    height: "calc(100% - 52px)",
+    maxHeight: "32vh",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    overflowY: "auto",
+  },
+  boxCheckAndSearch: {
+    display: "flex",
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
 };
 
 const ModalCriarAviso = (params) => {
   const { openModalCriarAviso, setOpenModalCriarAviso } = params;
   const [activeStep, setActiveStep] = useState(0);
+  const [checkedTodos, setCheckedTodos] = useState(true);
+
+  const [membros, setMembros] = useState([
+    {
+      membro: "João Vinícius Soares",
+      email: "joaoexemplo@adpaz-zs.com.br",
+    },
+    {
+      membro: "Samuel Cardoso Félix",
+      email: "samuelexemplo@adpaz-zs.com.br",
+    },
+    {
+      membro: "Hatus Yodes Santos",
+      email: "hatusexemplo@adpaz-zs.com.br",
+    },
+    {
+      membro: "Gabriela Santos Eugênio",
+      email: "gabrielaexemplo@adpaz-zs.com.br",
+    },
+    { membro: "Renata Xavier Silva", email: "renataexemplo@adpaz-zs.com.br" },
+    { membro: "Samuel Silva Xavier", email: "silvaexemplo@adpaz-zs.com.br" },
+  ]);
+
+  const handleChangeCheckTodos = (event) => {
+    setCheckedTodos(event.target.checked);
+  };
 
   const boxTituloCards = (titulo) => {
     return (
@@ -239,36 +362,18 @@ const ModalCriarAviso = (params) => {
     {
       label: "Informações",
       conteudo: [
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            width: "90%",
-            alignItems: "center",
-            justifyContent: "flex-start",
-            gap: "10px",
-          }}
-        >
+        <Box sx={styles.boxAreaConteudoStepper}>
           <TextField
             focused
             label="Título do aviso"
             placeholder="Digite o título do aviso"
             variant="filled"
-            sx={{
-              ...styles.textField,
-              "& .MuiInputLabel-root": {
-                color: "#BDBDBD",
-                "&.MuiInputLabel-shrink": {
-                  color: "#F3A913",
-                  ml: "-12px",
-                },
-              },
-            }}
+            sx={styles.textField}
           />
           <TextField
             placeholder="Texto..."
             multiline
-            rows={4.1}
+            rows={5}
             sx={styles.textField}
           />
         </Box>,
@@ -276,7 +381,60 @@ const ModalCriarAviso = (params) => {
     },
     {
       label: "Destinatários",
-      conteudo: [<Box sx={{ background: "red", width: "100%" }}></Box>],
+      conteudo: [
+        <Box sx={styles.boxAreaConteudoStepper}>
+          <Box sx={styles.boxCheckAndSearch}>
+            <FormControlLabel
+              sx={{ color: "#ffffff" }}
+              control={
+                <Checkbox
+                  checked={checkedTodos}
+                  onChange={handleChangeCheckTodos}
+                  inputProps={{ "aria-label": "controlled" }}
+                  label="Todos os membros"
+                  sx={styles.checkbox}
+                />
+              }
+              label="Todos os membros"
+            />
+            <TextField
+              focused
+              variant="filled"
+              placeholder="Procurar membro"
+              sx={styles.textFieldSearch}
+              InputProps={{
+                startAdornment: <Search sx={styles.dataIcon} />,
+              }}
+            />
+          </Box>
+          <Box sx={styles.boxAreaMembros}>
+            {membros?.map(({ membro, email }, index) => (
+              <Box key={index} sx={styles.boxPerfis}>
+                <Checkbox
+                  checked={checkedTodos}
+                  onChange={handleChangeCheckTodos}
+                  inputProps={{ "aria-label": "controlled" }}
+                  sx={styles.checkbox}
+                />
+                <Avatar sx={styles.avatarMembro}>
+                  <Person sx={{ fontSize: "18px" }} />
+                </Avatar>
+                <Box sx={styles.boxInfoPerfil}>
+                  <Typography sx={styles.textInfoPerfil}>{membro}</Typography>
+                  <Typography
+                    sx={{
+                      ...styles.textInfoPerfil,
+                      color: "#F3CE24",
+                    }}
+                  >
+                    {email}
+                  </Typography>
+                </Box>
+              </Box>
+            ))}
+          </Box>
+        </Box>,
+      ],
     },
   ];
 
@@ -326,7 +484,7 @@ const ModalCriarAviso = (params) => {
                     onClick={() => {
                       if (activeStep === 0) {
                         setOpenModalCriarAviso(false);
-                      } else {
+                      } else if (activeStep === 1) {
                         setActiveStep(activeStep - 1);
                       }
                     }}
@@ -337,6 +495,14 @@ const ModalCriarAviso = (params) => {
                     {activeStep === 1 && "Voltar"}
                   </Button>
                   <Button
+                    onClick={() => {
+                      if (activeStep === 0) {
+                        setActiveStep(activeStep + 1);
+                      } else if (activeStep === 1) {
+                        setOpenModalCriarAviso(false);
+                        setActiveStep(0);
+                      }
+                    }}
                     variant="contained"
                     sx={{ ...styles.botaoDefault, mb: "8px" }}
                   >

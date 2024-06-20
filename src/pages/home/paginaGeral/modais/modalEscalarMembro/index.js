@@ -406,7 +406,7 @@ const ModalEscalarMembro = (params) => {
               background: "#1B1B1B",
               width: "400px",
               height: "auto",
-              top: "25%",
+              top: "50%",
             }}
           >
             <Box sx={{ ...styles.boxConteudoModal, gap: "0px" }}>
