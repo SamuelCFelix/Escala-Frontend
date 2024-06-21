@@ -11,6 +11,7 @@ import {
   ReportProblemOutlined,
   SaveOutlined,
   SettingsOutlined,
+  SmsFailedOutlined,
 } from "@mui/icons-material";
 import {
   Avatar,
@@ -25,7 +26,11 @@ import {
 import { useState } from "react";
 import ModalEscalarMembro from "./modais/modalEscalarMembro";
 import ModalCriarAviso from "./modais/modalCriarAviso";
-import ModalAviso from "./modais/modalAviso";
+import AvisoDefault from "./cardsAvisos/avisoDefault";
+import AvisoNovaSolicitacao from "./cardsAvisos/avisoNovaSolicitacao";
+import AvisoSistema from "./cardsAvisos/avisoSistema";
+import AvisoNaoPreenchido from "./cardsAvisos/avisoNaoPreenchido";
+import AvisoFaltaAnunciada from "./cardsAvisos/avisoFaltaAnunciada";
 
 const styles = {
   configBox: {
@@ -294,6 +299,13 @@ const styles = {
     justifyContent: "flex-start",
     gap: "6px",
   },
+  boxTextoDesfalque: {
+    display: "flex",
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    gap: "4px",
+  },
 };
 
 const PaginaGeral = () => {
@@ -527,206 +539,15 @@ const PaginaGeral = () => {
             </Box>
           </Box>
           <Box sx={{ ...styles.areaConteudoCard, overflowY: "auto" }}>
-            <Box position={"relative"} mb={"10px"}>
-              <Button
-                onClick={() => {
-                  setOpenModalAviso(true);
-                }}
-                sx={styles.boxAviso}
-              >
-                <Avatar
-                  sx={{ ...styles.avatarIcon, width: "40px", height: "40px" }}
-                >
-                  <Person sx={{ fontSize: "24px" }} />
-                </Avatar>
-                <Box sx={styles.boxAreaConteudoAviso}>
-                  <Box sx={styles.boxAreaTituloDate}>
-                    <Typography sx={styles.dataTextTituloAviso}>
-                      AVISO IMPORTANTE DO PASTOR!!!
-                    </Typography>
-                    <Typography sx={styles.dataTextDateAviso}>
-                      17:26 - 28/02/24
-                    </Typography>
-                  </Box>
-                  <Typography sx={styles.dataTextAviso}>
-                    O pastor está convocando todos os servos apaixonados para
-                    comparecerem na igreja 4.0 para uma reunião de alinhamento.
-                    Sua presença é indispensável, pois bla bl...
-                  </Typography>
-                </Box>
-              </Button>
-              <IconButton sx={styles.iconConfigAviso}>
-                <SettingsOutlined
-                  sx={{
-                    color: "#F3A913",
-                    fontSize: "18px",
-                  }}
-                />
-              </IconButton>
-            </Box>
+            <AvisoDefault />
 
-            <Box position={"relative"} mb={"10px"}>
-              <Box sx={styles.boxAviso}>
-                <Avatar
-                  sx={{
-                    ...styles.avatarIcon,
-                    width: "40px",
-                    height: "40px",
-                    background: "#2E7D32",
-                  }}
-                >
-                  <PersonAdd sx={{ fontSize: "24px" }} />
-                </Avatar>
-                <Box sx={styles.boxAreaConteudoAviso}>
-                  <Box sx={styles.boxAreaTituloDate}>
-                    <Typography
-                      sx={{ ...styles.dataTextTituloAviso, color: "#2E7D32" }}
-                    >
-                      NOVA SOLICITAÇÃO DE ENTRADA
-                    </Typography>
-                    <Typography sx={styles.dataTextDateAviso}>
-                      17:26 - 28/02/24
-                    </Typography>
-                  </Box>
-                  <Box sx={styles.boxTextDestaqueAviso}>
-                    <Typography
-                      sx={{
-                        ...styles.dataTextAviso,
-                        fontWeight: 600,
-                        color: "#ffffff",
-                      }}
-                    >
-                      Samuel Cardoso Félix
-                    </Typography>
-                    <Typography sx={styles.dataTextAviso}>
-                      solicitou entrada na equipe.
-                    </Typography>
-                  </Box>
-                  <Typography sx={styles.dataTextAviso}>
-                    Vá para a aba de Equipe {`>`} Solicitações de Entrada e
-                    Aceite ou Recuse a solicitação.
-                  </Typography>
-                </Box>
-              </Box>
-              <IconButton sx={styles.iconConfigAviso}>
-                <SettingsOutlined
-                  sx={{
-                    color: "#F3A913",
-                    fontSize: "18px",
-                  }}
-                />
-              </IconButton>
-            </Box>
+            <AvisoNovaSolicitacao />
 
-            <Box position={"relative"} mb={"10px"}>
-              <Button
-                onClick={() => {
-                  setOpenModalAviso(true);
-                }}
-                sx={styles.boxAviso}
-              >
-                <Avatar
-                  sx={{
-                    ...styles.avatarIcon,
-                    width: "40px",
-                    height: "40px",
-                    background: "#00A7CC",
-                  }}
-                >
-                  <CloudOutlined sx={{ fontSize: "24px" }} />
-                </Avatar>
-                <Box sx={styles.boxAreaConteudoAviso}>
-                  <Box sx={styles.boxAreaTituloDate}>
-                    <Typography
-                      sx={{ ...styles.dataTextTituloAviso, color: "#00A7CC" }}
-                    >
-                      AVISO DO SISTEMA
-                    </Typography>
-                    <Typography sx={styles.dataTextDateAviso}>
-                      17:26 - 28/02/24
-                    </Typography>
-                  </Box>
-                  <Box sx={styles.boxTextDestaqueAviso}>
-                    <Typography
-                      sx={{
-                        ...styles.dataTextAviso,
-                        fontWeight: 600,
-                        color: "#ffffff",
-                      }}
-                    >
-                      Nova atualização!
-                    </Typography>
-                  </Box>
-                  <Typography sx={styles.dataTextAviso}>
-                    Agora em nosso sistema está disponível a função tal que fará
-                    tal coisa, teste agora!
-                  </Typography>
-                </Box>
-              </Button>
-              <IconButton sx={styles.iconConfigAviso}>
-                <SettingsOutlined
-                  sx={{
-                    color: "#F3A913",
-                    fontSize: "18px",
-                  }}
-                />
-              </IconButton>
-            </Box>
+            <AvisoSistema />
 
-            <Box position={"relative"} mb={"10px"}>
-              <Button
-                onClick={() => {
-                  setOpenModalAviso(true);
-                }}
-                sx={styles.boxAviso}
-              >
-                <Avatar
-                  sx={{
-                    ...styles.avatarIcon,
-                    width: "40px",
-                    height: "40px",
-                    background: "#D32F2F",
-                  }}
-                >
-                  <CloudOutlined sx={{ fontSize: "24px" }} />
-                </Avatar>
-                <Box sx={styles.boxAreaConteudoAviso}>
-                  <Box sx={styles.boxAreaTituloDate}>
-                    <Typography
-                      sx={{ ...styles.dataTextTituloAviso, color: "#D32F2F" }}
-                    >
-                      NÃO PREENCHIDO
-                    </Typography>
-                    <Typography sx={styles.dataTextDateAviso}>
-                      17:26 - 28/02/24
-                    </Typography>
-                  </Box>
-                  <Box sx={styles.boxTextDestaqueAviso}>
-                    <Typography
-                      sx={{
-                        ...styles.dataTextAviso,
-                        fontWeight: 600,
-                        color: "#ffffff",
-                      }}
-                    >
-                      Nova atualização!
-                    </Typography>
-                  </Box>
-                  <Typography sx={styles.dataTextAviso}>
-                    Agora em nosso sistema está disponível a função tal que fará
-                    tal coisa, teste agora!
-                  </Typography>
-                </Box>
-              </Button>
-              <IconButton sx={styles.iconConfigAviso}>
-                <SettingsOutlined
-                  sx={{
-                    color: "#F3A913",
-                    fontSize: "18px",
-                  }}
-                />
-              </IconButton>
-            </Box>
+            <AvisoNaoPreenchido />
+
+            <AvisoFaltaAnunciada />
           </Box>
           <Box sx={styles.boxAreaBotaoCard}>
             <Divider sx={styles.divider} />
@@ -763,10 +584,6 @@ const PaginaGeral = () => {
       <ModalCriarAviso
         openModalCriarAviso={openModalCriarAviso}
         setOpenModalCriarAviso={setOpenModalCriarAviso}
-      />
-      <ModalAviso
-        openModalAviso={openModalAviso}
-        setOpenModalAviso={setOpenModalAviso}
       />
     </Box>
   );

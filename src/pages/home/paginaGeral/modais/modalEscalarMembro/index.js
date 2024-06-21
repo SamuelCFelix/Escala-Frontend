@@ -248,6 +248,15 @@ const styles = {
       background: "#FEBC36",
     },
   },
+  boxBotoesModal: {
+    display: "flex",
+    width: "100%",
+    gap: "6px",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    margin: "10px 0px",
+    mr: "20px",
+  },
 };
 
 const ModalEscalarMembro = (params) => {
@@ -417,17 +426,7 @@ const ModalEscalarMembro = (params) => {
               <Typography sx={{ ...styles.dataText, color: "#D32F2F" }}>
                 Obs.: Membro sem Disponibilidade ou Tag necessária
               </Typography>
-              <Box
-                sx={{
-                  display: "flex",
-                  width: "100%",
-                  gap: "6px",
-                  alignItems: "center",
-                  justifyContent: "flex-end",
-                  margin: "10px 0px",
-                  mr: "20px",
-                }}
-              >
+              <Box sx={styles.boxBotoesModal}>
                 <Button
                   onClick={() => {
                     setOpenModalConfirmarEscolha(false);
