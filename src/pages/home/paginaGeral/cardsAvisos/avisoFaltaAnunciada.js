@@ -32,6 +32,9 @@ const styles = {
     borderRadius: "4px",
     boxSizing: "border-box",
     textTransform: "none",
+    "&:hover": {
+      backgroundColor: "rgba(243, 169, 19, 0.2)",
+    },
   },
   avatarIcon: {
     background: "#F3A913",
@@ -76,9 +79,14 @@ const styles = {
   },
   iconConfigAviso: {
     position: "absolute",
-    right: "-30px",
+    right: "-28px",
     top: "50%",
     transform: "translateY(-50%)",
+    width: "26px",
+    height: "26px",
+    "&.MuiButtonBase-root.MuiIconButton-root:hover": {
+      backgroundColor: "rgba(243, 169, 19, 0.2)",
+    },
   },
   boxTextDestaqueAviso: {
     width: "100%",
