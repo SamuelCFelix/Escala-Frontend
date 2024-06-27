@@ -38,6 +38,7 @@ import AvisoFaltaAnunciada from "./cardsAvisos/avisoFaltaAnunciada";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
 import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
+import ModalCriarEvento from "./modais/modalCriarEvento";
 
 const styles = {
   configBox: {
@@ -499,7 +500,7 @@ const PaginaGeral = () => {
   const [editarEscala, setEditarEscala] = useState(false);
   const [openModalEscalarMembro, setOpenModalEscalarMembro] = useState(false);
   const [openModalCriarAviso, setOpenModalCriarAviso] = useState(false);
-  const [openModalAviso, setOpenModalAviso] = useState(false);
+  const [openModalCriarEvento, setOpenModalCriarEvento] = useState(false);
 
   const boxTituloCards = (titulo) => {
     return (
@@ -826,7 +827,9 @@ const PaginaGeral = () => {
             <Button
               variant="contained"
               sx={{ ...styles.botaoDefault, mb: "8px", gap: "4px" }}
-              onClick={() => {}}
+              onClick={() => {
+                setOpenModalCriarEvento(true);
+              }}
             >
               <Box sx={styles.boxDoubleIconeBotaoEvento}>
                 <CalendarTodayOutlinedIcon sx={{ fontSize: "18px" }} />
@@ -851,6 +854,10 @@ const PaginaGeral = () => {
       <ModalCriarAviso
         openModalCriarAviso={openModalCriarAviso}
         setOpenModalCriarAviso={setOpenModalCriarAviso}
+      />
+      <ModalCriarEvento
+        openModalCriarEvento={openModalCriarEvento}
+        setOpenModalCriarEvento={setOpenModalCriarEvento}
       />
     </Box>
   );
