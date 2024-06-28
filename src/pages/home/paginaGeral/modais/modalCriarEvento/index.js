@@ -31,6 +31,8 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
+import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
 
 const styles = {
   boxModal: {
@@ -434,7 +436,55 @@ const styles = {
     alignItems: "center",
     justifyContent: "flex-start",
     overflowY: "auto",
-    gap: "10px",
+    gap: "6px",
+  },
+  textTurnosEvento: {
+    color: "#ffffff",
+    textAlign: "center",
+    fontSize: "14px",
+    lineHeight: "150%",
+    letterSpacing: "0.15px",
+  },
+  boxAreaInfoTurno: {
+    display: "flex",
+    width: "100%",
+    height: "100%",
+    alignItems: "center",
+    justifyContent: "space-between",
+    mr: "16px",
+  },
+  boxIconeTextTurno: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "6px",
+  },
+  iconesEvento: {
+    fontSize: "18px",
+    color: "#F3A913",
+  },
+  boxAreaCardMembro: {
+    display: "flex",
+    width: "100%",
+    height: "42px",
+    alignItems: "center",
+    justifyContent: "flex-start",
+  },
+  configAccordion: {
+    width: "100%",
+    background: "#1B1B1B",
+    "&.MuiPaper-root.MuiAccordion-root.Mui-expanded": {
+      margin: "0px",
+    },
+  },
+  configAccordionSummary: {
+    "& .MuiSvgIcon-root": {
+      color: "#F3A913",
+    },
+    "&.MuiButtonBase-root.MuiAccordionSummary-root.Mui-expanded": {
+      minHeight: "48px",
+      height: "48px",
+    },
   },
 };
 
@@ -563,24 +613,60 @@ const ModalCriarEvento = (params) => {
               Exemplo: Se um evento tem duração de 4 horas, eu posso dividir em
               2 turnos de 2 horas, onde eu terei uma equipe para cada turno.
             </Typography> */}
-            <Accordion
-              expanded={expandedAccordion === "panel1"}
-              onChange={handleChange("panel1")}
-            >
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls="panel1bh-content"
-                id="panel1bh-header"
+            {Array.from({ length: 8 }).map((_, index) => (
+              <Accordion
+                expanded={expandedAccordion === "panel1"}
+                onChange={handleChange("panel1")}
+                sx={styles.configAccordion}
               >
-                <Typography sx={{ width: "33%", flexShrink: 0 }}>
-                  General settings
-                </Typography>
-                <Typography sx={{ color: "text.secondary" }}>
-                  I am an accordion
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails></AccordionDetails>
-            </Accordion>
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  aria-controls="panel1bh-content"
+                  id="panel1bh-header"
+                  sx={styles.configAccordionSummary}
+                >
+                  <Box sx={styles.boxAreaInfoTurno}>
+                    <Typography
+                      sx={{ ...styles.textTurnosEvento, color: "#F3A913" }}
+                    >
+                      1° Turno
+                    </Typography>
+                    <Box sx={styles.boxIconeTextTurno}>
+                      <AccessTimeOutlinedIcon sx={styles.iconesEvento} />
+                      <Typography sx={styles.textTurnosEvento}>
+                        08:00 - 10:00
+                      </Typography>
+                    </Box>
+                    <Box sx={styles.boxIconeTextTurno}>
+                      <GroupsOutlinedIcon sx={styles.iconesEvento} />
+                      <Typography sx={styles.textTurnosEvento}>4</Typography>
+                    </Box>
+                  </Box>
+                </AccordionSummary>
+                <AccordionDetails sx={{ padding: "0px 0px 4px 12px" }}>
+                  {Array.from({ length: 4 }).map((_, index) => (
+                    <Box sx={styles.boxAreaCardMembro} key={index}>
+                      <Avatar sx={styles.avatarMembro}>
+                        <Person sx={{ fontSize: "18px" }} />
+                      </Avatar>
+                      <Box sx={styles.boxInfoPerfil}>
+                        <Typography sx={styles.textInfoPerfil}>
+                          Membro {index + 1}
+                        </Typography>
+                        <Typography
+                          sx={{
+                            ...styles.textInfoPerfil,
+                            color: "#F3CE24",
+                          }}
+                        >
+                          Câmera Lateral - Esquerda
+                        </Typography>
+                      </Box>
+                    </Box>
+                  ))}
+                </AccordionDetails>
+              </Accordion>
+            ))}
           </Box>
         </Box>,
       ],
