@@ -3,12 +3,14 @@ import {
   Close,
   Person,
   Search,
+  SellOutlined,
   Star,
 } from "@mui/icons-material";
 import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Autocomplete,
   Avatar,
   Backdrop,
   Box,
@@ -33,6 +35,9 @@ import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
 import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
+import { TimePicker, pickersLayoutClasses } from "@mui/x-date-pickers";
 
 const styles = {
   boxModal: {
@@ -136,6 +141,106 @@ const styles = {
       mt: "-8px",
       fontSize: "14px",
     },
+  },
+  timePicker: {
+    display: "flex",
+    width: "100%",
+    marginTop: "5px",
+    padding: "10px 0px",
+    "& input": {
+      color: "#ffffff",
+    },
+    "& .MuiInputLabel-root": {
+      color: "#BDBDBD",
+      "&.MuiInputLabel-shrink": {
+        color: "#F3A913",
+        ml: "-12px",
+      },
+    },
+    "& .MuiSelect-icon": {
+      color: "#ffffff",
+    },
+    "& .MuiOutlinedInput-root": {
+      "& fieldset": {
+        borderColor: "#F3A913",
+      },
+      "&:hover fieldset": {
+        borderColor: "#F3A913",
+      },
+      "&.Mui-focused fieldset": {
+        borderColor: "#F3A913",
+      },
+      "& .MuiInputBase-input": {
+        color: "#ffffff",
+      },
+    },
+    "& .MuiMenuItem-root.Mui-selected": {
+      color: "#ffffff",
+    },
+    "& .MuiSvgIcon-root": {
+      color: "#ffffff",
+    },
+    "& .MuiOutlinedInput-root .MuiSelect-select": {
+      textAlign: "center",
+    },
+    "& .MuiInputBase-input.MuiFilledInput-input": {
+      paddingLeft: "0px",
+    },
+    "& .MuiFormControl-root.MuiTextField-root": {
+      minWidth: "0px",
+    },
+    "& .MuiInputLabel-root.MuiInputLabel-shrink": {
+      color: "#F3A913",
+      ml: "0px",
+    },
+    "& .MuiInputBase-root.MuiOutlinedInput-root": {
+      height: "40px",
+      "&.Mui-error.MuiOutlinedInput-notchedOutline": {
+        borderColor: "#F3A913",
+      },
+    },
+    "& .MuiFormLabel-root.MuiInputLabel-root:not(.MuiInputLabel-shrink)": {
+      top: "-7px",
+    },
+  },
+  configSlotPropsTimePicker: {
+    maxHeight: "170px",
+    backgroundColor: "#565656",
+    color: "#ffffff",
+    borderRadius: "4px",
+    boxShadow:
+      "0px 5px 5px -3px rgba(0,0,0,0.2), 0px 8px 10px 1px rgba(0,0,0,0.14), 0px 3px 14px 2px rgba(0,0,0,0.12)",
+
+    "@media (pointer: fine)": {
+      ".MuiList-root.MuiMultiSectionDigitalClockSection-root:hover": {
+        overflowY: "auto",
+        "&::-webkit-scrollbar": {
+          display: "none",
+        },
+      },
+    },
+    "& .Mui-selected": {
+      backgroundColor: "#F3A913",
+      color: "white",
+      "&:hover": {
+        backgroundColor: "#F3A913",
+        color: "white",
+      },
+      "&:focus": {
+        backgroundColor: "#F3A913",
+        color: "white",
+      },
+    },
+    "& .MuiButtonBase-root.MuiMenuItem-root.MuiMultiSectionDigitalClockSection-item":
+      {
+        "&:hover": {
+          backgroundColor: "rgba(0, 0, 0, 0.04)",
+        },
+
+        "&[aria-selected='true']:hover": {
+          backgroundColor: "#F3A913",
+        },
+      },
   },
   datePicker: {
     display: "flex",
@@ -486,6 +591,36 @@ const styles = {
       height: "48px",
     },
   },
+  boxBotoesModal: {
+    display: "flex",
+    width: "100%",
+    gap: "6px",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    margin: "10px 0px",
+    mr: "20px",
+  },
+  boxIconeTextAddTurno: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    gap: "4px",
+  },
+  boxAreaConteudoAddTurno: {
+    display: "flex",
+    flexDirection: "column",
+    width: "100%",
+    alignItems: "flex-start",
+    justifyContent: "center",
+    ml: "20px",
+  },
+  boxAreaHorariosTurno: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    gap: "16px",
+    mb: "10px",
+  },
 };
 
 const ModalCriarEvento = (params) => {
@@ -493,6 +628,7 @@ const ModalCriarEvento = (params) => {
   const [activeStep, setActiveStep] = useState(0);
   const [checkedTodos, setCheckedTodos] = useState(true);
   const [expandedAccordion, setExpandedAccordion] = useState(false);
+  const [OpenModalCriarTurno, setOpenModalCriarTurno] = useState(false);
 
   const handleChange = (panel) => (event, isExpanded) => {
     setExpandedAccordion(isExpanded ? panel : false);
@@ -517,6 +653,24 @@ const ModalCriarEvento = (params) => {
     },
     { membro: "Renata Xavier Silva", email: "renataexemplo@adpaz-zs.com.br" },
     { membro: "Samuel Silva Xavier", email: "silvaexemplo@adpaz-zs.com.br" },
+  ]);
+
+  const [tags, setTags] = useState([
+    {
+      nome: "Câmera Lateral - Esquerda",
+    },
+    {
+      nome: "Câmera Lateral - Direita",
+    },
+    {
+      nome: "Câmera Central",
+    },
+    {
+      nome: "Gimball",
+    },
+    {
+      nome: "Câmera de Cortes",
+    },
   ]);
 
   const handleChangeCheckTodos = (event) => {
@@ -582,7 +736,12 @@ const ModalCriarEvento = (params) => {
             <Typography
               sx={styles.textInfoDataEvento}
             >{`19/05/24 - DOMINGO`}</Typography>
-            <IconButton sx={styles.iconButtonAddConfig}>
+            <IconButton
+              onClick={() => {
+                setOpenModalCriarTurno(true);
+              }}
+              sx={styles.iconButtonAddConfig}
+            >
               <AddCircleOutline sx={styles.estiloIconAdd} />
             </IconButton>
           </Box>
@@ -802,6 +961,164 @@ const ModalCriarEvento = (params) => {
                     {activeStep === 2 && "Enviar"}
                   </Button>
                 </Box>
+              </Box>
+            </Box>
+          </Box>
+        </Fade>
+      </Modal>
+      <Modal
+        open={OpenModalCriarTurno}
+        onClose={() => {
+          setOpenModalCriarTurno(false);
+        }}
+        closeAfterTransition
+        slots={{ backdrop: Backdrop }}
+        slotProps={{
+          backdrop: {
+            timeout: 500,
+          },
+        }}
+      >
+        <Fade in={OpenModalCriarTurno}>
+          <Box
+            sx={{
+              ...styles.boxModal,
+              background: "#1B1B1B",
+              width: "400px",
+              height: "auto",
+            }}
+          >
+            <Box sx={{ ...styles.boxConteudoModal, gap: "0px" }}>
+              {boxTituloCards("Adicionar Turno")}
+              <Box sx={styles.boxAreaConteudoAddTurno}>
+                <Box position={"relative"} sx={styles.boxIconeTextAddTurno}>
+                  <AccessTimeOutlinedIcon sx={styles.iconesEvento} />
+                  <Typography sx={styles.textTurnosEvento}>TURNO</Typography>
+                  <Divider
+                    sx={{
+                      ...styles.divider,
+                      width: "116px",
+                      position: "absolute",
+                      bottom: -2,
+                    }}
+                  />
+                </Box>
+                <Box sx={styles.boxAreaHorariosTurno}>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DemoContainer
+                      sx={styles.timePicker}
+                      components={["TimePicker"]}
+                    >
+                      <TimePicker
+                        /* value={horario}
+                      onChange={(newValue) => {
+                        setHorario(newValue);
+                      }} */
+                        sx={{
+                          width: "114px",
+                          height: "40px",
+                        }}
+                        slotProps={{
+                          layout: {
+                            sx: {
+                              [`.${pickersLayoutClasses.contentWrapper}`]:
+                                styles.configSlotPropsTimePicker,
+                            },
+                          },
+                          actionBar: {
+                            actions: [],
+                          },
+                        }}
+                        ampm={false}
+                        label="Início"
+                      />
+                    </DemoContainer>
+                  </LocalizationProvider>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DemoContainer
+                      sx={styles.timePicker}
+                      components={["TimePicker"]}
+                    >
+                      <TimePicker
+                        /* value={horario}
+                      onChange={(newValue) => {
+                        setHorario(newValue);
+                      }} */
+                        sx={{
+                          width: "114px",
+                          height: "40px",
+                        }}
+                        slotProps={{
+                          layout: {
+                            sx: {
+                              [`.${pickersLayoutClasses.contentWrapper}`]:
+                                styles.configSlotPropsTimePicker,
+                            },
+                          },
+                          actionBar: {
+                            actions: [],
+                          },
+                        }}
+                        ampm={false}
+                        label="Fim"
+                      />
+                    </DemoContainer>
+                  </LocalizationProvider>
+                </Box>
+                <Box position={"relative"} sx={styles.boxIconeTextAddTurno}>
+                  <SellOutlined sx={styles.iconesEvento} />
+                  <Typography sx={styles.textTurnosEvento}>
+                    TAGS DA EQUIPE
+                  </Typography>
+                  <Divider
+                    sx={{
+                      ...styles.divider,
+                      width: "160px",
+                      position: "absolute",
+                      bottom: -2,
+                    }}
+                  />
+                </Box>
+                <Autocomplete
+                  multiple
+                  id="tags-standard"
+                  options={tags}
+                  getOptionLabel={(option) => option.nome}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      variant="outlined"
+                      label="Tags"
+                      placeholder="Escolha as Tags para esse turno"
+                      sx={{}}
+                    />
+                  )}
+                  sx={{
+                    width: "94%",
+                    mt: "16px",
+                    mb: "6px",
+                  }}
+                />
+              </Box>
+              <Box sx={styles.boxBotoesModal}>
+                <Button
+                  onClick={() => {
+                    setOpenModalCriarTurno(false);
+                  }}
+                  sx={styles.botaoDefault}
+                >
+                  {" "}
+                  Cancelar
+                </Button>
+                <Button
+                  onClick={() => {
+                    setOpenModalCriarTurno(false);
+                  }}
+                  sx={styles.botaoDefault}
+                >
+                  {" "}
+                  Adicionar
+                </Button>
               </Box>
             </Box>
           </Box>
