@@ -1090,7 +1090,14 @@ const ModalCriarEvento = (params) => {
                       variant="outlined"
                       label="Tags"
                       placeholder="Escolha as Tags para esse turno"
-                      sx={{}}
+                      sx={{
+                        "& .MuiOutlinedInput-notchedOutline": {
+                          borderColor: "#F3A913",
+                          /* ":hover": {
+                            borderColor: "#F3A913",
+                          }, */
+                        },
+                      }}
                     />
                   )}
                   sx={{

@@ -25,7 +25,10 @@ import {
   IconButton,
   Pagination,
   Stack,
+  Tab,
+  Tabs,
   Typography,
+  tabsClasses,
 } from "@mui/material";
 import { useState } from "react";
 import ModalEscalarMembro from "./modais/modalEscalarMembro";
@@ -39,6 +42,8 @@ import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined
 import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
 import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
 import ModalCriarEvento from "./modais/modalCriarEvento";
+import CardEvento from "./cardEvento";
+import AddchartOutlinedIcon from "@mui/icons-material/AddchartOutlined";
 
 const styles = {
   configBox: {
@@ -145,7 +150,7 @@ const styles = {
     display: "flex",
     width: "auto",
     height: "30px",
-    padding: "0px 40px",
+    padding: "0px 20px",
     borderRadius: "5px",
     fontFamily: "Roboto, sans-serif",
     fontSize: "12px",
@@ -472,6 +477,110 @@ const styles = {
     justifyContent: "center",
     gap: "3px",
   },
+  boxAreaInformacoesPerfil: {
+    width: "100%",
+    height: "100%",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "flex-start",
+  },
+  textPerfilNome: {
+    color: "#ffffff",
+    textAlign: "center",
+    fontSize: "16px",
+    lineHeight: "150%",
+    letterSpacing: "0.15px",
+    margin: "8px 0px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "4px",
+  },
+  boxTabs: {
+    width: "auto",
+    height: "42px",
+  },
+  estiloTabs: {
+    [`& .${tabsClasses?.scrollButtons}`]: {
+      color: "#F3A913",
+      "&.Mui-disabled": { opacity: 1 },
+    },
+    "& .MuiTabs-indicator": {
+      backgroundColor: "#F3A913",
+    },
+    "& .MuiTab-root.Mui-selected": {
+      color: "#F3A913",
+    },
+  },
+  boxAreaConteudoTabsInformacoes: {
+    width: "100%",
+    height: "calc(100% - 146px)",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    gap: "6px",
+    mt: "12px",
+    overflowY: "auto",
+  },
+  boxCardEscalado: {
+    width: "100%",
+    height: "66px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  boxInfoEscalado1: {
+    width: "calc(100% - 60px)",
+    height: "100%",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    justifyContent: "center",
+  },
+  boxInfoEscalado2: {
+    width: "60px",
+    height: "46px",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    mt: "20px",
+  },
+  textDataCardEscalado: {
+    color: "#BDBDBD",
+    fontSize: "14px",
+    lineHeight: "143%",
+    letterSpacing: "0.17px",
+    textAlign: "left",
+    width: "100%",
+    ml: "8px",
+  },
+  textDataCardEscaladoCulto: {
+    color: "#ffffff",
+    fontSize: "16px",
+    lineHeight: "24px",
+    letterSpacing: "0.17px",
+    textAlign: "left",
+    width: "100%",
+    ml: "8px",
+  },
+  text2DataCardEscalado: {
+    color: "#ffffff",
+    fontSize: "14px",
+    lineHeight: "150%",
+    letterSpacing: "0.15px",
+    textAlign: "center",
+  },
+  chipDefault: {
+    backgroundColor: "#1B1B1B",
+    border: "2px solid #F3A913",
+    borderRadius: "10px",
+    color: "#ffffff",
+    height: "32px",
+    minHeight: "32px",
+  },
 };
 
 const PaginaGeral = () => {
@@ -501,6 +610,7 @@ const PaginaGeral = () => {
   const [openModalEscalarMembro, setOpenModalEscalarMembro] = useState(false);
   const [openModalCriarAviso, setOpenModalCriarAviso] = useState(false);
   const [openModalCriarEvento, setOpenModalCriarEvento] = useState(false);
+  const [valueTabInformacoes, setValueTabInformacoes] = useState("escalado");
 
   const boxTituloCards = (titulo) => {
     return (
@@ -522,6 +632,10 @@ const PaginaGeral = () => {
         </Button>
       </Box>
     );
+  };
+
+  const handleChangeTabsInformacoes = (event, newValue) => {
+    setValueTabInformacoes(newValue);
   };
 
   return (
@@ -681,7 +795,6 @@ const PaginaGeral = () => {
                   ...styles.botaoDefault,
                   mb: "8px",
                   gap: "4px",
-                  padding: "0px 20px",
                 }}
                 onClick={() => setEditarEscala(false)}
               >
@@ -710,12 +823,12 @@ const PaginaGeral = () => {
               <Typography sx={styles.textTitulo}>Avisos</Typography>
               <Box sx={styles.baseTitulo} />
             </Box>
-            <Box sx={styles.boxNumeroAvisos}>
+            {/* <Box sx={styles.boxNumeroAvisos}>
               <Typography sx={styles.numeroAvisos}>7</Typography>
-            </Box>
+            </Box> */}
           </Box>
           <Box sx={{ ...styles.areaConteudoCard, overflowY: "auto" }}>
-            <AvisoDefault />
+            {/* <AvisoDefault />
 
             <AvisoNovaSolicitacao />
 
@@ -723,11 +836,15 @@ const PaginaGeral = () => {
 
             <AvisoNaoPreenchido />
 
-            <AvisoFaltaAnunciada />
+            <AvisoFaltaAnunciada /> */}
+            <Box sx={{ ...styles.configBox, height: "100%" }}>
+              <Typography sx={styles.textTitulo}>Em Breve</Typography>
+            </Box>
           </Box>
           <Box sx={styles.boxAreaBotaoCard}>
             <Divider sx={styles.divider} />
             <Button
+              disabled
               variant="contained"
               sx={{ ...styles.botaoDefault, mb: "8px", gap: "4px" }}
               onClick={() => {
@@ -743,88 +860,15 @@ const PaginaGeral = () => {
         <Box sx={styles.boxCardDefaultMid}>
           {boxTituloCards("Eventos")}
           <Box sx={styles.areaConteudoCard}>
-            <Box sx={styles.boxConteudoEvento}>
-              <Button sx={styles.boxCardEvento}>
-                <Box sx={styles.boxAreaInfoEvento}>
-                  <Box sx={styles.boxDataEvento}>
-                    <Typography
-                      sx={{ ...styles.dataTextDateEvento, mb: "-3px" }}
-                    >
-                      11/05/24
-                    </Typography>
-                    <Typography
-                      sx={{
-                        ...styles.dataTextDateEvento,
-                        fontSize: "8px",
-                        mb: "0px",
-                      }}
-                    >
-                      (SEGUNDA-FEIRA)
-                    </Typography>
-                    <Box sx={styles.boxDoubleIconeBotaoEvento}>
-                      <CalendarTodayOutlinedIcon
-                        sx={{ fontSize: "18px", color: "#F3A913" }}
-                      />
-                      <Star
-                        sx={{
-                          ...styles.positionStarCalendario,
-                          color: "#F3A913",
-                        }}
-                      />
-                    </Box>
-                  </Box>
-                  <Box sx={styles.boxDataEvento}>
-                    <Typography sx={styles.dataTextDateEvento}>
-                      15:30 - 19:00
-                    </Typography>
-                    <AccessTimeOutlinedIcon sx={styles.iconeEvento} />
-                  </Box>
-                  <Box sx={styles.boxDataEvento}>
-                    <Typography
-                      sx={{ ...styles.dataTextDateEvento, color: "#D32F2F" }}
-                    >
-                      2/8
-                    </Typography>
-                    <GroupsOutlinedIcon sx={styles.iconeEvento} />
-                  </Box>
-                </Box>
-                <Box sx={styles.boxTituloEvento}>
-                  <Typography sx={styles.tituloEventoText}>
-                    Culto de Batismo
-                  </Typography>
-                  <Box sx={styles.lineWithTriangles} />
-                </Box>
-              </Button>
-              <Box sx={styles.boxPaginacao}>
-                <Pagination
-                  /* count={groupedCards.length > 0 ? groupedCards.length : 1}
-                  page={page}
-                  onChange={handleChangePage} */
-                  count={2}
-                  page={1}
-                  shape="rounded"
-                  hidePrevButton
-                  hideNextButton
-                  sx={styles.estiloPaginacao}
-                />
-              </Box>
-              <Box sx={styles.boxAreaSetasEvento}>
-                <IconButton sx={styles.IconButtonEvento}>
-                  <KeyboardArrowLeftOutlined
-                    sx={{ color: "#F3A913", fontSize: "40px" }}
-                  />
-                </IconButton>
-                <IconButton sx={styles.IconButtonEvento}>
-                  <KeyboardArrowRightOutlined
-                    sx={{ color: "#F3A913", fontSize: "40px" }}
-                  />
-                </IconButton>
-              </Box>
+            {/* <CardEvento /> */}
+            <Box sx={{ ...styles.configBox, height: "100%" }}>
+              <Typography sx={styles.textTitulo}>Em Breve</Typography>
             </Box>
           </Box>
           <Box sx={styles.boxAreaBotaoCard}>
             <Divider sx={styles.divider} />
             <Button
+              disabled
               variant="contained"
               sx={{ ...styles.botaoDefault, mb: "8px", gap: "4px" }}
               onClick={() => {
@@ -842,8 +886,99 @@ const PaginaGeral = () => {
       </Box>
       <Box sx={styles.boxCardDefault}>
         {boxTituloCards("Informações")}
-        <Box sx={styles.areaConteudoCard}> </Box>
-        {boxBotaoCards("Cadastrar disponibilidade")}
+        <Box sx={styles.areaConteudoCard}>
+          <Box sx={styles.boxAreaInformacoesPerfil}>
+            <Avatar sx={styles.avatarIcon}>
+              <Person sx={{ fontSize: "24px" }} />
+            </Avatar>
+            <Typography sx={styles.textPerfilNome}>
+              Samuel Cardoso Félix
+              <Chip label="Admin" variant="outlined" sx={styles.chipName} />
+            </Typography>
+            <Box sx={styles.boxTabs}>
+              <Tabs
+                value={valueTabInformacoes}
+                onChange={handleChangeTabsInformacoes}
+                variant="scrollable"
+                scrollButtons
+                allowScrollButtonsMobile
+                sx={styles.estiloTabs}
+              >
+                <Tab
+                  label="Escalado"
+                  value="escalado"
+                  sx={{ color: "#ffffff" }}
+                />
+                <Tab label="Tags" value="tags" sx={{ color: "#ffffff" }} />
+              </Tabs>
+            </Box>
+            <Box sx={styles.boxAreaConteudoTabsInformacoes}>
+              {valueTabInformacoes === "escalado" &&
+                Array.from({ length: 6 }).map((_, index) => (
+                  <Box key={index} sx={styles.boxCardEscalado}>
+                    <Box sx={styles.boxInfoEscalado1}>
+                      <Typography
+                        sx={{ ...styles.textDataCardEscalado, width: "auto" }}
+                      >
+                        Domingo
+                        <Divider
+                          sx={{
+                            ...styles.divider,
+                            width: "104%",
+                            mt: "-2px",
+                            mb: "2px",
+                          }}
+                        />
+                      </Typography>
+                      <Typography sx={styles.textDataCardEscaladoCulto}>
+                        Culto Celebração - ZS16
+                      </Typography>
+                      <Typography
+                        sx={{
+                          ...styles.textDataCardEscalado,
+                          color: "#F3CE24",
+                        }}
+                      >
+                        Câmera Lateral - Direita
+                      </Typography>
+                    </Box>
+                    <Box sx={styles.boxInfoEscalado2}>
+                      <Typography sx={styles.text2DataCardEscalado}>
+                        18/01
+                      </Typography>
+                      <Typography sx={styles.text2DataCardEscalado}>
+                        17:00
+                      </Typography>
+                    </Box>
+                  </Box>
+                ))}
+
+              {valueTabInformacoes === "tags" &&
+                proximaEscala.map(({ tag }, index) => (
+                  <Chip
+                    key={index}
+                    label={tag}
+                    variant="outlined"
+                    sx={styles.chipDefault}
+                  />
+                ))}
+            </Box>
+          </Box>
+        </Box>
+        <Box sx={styles.boxAreaBotaoCard}>
+          <Divider sx={styles.divider} />
+          <Button
+            variant="contained"
+            sx={{ ...styles.botaoDefault, mb: "8px", gap: "4px" }}
+            onClick={() => {}}
+          >
+            <Box sx={styles.boxDoubleIconeBotaoEvento}>
+              <AddchartOutlinedIcon sx={{ fontSize: "18px" }} />
+              <Star sx={styles.positionStarCalendario} />
+            </Box>
+            Cadastrar diponibilidade
+          </Button>
+        </Box>
       </Box>
 
       {/* Modais */}
