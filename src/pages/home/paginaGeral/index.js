@@ -117,6 +117,20 @@ const styles = {
     letterSpacing: "1.25px",
     padding: "0px 20px",
   },
+  textTituloInfoEscala: {
+    color: "#ffffff",
+    textTransform: "uppercase",
+    textAlign: "center",
+    fontSize: "14px",
+    lineHeight: "16px",
+    letterSpacing: "1.25px",
+    padding: "0px 20px",
+    alignSelf: "flex-start",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: "4px",
+  },
   textPerfilProximoCulto: {
     color: "#ffffff",
     textAlign: "center",
@@ -525,7 +539,7 @@ const styles = {
     overflowY: "auto",
   },
   boxCardEscalado: {
-    width: "100%",
+    width: "98.5%",
     height: "66px",
     display: "flex",
     alignItems: "center",
@@ -653,16 +667,7 @@ const PaginaGeral = () => {
             <Typography sx={{ ...styles.textTitulo, fontSize: "18px" }}>
               16:00
             </Typography>
-            <Typography
-              sx={{
-                ...styles.textTitulo,
-                alignSelf: "flex-start",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                gap: "4px",
-              }}
-            >
+            <Typography sx={styles.textTituloInfoEscala}>
               <CalendarMonthOutlined
                 sx={{ color: "#F3A913", fontSize: "16px" }}
               />
@@ -884,6 +889,7 @@ const PaginaGeral = () => {
           </Box>
         </Box>
       </Box>
+      {/* Tabela INFORMAÇÕES */}
       <Box sx={styles.boxCardDefault}>
         {boxTituloCards("Informações")}
         <Box sx={styles.areaConteudoCard}>
