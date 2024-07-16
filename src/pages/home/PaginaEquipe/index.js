@@ -12,6 +12,7 @@ import {
   PersonRemoveAlt1Outlined,
   ReportProblemOutlined,
   SaveOutlined,
+  Search,
   SettingsOutlined,
   SmsFailedOutlined,
   Star,
@@ -27,6 +28,7 @@ import {
   Stack,
   Tab,
   Tabs,
+  TextField,
   Typography,
   tabsClasses,
 } from "@mui/material";
@@ -208,6 +210,7 @@ const styles = {
     alignItems: "center",
     justifyContent: "flex-start",
     gap: "8px",
+    marginBottom: "14px",
   },
   boxInfoEscalaMensal: {
     /*  background: "blue", */
@@ -493,7 +496,7 @@ const styles = {
     justifyContent: "center",
     gap: "3px",
   },
-  boxAreaInformacoesPerfil: {
+  boxAreaMinhaEquipe: {
     width: "100%",
     height: "100%",
     display: "flex",
@@ -529,9 +532,9 @@ const styles = {
       color: "#F3A913",
     },
   },
-  boxAreaConteudoTabsInformacoes: {
+  boxAreaConteudoTabsMinhaEquipe: {
     width: "100%",
-    height: "calc(100% - 146px)",
+    height: "calc(100% - 54px)",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
@@ -663,6 +666,126 @@ const styles = {
     letterSpacing: "0.15px",
     paddingLeft: "6px",
   },
+  boxCardSolicitacao: {
+    background: "#1B1B1B",
+    width: "90%",
+    height: "90px",
+    borderRadius: "5px",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    mb: "10px",
+  },
+  boxAreaBotoesSolicitacao: {
+    width: "100%",
+    height: "25px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    gap: "8px",
+  },
+  boxAreaInfoSolicatao: {
+    display: "flex",
+    width: "100%",
+    height: "calc(100% - 35px)",
+    mb: "5px",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    gap: "6px",
+  },
+  boxDataSolicitacao: {
+    display: "flex",
+    flexDirection: "column",
+    width: "calc(100% - 56px)",
+    height: "100%",
+    alignItems: "flex-start",
+    justifyContent: "flex-start",
+  },
+  textCardSolicitacao: {
+    color: "#F3A913",
+    fontSize: "12px",
+    lineHeight: "24px",
+    letterSpacing: "0.17px",
+    textAlign: "left",
+  },
+  textNameSolicitacao: {
+    color: "#FFFFFF",
+    fontSize: "11px",
+    lineHeight: "12px",
+    letterSpacing: "0.17px",
+    textAlign: "left",
+  },
+  boxDoubleTextSolicitacao: {
+    width: "100%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    gap: "4px",
+  },
+  boxAreaTabMembros: {
+    display: "flex",
+    flexDirection: "column",
+    width: "100%",
+    height: "calc(100% - 10px)",
+    paddingTop: "10px",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    gap: "10px",
+  },
+  textFieldSearch: {
+    display: "flex",
+    width: "90%",
+    height: "28px",
+    "& .MuiInputBase-root.MuiFilledInput-root": {
+      height: "30px",
+      paddingLeft: "0px",
+    },
+    "& input": {
+      color: "#ffffff",
+      p: "0px",
+      ml: "6px",
+    },
+    "& .MuiInputLabel-root": {
+      color: "#BDBDBD",
+      "&.MuiInputLabel-shrink": {
+        color: "#ffffff",
+      },
+    },
+    "& .MuiSelect-icon": {
+      color: "#ffffff",
+    },
+    "& .MuiOutlinedInput-root": {
+      "& fieldset": {
+        borderColor: "#F3A913",
+      },
+      "&:hover fieldset": {
+        borderColor: "#F3A913",
+      },
+      "&.Mui-focused fieldset": {
+        borderColor: "#F3A913",
+      },
+      "& .MuiInputBase-input": {
+        color: "#ffffff",
+      },
+    },
+    "& .MuiMenuItem-root.Mui-selected": {
+      color: "#ffffff",
+    },
+    "& .MuiSvgIcon-root": {
+      color: "#F3A913",
+    },
+    "& .MuiOutlinedInput-root .MuiSelect-select": {
+      textAlign: "center",
+    },
+  },
+  boxAreaPerfisMembros: {
+    display: "flex",
+    flexDirection: "column",
+    width: "90%",
+    height: "calc(100% - 40px)",
+    overflowY: "auto",
+  },
 };
 
 const PaginaEquipe = () => {
@@ -692,7 +815,7 @@ const PaginaEquipe = () => {
   const [openModalEscalarMembro, setOpenModalEscalarMembro] = useState(false);
   const [openModalCriarAviso, setOpenModalCriarAviso] = useState(false);
   const [openModalCriarEvento, setOpenModalCriarEvento] = useState(false);
-  const [valueTabInformacoes, setValueTabInformacoes] = useState("escalado");
+  const [valueTabInformacoes, setValueTabInformacoes] = useState("membros");
 
   const boxTituloCards = (titulo) => {
     return (
@@ -725,120 +848,125 @@ const PaginaEquipe = () => {
       {/* Tabela ESCALA DO MÊS */}
       <Box sx={styles.boxCardDefault}>
         {boxTituloCards("Escala do mês")}
-        <Box sx={styles.areaConteudoCard}>
-          <Box sx={styles.boxCardEscalaMensal}>
-            <Box sx={styles.boxInfoEscalaMensal}>
-              <Typography sx={styles.textTituloInfoEscala}>
-                <CalendarMonthOutlined
-                  sx={{ color: "#F3A913", fontSize: "16px" }}
+        <Box sx={{ ...styles.areaConteudoCard, overflowY: "auto" }}>
+          {Array.from({ length: 10 }).map((_, index) => (
+            <Box sx={styles.boxCardEscalaMensal}>
+              <Box sx={styles.boxInfoEscalaMensal}>
+                <Typography sx={styles.textTituloInfoEscala}>
+                  <CalendarMonthOutlined
+                    sx={{ color: "#F3A913", fontSize: "16px" }}
+                  />
+                  19/05/24 - DOMINGO
+                </Typography>
+                <Divider
+                  sx={{
+                    ...styles.divider,
+                    justifySelf: "flex-start",
+                    position: "absolute",
+                    bottom: 0,
+                  }}
                 />
-                19/05/24 - DOMINGO
-              </Typography>
-              <Divider
-                sx={{
-                  ...styles.divider,
-                  justifySelf: "flex-start",
-                  position: "absolute",
-                  bottom: 0,
-                }}
-              />
-            </Box>
-            <Box sx={styles.boxCardInfoEscaladosMensal}>
-              <Box sx={styles.boxInfoCultoEscalaMensal}>
-                <Typography sx={styles.textInfoCultoEscalaMensal}>
-                  <ChurchOutlinedIcon sx={styles.iconEscalaMensal} />
-                  Culto Celebração - ZS16
-                </Typography>
-                <Typography sx={styles.textInfoCultoEscalaMensal}>
-                  <AccessTimeOutlinedIcon sx={styles.iconEscalaMensal} />
-                  Domingo - 16:00
-                </Typography>
               </Box>
-              {proximaEscala?.map(({ membro, tag, possuiTag }, index) => (
-                <Box key={index} sx={styles.boxPerfis}>
-                  <Avatar
-                    sx={{
-                      ...styles.avatarMembro,
-                      background:
-                        membro !== "NÃO PREENCHIDO" ? "#F3A913" : "#D32F2F",
-                    }}
-                  >
-                    {membro !== "NÃO PREENCHIDO" ? (
-                      <Person sx={{ fontSize: "18px" }} />
-                    ) : (
-                      <ReportProblemOutlined
-                        sx={{ fontSize: "18px", color: "#F3A913" }}
-                      />
-                    )}{" "}
-                  </Avatar>
-                  <Box sx={styles.boxInfoPerfil}>
-                    <Typography
-                      sx={{
-                        ...styles.textInfoPerfil,
-                        ...styles.configBox,
-                        width: "auto",
-                        gap: "4px",
-                        color:
-                          membro !== "NÃO PREENCHIDO" ? "#ffffff" : "#D32F2F",
-                      }}
-                    >
-                      {membro}
-                      {!possuiTag && membro !== "NÃO PREENCHIDO" && (
-                        <Chip
-                          label="Sem TAG"
-                          variant="outlined"
-                          sx={{ ...styles.chipName, borderColor: "#D32F2F" }}
-                        />
-                      )}
-                      {userLogin && index === 1 && (
-                        <Chip
-                          label="Eu"
-                          variant="outlined"
-                          sx={styles.chipName}
-                        />
-                      )}
-                    </Typography>
-                    <Typography
-                      sx={{
-                        ...styles.textInfoPerfil,
-                        color: "#F3CE24",
-                      }}
-                    >
-                      {tag}
-                    </Typography>
-                  </Box>
-                  {editarEscala && membro !== "NÃO PREENCHIDO" && (
-                    <IconButton
-                      sx={{
-                        "&.MuiButtonBase-root.MuiIconButton-root:hover ": {
-                          backgroundColor: "rgba(211, 47, 47, 0.2)",
-                        },
-                      }}
-                    >
-                      <PersonRemoveAlt1Outlined
-                        sx={{
-                          color: "#D32F2F",
-                          fontSize: "22px",
-                        }}
-                      />
-                    </IconButton>
-                  )}
-                  {membro === "NÃO PREENCHIDO" && (
-                    <IconButton
-                      sx={styles.IconButtonHover}
-                      onClick={() => {
-                        setOpenModalEscalarMembro(true);
-                      }}
-                    >
-                      <PersonAddAlt1Outlined
-                        sx={{ color: "#F3A913", fontSize: "22px" }}
-                      />
-                    </IconButton>
-                  )}
+              <Box sx={styles.boxCardInfoEscaladosMensal}>
+                <Box sx={styles.boxInfoCultoEscalaMensal}>
+                  <Typography sx={styles.textInfoCultoEscalaMensal}>
+                    <ChurchOutlinedIcon sx={styles.iconEscalaMensal} />
+                    Culto Celebração - ZS16
+                  </Typography>
+                  <Typography sx={styles.textInfoCultoEscalaMensal}>
+                    <AccessTimeOutlinedIcon sx={styles.iconEscalaMensal} />
+                    Domingo - 16:00
+                  </Typography>
                 </Box>
-              ))}
+                {proximaEscala?.map(({ membro, tag, possuiTag }, index) => (
+                  <Box key={index} sx={styles.boxPerfis}>
+                    <Avatar
+                      sx={{
+                        ...styles.avatarMembro,
+                        background:
+                          membro !== "NÃO PREENCHIDO" ? "#F3A913" : "#D32F2F",
+                      }}
+                    >
+                      {membro !== "NÃO PREENCHIDO" ? (
+                        <Person sx={{ fontSize: "18px" }} />
+                      ) : (
+                        <ReportProblemOutlined
+                          sx={{ fontSize: "18px", color: "#F3A913" }}
+                        />
+                      )}{" "}
+                    </Avatar>
+                    <Box sx={styles.boxInfoPerfil}>
+                      <Typography
+                        sx={{
+                          ...styles.textInfoPerfil,
+                          ...styles.configBox,
+                          width: "auto",
+                          gap: "4px",
+                          color:
+                            membro !== "NÃO PREENCHIDO" ? "#ffffff" : "#D32F2F",
+                        }}
+                      >
+                        {membro}
+                        {!possuiTag && membro !== "NÃO PREENCHIDO" && (
+                          <Chip
+                            label="Sem TAG"
+                            variant="outlined"
+                            sx={{
+                              ...styles.chipName,
+                              borderColor: "#D32F2F",
+                            }}
+                          />
+                        )}
+                        {userLogin && index === 1 && (
+                          <Chip
+                            label="Eu"
+                            variant="outlined"
+                            sx={styles.chipName}
+                          />
+                        )}
+                      </Typography>
+                      <Typography
+                        sx={{
+                          ...styles.textInfoPerfil,
+                          color: "#F3CE24",
+                        }}
+                      >
+                        {tag}
+                      </Typography>
+                    </Box>
+                    {editarEscala && membro !== "NÃO PREENCHIDO" && (
+                      <IconButton
+                        sx={{
+                          "&.MuiButtonBase-root.MuiIconButton-root:hover ": {
+                            backgroundColor: "rgba(211, 47, 47, 0.2)",
+                          },
+                        }}
+                      >
+                        <PersonRemoveAlt1Outlined
+                          sx={{
+                            color: "#D32F2F",
+                            fontSize: "22px",
+                          }}
+                        />
+                      </IconButton>
+                    )}
+                    {membro === "NÃO PREENCHIDO" && (
+                      <IconButton
+                        sx={styles.IconButtonHover}
+                        onClick={() => {
+                          setOpenModalEscalarMembro(true);
+                        }}
+                      >
+                        <PersonAddAlt1Outlined
+                          sx={{ color: "#F3A913", fontSize: "22px" }}
+                        />
+                      </IconButton>
+                    )}
+                  </Box>
+                ))}
+              </Box>
             </Box>
-          </Box>
+          ))}
         </Box>
         <Box sx={styles.boxAreaBotaoCard}>
           <Divider sx={styles.divider} />
@@ -886,61 +1014,96 @@ const PaginaEquipe = () => {
       {/* Tabela SOLICITAÇÕES DE ENTRADA */}
       <Box sx={styles.boxCardDefault}>
         {boxTituloCards("Solicitações de entrada")}
-        <Box sx={styles.areaConteudoCard}></Box>
+        <Box sx={{ ...styles.areaConteudoCard, overflowY: "auto" }}>
+          {Array.from({ length: 5 }).map((_, index) => (
+            <Box sx={styles.boxCardSolicitacao}>
+              <Box sx={styles.boxAreaInfoSolicatao}>
+                <Avatar
+                  sx={{
+                    ...styles.avatarIcon,
+                    width: "40px",
+                    height: "40px",
+                    margin: "0px 0px -22px 6px",
+                  }}
+                >
+                  <Person />
+                </Avatar>
+                <Box sx={styles.boxDataSolicitacao}>
+                  <Box
+                    sx={{
+                      ...styles.boxDoubleTextSolicitacao,
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <Typography sx={styles.textCardSolicitacao}>
+                      SOLICITAÇÃO DE ENTRADA
+                    </Typography>
+                    <Typography
+                      sx={{
+                        ...styles.textCardSolicitacao,
+                        color: "#ffffff",
+                        fontSize: "9px",
+                      }}
+                    >
+                      17:26 - 28/02/24
+                    </Typography>
+                  </Box>
+
+                  <Box sx={styles.boxDoubleTextSolicitacao}>
+                    <Typography
+                      sx={{ ...styles.textNameSolicitacao, fontWeight: 600 }}
+                    >
+                      Samuel Cardoso Félix
+                    </Typography>
+                    <Typography
+                      sx={{ ...styles.textNameSolicitacao, color: "#BDBDBD" }}
+                    >
+                      enviou um pedido de entrada!
+                    </Typography>
+                  </Box>
+                  <Typography
+                    sx={{ ...styles.textCardSolicitacao, color: "#F3CE24" }}
+                  >
+                    samuelexemplo@adpaz-zs.com.br
+                  </Typography>
+                </Box>
+              </Box>
+              <Box sx={styles.boxAreaBotoesSolicitacao}>
+                <Button
+                  variant="contained"
+                  sx={{
+                    ...styles.botaoDefaultCancelar,
+                    height: "20px",
+                    fontSize: "10px",
+                    padding: "0px 20px",
+                  }}
+                >
+                  Recusar
+                </Button>
+                <Button
+                  variant="contained"
+                  sx={{
+                    ...styles.botaoDefault,
+                    height: "20px",
+                    fontSize: "10px",
+                    mr: "10px",
+                  }}
+                >
+                  Aceitar
+                </Button>
+              </Box>
+            </Box>
+          ))}
+        </Box>
         <Box sx={styles.boxAreaBotaoCard}>
           <Divider sx={styles.divider} />
-          {editarEscala ? (
-            <Box sx={{ ...styles.configBox, gap: "16px" }}>
-              <Button
-                variant="contained"
-                sx={{
-                  ...styles.botaoDefaultCancelar,
-                  mb: "8px",
-                  gap: "4px",
-                  padding: "0px 20px",
-                }}
-                onClick={() => setEditarEscala(false)}
-              >
-                <Close sx={{ fontSize: "18px" }} />
-                Cancelar
-              </Button>
-              <Button
-                variant="contained"
-                sx={{
-                  ...styles.botaoDefault,
-                  mb: "8px",
-                  gap: "4px",
-                }}
-                onClick={() => setEditarEscala(false)}
-              >
-                <SaveOutlined sx={{ fontSize: "18px" }} />
-                Salvar
-              </Button>
-            </Box>
-          ) : (
-            <Button
-              variant="contained"
-              sx={{ ...styles.botaoDefault, mb: "8px", gap: "4px" }}
-              onClick={() => setEditarEscala(true)}
-            >
-              <EditCalendarOutlined sx={{ fontSize: "18px" }} />
-              Editar Escala
-            </Button>
-          )}
         </Box>
       </Box>
       {/* Tabela MINHA EQUIPE */}
       <Box sx={styles.boxCardDefault}>
         {boxTituloCards("Minha equipe")}
         <Box sx={styles.areaConteudoCard}>
-          <Box sx={styles.boxAreaInformacoesPerfil}>
-            <Avatar sx={styles.avatarIcon}>
-              <Person sx={{ fontSize: "24px" }} />
-            </Avatar>
-            <Typography sx={styles.textPerfilNome}>
-              Samuel Cardoso Félix
-              <Chip label="Admin" variant="outlined" sx={styles.chipName} />
-            </Typography>
+          <Box sx={styles.boxAreaMinhaEquipe}>
             <Box sx={styles.boxTabs}>
               <Tabs
                 value={valueTabInformacoes}
@@ -951,69 +1114,49 @@ const PaginaEquipe = () => {
                 sx={styles.estiloTabs}
               >
                 <Tab
-                  label="Escalado"
-                  value="escalado"
+                  label="Membros"
+                  value="membros"
+                  sx={{ color: "#ffffff" }}
+                />
+                <Tab
+                  label="Programações"
+                  value="programacoes"
                   sx={{ color: "#ffffff" }}
                 />
                 <Tab label="Tags" value="tags" sx={{ color: "#ffffff" }} />
               </Tabs>
             </Box>
-            <Box sx={styles.boxAreaConteudoTabsInformacoes}>
-              {valueTabInformacoes === "escalado" &&
-                Array.from({ length: 6 }).map((_, index) => (
-                  <Box key={index} sx={styles.boxCardEscalado}>
-                    <Box sx={styles.boxInfoEscalado1}>
-                      <Typography
-                        sx={{ ...styles.textDataCardEscalado, width: "auto" }}
-                      >
-                        Domingo
-                        <Divider
-                          sx={{
-                            ...styles.divider,
-                            width: "104%",
-                            mt: "-2px",
-                            mb: "2px",
-                          }}
-                        />
-                      </Typography>
-                      <Typography sx={styles.textDataCardEscaladoCulto}>
-                        Culto Celebração - ZS16
-                      </Typography>
-                      <Typography
-                        sx={{
-                          ...styles.textDataCardEscalado,
-                          color: "#F3CE24",
-                        }}
-                      >
-                        Câmera Lateral - Direita
-                      </Typography>
-                    </Box>
-                    <Box sx={styles.boxInfoEscalado2}>
-                      <Typography sx={styles.text2DataCardEscalado}>
-                        18/01
-                      </Typography>
-                      <Typography sx={styles.text2DataCardEscalado}>
-                        17:00
-                      </Typography>
-                    </Box>
-                  </Box>
-                ))}
-
-              {valueTabInformacoes === "tags" &&
-                proximaEscala.map(({ tag }, index) => (
-                  <Chip
-                    key={index}
-                    label={tag}
-                    variant="outlined"
-                    sx={styles.chipDefault}
+            <Box sx={styles.boxAreaConteudoTabsMinhaEquipe}>
+              {valueTabInformacoes === "membros" && (
+                <Box sx={styles.boxAreaTabMembros}>
+                  <TextField
+                    focused
+                    variant="filled"
+                    placeholder="Procurar membro"
+                    sx={styles.textFieldSearch}
+                    InputProps={{
+                      startAdornment: <Search />,
+                    }}
                   />
-                ))}
+                  <Box sx={styles.boxAreaPerfisMembros}></Box>
+                </Box>
+              )}
+              {valueTabInformacoes === "programacoes" && (
+                <Box sx={{ ...styles.configBox, height: "100%" }}>
+                  <Typography sx={styles.textTitulo}>Em Breve</Typography>
+                </Box>
+              )}
+              {valueTabInformacoes === "tags" && (
+                <Box sx={{ ...styles.configBox, height: "100%" }}>
+                  <Typography sx={styles.textTitulo}>Em Breve</Typography>
+                </Box>
+              )}
             </Box>
           </Box>
         </Box>
         <Box sx={styles.boxAreaBotaoCard}>
           <Divider sx={styles.divider} />
-          <Button
+          {/* <Button
             variant="contained"
             sx={{ ...styles.botaoDefault, mb: "8px", gap: "4px" }}
             onClick={() => {}}
@@ -1023,7 +1166,7 @@ const PaginaEquipe = () => {
               <Star sx={styles.positionStarCalendario} />
             </Box>
             Cadastrar diponibilidade
-          </Button>
+          </Button> */}
         </Box>
       </Box>
 
