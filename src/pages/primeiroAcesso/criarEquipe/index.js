@@ -113,6 +113,9 @@ const styles = {
     mb: "20px",
   },
   step: {
+    "& .MuiStepIcon-text": {
+      fill: "#ffffff",
+    },
     "& .MuiStepLabel-label.MuiStepLabel-alternativeLabel": {
       color: "#ffffff", // text color (next)
     },
@@ -685,13 +688,14 @@ const CriarEquipe = () => {
   const cardsPerPage = 3;
 
   useEffect(() => {
-    const storedData = localStorage.getItem("login");
+    const storedData = localStorage?.getItem("login");
 
-    const userData = JSON.parse(storedData);
+    const userData = JSON?.parse(storedData);
 
     if (userData?.usuarioHostId && userData?.equipe[0] === "sem equipe") {
-      setUsuarioHostId(userData.usuarioHostId);
+      setUsuarioHostId(userData?.usuarioHostId);
     } else {
+      localStorage?.clear();
       window.location.href = "/login";
     }
   }, []);
@@ -1087,7 +1091,7 @@ const CriarEquipe = () => {
               </Box>
               <Box sx={styles.boxColunas}>
                 <GroupsOutlinedIcon sx={styles.estiloIcones} />
-                <Typography sx={styles.nomesTabela}>Servindo</Typography>
+                <Typography sx={styles.nomesTabela}>Membros</Typography>
               </Box>
               <Box
                 sx={{
@@ -1258,14 +1262,14 @@ const CriarEquipe = () => {
                       <FiberManualRecordIcon sx={{ width: "8px", mr: "5px" }} />
                       <ListItemText
                         primaryTypographyProps={{ fontSize: "14px" }}
-                        primary="Quinta-Feira / 19:30 / 2 pessoas servindo / Culto de Doutrina"
+                        primary="Quinta-Feira / 19:30 / 2 membros escalados / Culto de Doutrina"
                       />
                     </ListItem>
                     <ListItem sx={{ mt: "-14px" }}>
                       <FiberManualRecordIcon sx={{ width: "8px", mr: "5px" }} />
                       <ListItemText
                         primaryTypographyProps={{ fontSize: "14px" }}
-                        primary="Domingo / 10:00 / 3 pessoas servindo / Culto Celebração - ZS10"
+                        primary="Domingo / 10:00 / 3 membros escalados / Culto Celebração - ZS10"
                       />
                     </ListItem>
                   </List>

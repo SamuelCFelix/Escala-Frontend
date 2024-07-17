@@ -6,8 +6,24 @@ import Typography from "@mui/material/Typography";
 import Avatar from "@mui/material/Avatar";
 import { Outlet } from "react-router-dom";
 import LogoPardal from "../../img/logoZS.png";
+import { useEffect, useState } from "react";
 
 const LayoutBar = () => {
+  const autenticated = localStorage?.getItem("token");
+  const [user, setUser] = useState({});
+
+  useEffect(() => {
+    if (!autenticated) {
+      window.location.href = "/login";
+    }
+  }, [autenticated]);
+
+  useEffect(() => {
+    const storedData = localStorage?.getItem("login");
+    const userData = JSON?.parse(storedData);
+
+    setUser(userData);
+  }, []);
   return (
     <>
       <Box sx={{ flexGrow: 1 }}>
@@ -23,7 +39,7 @@ const LayoutBar = () => {
                   width: "100%",
                   height: "100%",
                   objectFit: "contain",
-                  transform: "scale(3.0)", // Ajuste o valor conforme necessário para o zoom desejado
+                  transform: "scale(3.0)",
                 }}
               />
             </IconButton>
@@ -31,7 +47,9 @@ const LayoutBar = () => {
               {""}
             </Typography>
             <IconButton>
-              <Avatar sx={{ background: "#F3A913" }}>S</Avatar>
+              <Avatar sx={{ background: "#F3A913" }}>
+                {user?.nome?.charAt(0)?.toUpperCase()}
+              </Avatar>
             </IconButton>
           </Toolbar>
         </AppBar>

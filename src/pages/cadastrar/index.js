@@ -1,4 +1,5 @@
 import {
+  Alert,
   Box,
   Button,
   Checkbox,
@@ -109,6 +110,7 @@ const styles = {
       },
   },
   botaoCriarConta: {
+    color: "#ffffff",
     width: 210,
     height: 40,
     borderRadius: "10px",
@@ -185,7 +187,9 @@ const Cadastrar = () => {
   const { showPopup, hidePopup } = useAuth();
 
   const navigate = useNavigate();
-
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarSeverity, setSnackbarSeverity] = useState("");
+  const [snackbarMessage, setSnackbarMessage] = useState("");
   const [nome, setNome] = useState("");
   const [cpf, setCpf] = useState("");
   const [dataNascimento, setDataNascimento] = useState("");
@@ -203,19 +207,17 @@ const Cadastrar = () => {
   const [errorConfirmPassword2, setErrorConfirmPassword2] = useState(false);
   const [errorChecked, setErrorChecked] = useState(false);
 
-  const Alert = forwardRef(function Alert(props, ref) {
-    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-  });
-
-  const [openPopUpError, setOpenPopUpError] = useState(false);
-  const handleOpenPopUpError = () => {
-    setOpenPopUpError(true);
-  };
-  const handleClosePopUpError = (event, reason) => {
+  const handleSnackbarClose = (event, reason) => {
     if (reason === "clickaway") {
       return;
     }
-    setOpenPopUpError(false);
+    setSnackbarOpen(false);
+  };
+
+  const setSnackbar = (severity, message) => {
+    setSnackbarSeverity(severity);
+    setSnackbarMessage(message);
+    setSnackbarOpen(true);
   };
 
   //Botão de Criar Cadastro
@@ -262,11 +264,17 @@ const Cadastrar = () => {
       if (checked === false) {
         setErrorChecked(true);
       }
-      handleOpenPopUpError();
+      setSnackbar("error", "Preencha todos os campos corretamente!");
     } else {
       try {
+        const capitalizeFirstLetters = (str) => {
+          return str
+            .toLowerCase()
+            .replace(/\b\w/g, (char) => char.toUpperCase());
+        };
+
         const response = await api.post("/createPerfil", {
-          nome: nome.toUpperCase(),
+          nome: capitalizeFirstLetters(nome),
           cpf: cpf,
           dataNascimento: dataNascimento,
           email: email,
@@ -278,9 +286,11 @@ const Cadastrar = () => {
           showPopup();
           navigate("/login");
         } else {
+          setSnackbar("error", "Erro ao conectar com o servidor");
           console.error("erro ao criar perfil", response.data);
         }
       } catch (error) {
+        setSnackbar("error", "Erro ao conectar com o servidor");
         console.error("erro ao criar perfil: ", error);
       }
     }
@@ -640,9 +650,9 @@ const Cadastrar = () => {
       </Box>
 
       <Snackbar
-        open={openPopUpError}
+        open={snackbarOpen}
         autoHideDuration={3000}
-        onClose={handleClosePopUpError}
+        onClose={handleSnackbarClose}
         style={{
           bottom: "20px",
           left: "50%",
@@ -650,11 +660,12 @@ const Cadastrar = () => {
         }}
       >
         <Alert
-          onClose={handleClosePopUpError}
-          severity="error"
-          sx={{ width: "100%" }}
+          elevation={6}
+          variant="filled"
+          onClose={handleSnackbarClose}
+          severity={snackbarSeverity}
         >
-          Preencha todos os campos corretamente!
+          {snackbarMessage}
         </Alert>
       </Snackbar>
 

@@ -1,10 +1,19 @@
-import { Box, Tab, Tabs, Typography, tabsClasses } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Snackbar,
+  Tab,
+  Tabs,
+  Typography,
+  tabsClasses,
+} from "@mui/material";
 import "../../../src/style.css";
 import BackgroundImage from "../../img/fotoProducaoSamuel.jpeg";
 import { useEffect, useState } from "react";
 import Rodape from "../../components/rodape";
 import PaginaGeral from "./paginaGeral";
 import PaginaEquipe from "./PaginaEquipe";
+import api from "../../api";
 
 const styles = {
   configBox: {
@@ -67,15 +76,85 @@ const styles = {
 const Home = () => {
   const [valueTab, setValueTab] = useState("Geral");
   const autenticated = localStorage?.getItem("token");
+  const [user, setUser] = useState({});
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarSeverity, setSnackbarSeverity] = useState("");
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
-  /* useEffect(() => {
+  useEffect(() => {
     if (!autenticated) {
+      localStorage?.clear();
       window.location.href = "/login";
     }
-  }, [autenticated]); */
+  }, [autenticated]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const storedToken = localStorage?.getItem("token");
+      const storedData = localStorage?.getItem("login");
+      const userToken = JSON?.parse(storedToken);
+      const userData = JSON?.parse(storedData);
+
+      if (userData && storedToken) {
+        try {
+          let response = "";
+
+          const usuarioToken = {
+            headers: { Authorization: `Bearer ${userToken}` },
+          };
+
+          if (userData?.usuarioHostId) {
+            response = await api.post(
+              "/informacoesHome",
+              {
+                usuarioId: userData?.usuarioHostId,
+                isHost: true,
+              },
+              usuarioToken
+            );
+          } else if (userData?.usuarioDefaultId) {
+            response = await api.post(
+              "/informacoesHome",
+              {
+                usuarioId: userData?.usuarioDefaultId,
+                isHost: false,
+              },
+              usuarioToken
+            );
+          }
+
+          if (response?.status === 200) {
+            setUser(response?.data);
+            console.log(response?.data);
+          } else {
+            setSnackbar("error", "Erro ao conectar com o servidor");
+            console.error("erro ao criar perfil", response?.data);
+          }
+        } catch (error) {
+          setSnackbar("error", "Erro ao conectar com o servidor");
+          console.error("erro ao buscar informações da Home: ", error);
+        }
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleChangeTabs = (event, newValue) => {
     setValueTab(newValue);
+  };
+
+  const setSnackbar = (severity, message) => {
+    setSnackbarSeverity(severity);
+    setSnackbarMessage(message);
+    setSnackbarOpen(true);
+  };
+
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbarOpen(false);
   };
 
   return (
@@ -96,11 +175,30 @@ const Home = () => {
           </Box>
         </Box>
         <Box sx={{ display: "flex", width: "100%" }}>
-          {valueTab === "Geral" && <PaginaGeral />}
-          {valueTab === "Equipe" && <PaginaEquipe />}
+          {valueTab === "Geral" && <PaginaGeral usuario={user} />}
+          {valueTab === "Equipe" && <PaginaEquipe usuario={user} />}
         </Box>
         <Rodape />
       </Box>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={handleSnackbarClose}
+        style={{
+          bottom: "20px",
+          left: "50%",
+          transform: "translateX(-50%)",
+        }}
+      >
+        <Alert
+          elevation={6}
+          variant="filled"
+          onClose={handleSnackbarClose}
+          severity={snackbarSeverity}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

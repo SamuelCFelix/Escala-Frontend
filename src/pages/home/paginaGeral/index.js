@@ -597,7 +597,8 @@ const styles = {
   },
 };
 
-const PaginaGeral = () => {
+const PaginaGeral = (params) => {
+  const { usuario } = params;
   const [userLogin, setUserLogin] = useState(true); // Simula se o usuário logado está na escala
 
   const [proximaEscala, setProximaEscala] = useState([
@@ -658,7 +659,7 @@ const PaginaGeral = () => {
       <Box sx={styles.boxCardDefault}>
         {boxTituloCards("Próximo Culto")}
         <Box sx={styles.areaConteudoCard}>
-          <Box sx={styles.boxInfoProximoCulto}>
+          {/*  <Box sx={styles.boxInfoProximoCulto}>
             <Typography
               sx={{ ...styles.textTitulo, fontSize: "18px", fontWeight: 600 }}
             >
@@ -775,6 +776,9 @@ const PaginaGeral = () => {
                 />
               </Box>
             ))}
+          </Box> */}
+          <Box sx={{ ...styles.configBox, height: "100%" }}>
+            <Typography sx={styles.textTitulo}>Sem programação</Typography>
           </Box>
         </Box>
         <Box sx={styles.boxAreaBotaoCard}>
@@ -898,9 +902,13 @@ const PaginaGeral = () => {
               <Person sx={{ fontSize: "24px" }} />
             </Avatar>
             <Typography sx={styles.textPerfilNome}>
-              Samuel Cardoso Félix
-              <Chip label="Admin" variant="outlined" sx={styles.chipName} />
+              {usuario?.nome}
+              {(usuario?.autorizacao === "adm001" ||
+                usuario?.autorizacao === "adm002") && (
+                <Chip label="Admin" variant="outlined" sx={styles.chipName} />
+              )}
             </Typography>
+
             <Box sx={styles.boxTabs}>
               <Tabs
                 value={valueTabInformacoes}
@@ -919,7 +927,7 @@ const PaginaGeral = () => {
               </Tabs>
             </Box>
             <Box sx={styles.boxAreaConteudoTabsInformacoes}>
-              {valueTabInformacoes === "escalado" &&
+              {/* {valueTabInformacoes === "escalado" &&
                 Array.from({ length: 6 }).map((_, index) => (
                   <Box key={index} sx={styles.boxCardEscalado}>
                     <Box sx={styles.boxInfoEscalado1}>
@@ -967,7 +975,18 @@ const PaginaGeral = () => {
                     variant="outlined"
                     sx={styles.chipDefault}
                   />
-                ))}
+                ))} */}
+
+              {valueTabInformacoes === "escalado" && (
+                <Box sx={{ ...styles.configBox, height: "100%" }}>
+                  <Typography sx={styles.textTitulo}>Nenhuma escala</Typography>
+                </Box>
+              )}
+              {valueTabInformacoes === "tags" && (
+                <Box sx={{ ...styles.configBox, height: "100%" }}>
+                  <Typography sx={styles.textTitulo}>Sem TAGS</Typography>
+                </Box>
+              )}
             </Box>
           </Box>
         </Box>
