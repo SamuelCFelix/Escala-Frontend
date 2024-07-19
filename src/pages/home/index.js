@@ -74,71 +74,57 @@ const styles = {
 };
 
 const Home = () => {
+  const autenticatedToken = localStorage?.getItem("token");
+  const storedData = localStorage?.getItem("login");
+
   const [valueTab, setValueTab] = useState("Geral");
-  const autenticated = localStorage?.getItem("token");
-  const [user, setUser] = useState({});
+  const [user, setUser] = useState([]);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState("");
   const [snackbarMessage, setSnackbarMessage] = useState("");
 
   useEffect(() => {
-    if (!autenticated) {
+    if (!autenticatedToken) {
       localStorage?.clear();
       window.location.href = "/login";
+    } else {
+      fetchData(autenticatedToken, storedData);
     }
-  }, [autenticated]);
+  }, [autenticatedToken]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const storedToken = localStorage?.getItem("token");
-      const storedData = localStorage?.getItem("login");
-      const userToken = JSON?.parse(storedToken);
-      const userData = JSON?.parse(storedData);
+  const fetchData = async (autenticatedToken, storedData) => {
+    const userToken = JSON?.parse(autenticatedToken);
+    const userData = JSON?.parse(storedData);
 
-      if (userData && storedToken) {
-        try {
-          let response = "";
+    if (userToken && userData) {
+      try {
+        let response = "";
 
-          const usuarioToken = {
-            headers: { Authorization: `Bearer ${userToken}` },
-          };
-
-          if (userData?.usuarioHostId) {
-            response = await api.post(
-              "/informacoesHome",
-              {
-                usuarioId: userData?.usuarioHostId,
-                isHost: true,
-              },
-              usuarioToken
-            );
-          } else if (userData?.usuarioDefaultId) {
-            response = await api.post(
-              "/informacoesHome",
-              {
-                usuarioId: userData?.usuarioDefaultId,
-                isHost: false,
-              },
-              usuarioToken
-            );
-          }
-
-          if (response?.status === 200) {
-            setUser(response?.data);
-            console.log(response?.data);
-          } else {
-            setSnackbar("error", "Erro ao conectar com o servidor");
-            console.error("erro ao criar perfil", response?.data);
-          }
-        } catch (error) {
-          setSnackbar("error", "Erro ao conectar com o servidor");
-          console.error("erro ao buscar informações da Home: ", error);
+        if (userData?.usuarioHostId) {
+          response = await api.post("/informacoesHome", {
+            usuarioId: userData?.usuarioHostId,
+            isHost: true,
+          });
+        } else if (userData?.usuarioDefaultId) {
+          response = await api.post("/informacoesHome", {
+            usuarioId: userData?.usuarioDefaultId,
+            isHost: false,
+          });
         }
-      }
-    };
 
-    fetchData();
-  }, []);
+        if (response?.status === 200) {
+          console.log(response?.data);
+          setUser(response?.data);
+        } else {
+          setSnackbar("error", "Erro ao conectar com o servidor");
+          console.error("erro ao executar ação", response?.status);
+        }
+      } catch (error) {
+        setSnackbar("error", "Erro ao conectar com o servidor");
+        console.error("erro ao buscar informações da Home: ", error);
+      }
+    }
+  };
 
   const handleChangeTabs = (event, newValue) => {
     setValueTab(newValue);

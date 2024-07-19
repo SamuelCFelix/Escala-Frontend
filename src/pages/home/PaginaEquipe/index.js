@@ -19,13 +19,17 @@ import {
   StarBorderOutlined,
 } from "@mui/icons-material";
 import {
+  Alert,
   Avatar,
   Box,
   Button,
   Chip,
+  CircularProgress,
   Divider,
   IconButton,
+  LinearProgress,
   Pagination,
+  Snackbar,
   Stack,
   Tab,
   Tabs,
@@ -33,7 +37,7 @@ import {
   Typography,
   tabsClasses,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ModalEscalarMembro from "./modais/modalEscalarMembro";
 import ModalCriarAviso from "./modais/modalCriarAviso";
 import AvisoDefault from "./cardsAvisos/avisoDefault";
@@ -51,6 +55,7 @@ import ChurchOutlinedIcon from "@mui/icons-material/ChurchOutlined";
 import RestartAltOutlinedIcon from "@mui/icons-material/RestartAltOutlined";
 import FlagOutlinedIcon from "@mui/icons-material/FlagOutlined";
 import ManageAccountsOutlinedIcon from "@mui/icons-material/ManageAccountsOutlined";
+import api from "../../../api";
 
 const styles = {
   configBox: {
@@ -875,10 +880,27 @@ const styles = {
     color: "#F3A913",
     fontSize: "20px",
   },
+  boxAreaCircularProgress: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+    height: "100%",
+  },
 };
 
-const PaginaEquipe = () => {
-  const [userLogin, setUserLogin] = useState(true); // Simula se o usuário logado está na escala
+const PaginaEquipe = (params) => {
+  const { usuario } = params;
+  const [userLogin, setUserLogin] = useState(true);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarSeverity, setSnackbarSeverity] = useState("");
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+
+  const [solicitacoesEntrada, setSolicitacoesEntrada] = useState([]);
+  const [
+    loadingTabelaSolicitacoesEntrada,
+    setLoadingTabelaSolicitacoesEntrada,
+  ] = useState(false);
 
   const [proximaEscala, setProximaEscala] = useState([
     {
@@ -905,6 +927,85 @@ const PaginaEquipe = () => {
   const [openModalCriarAviso, setOpenModalCriarAviso] = useState(false);
   const [openModalCriarEvento, setOpenModalCriarEvento] = useState(false);
   const [valueTabInformacoes, setValueTabInformacoes] = useState("membros");
+
+  //UseEffect's
+
+  useEffect(() => {
+    buscarTabelaSolicitacoesEntrada();
+  }, []);
+
+  //API's
+
+  const buscarTabelaSolicitacoesEntrada = async () => {
+    try {
+      setLoadingTabelaSolicitacoesEntrada(true);
+      const response = await api.post("/tabelaSolicitacoes", {
+        equipeId: usuario?.equipeId,
+      });
+
+      if (response?.status === 200) {
+        setSolicitacoesEntrada(response?.data);
+        setLoadingTabelaSolicitacoesEntrada(false);
+      } else {
+        setSnackbar("error", "Erro ao conectar com o servidor");
+        console.error("erro ao executar ação", response?.status);
+      }
+    } catch (error) {
+      setSnackbar("error", "Erro ao conectar com o servidor");
+      console.error("erro ao buscar solicitações de entrada: ", error);
+    }
+  };
+
+  const aceitarSolicitacao = async (usuarioDefaultId) => {
+    try {
+      const response = await api.put("/aceitarMembroEquipe", {
+        usuarioId: usuarioDefaultId,
+        equipeId: usuario?.equipeId,
+      });
+
+      if (response?.status === 200) {
+        buscarTabelaSolicitacoesEntrada();
+      } else {
+        setSnackbar("error", "Erro ao conectar com o servidor");
+        console.error("erro ao executar ação", response?.status);
+      }
+    } catch (error) {
+      setSnackbar("error", "Erro ao conectar com o servidor");
+      console.error("erro ao aceitar solicitação de entrada: ", error);
+    }
+  };
+
+  const recusarSolicitacao = async (usuarioDefaultId) => {
+    try {
+      const response = await api.delete("/recusarMembroEquipe", {
+        usuarioId: usuarioDefaultId,
+        equipeId: usuario?.equipeId,
+      });
+
+      if (response?.status === 200) {
+        buscarTabelaSolicitacoesEntrada();
+      } else {
+        setSnackbar("error", "Erro ao conectar com o servidor");
+        console.error("erro ao executar ação", response?.status);
+      }
+    } catch (error) {
+      setSnackbar("error", "Erro ao conectar com o servidor");
+      console.error("erro ao recusar solicitação de entrada: ", error);
+    }
+  };
+
+  const setSnackbar = (severity, message) => {
+    setSnackbarSeverity(severity);
+    setSnackbarMessage(message);
+    setSnackbarOpen(true);
+  };
+
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbarOpen(false);
+  };
 
   const boxTituloCards = (titulo) => {
     return (
@@ -1104,95 +1205,129 @@ const PaginaEquipe = () => {
       </Box>
 
       {/* Tabela SOLICITAÇÕES DE ENTRADA */}
-      <Box sx={styles.boxCardDefault}>
-        {boxTituloCards("Solicitações de entrada")}
-        <Box sx={{ ...styles.areaConteudoCard, overflowY: "auto" }}>
-          {/* {Array.from({ length: 5 }).map((_, index) => (
-            <Box sx={styles.boxCardSolicitacao}>
-              <Box sx={styles.boxAreaInfoSolicatao}>
-                <Avatar
-                  sx={{
-                    ...styles.avatarMembroList,
-                    margin: "0px 0px -22px 6px",
-                  }}
-                >
-                  <Person />
-                </Avatar>
-                <Box sx={styles.boxDataSolicitacao}>
-                  <Box
-                    sx={{
-                      ...styles.boxDoubleTextSolicitacao,
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Typography sx={styles.textCardSolicitacao}>
-                      SOLICITAÇÃO DE ENTRADA
-                    </Typography>
-                    <Typography
-                      sx={{
-                        ...styles.textCardSolicitacao,
-                        color: "#ffffff",
-                        fontSize: "9px",
-                      }}
-                    >
-                      17:26 - 28/02/24
+      {(usuario?.autorizacao === "adm001" ||
+        usuario?.autorizacao === "adm002") && (
+        <Box sx={styles.boxCardDefault}>
+          {boxTituloCards("Solicitações de entrada")}
+          <Box sx={{ ...styles.areaConteudoCard, overflowY: "auto" }}>
+            {loadingTabelaSolicitacoesEntrada && (
+              <Box sx={styles.boxAreaCircularProgress}>
+                <CircularProgress />
+              </Box>
+            )}
+
+            {!loadingTabelaSolicitacoesEntrada && (
+              <>
+                {solicitacoesEntrada?.map(
+                  ({ usuarioDefaultId, nome, email, createAt }, index) => (
+                    <Box key={index} sx={styles.boxCardSolicitacao}>
+                      <Box sx={styles.boxAreaInfoSolicatao}>
+                        <Avatar
+                          sx={{
+                            ...styles.avatarMembroList,
+                            margin: "0px 0px -22px 6px",
+                          }}
+                        >
+                          <Person />
+                        </Avatar>
+                        <Box sx={styles.boxDataSolicitacao}>
+                          <Box
+                            sx={{
+                              ...styles.boxDoubleTextSolicitacao,
+                              justifyContent: "space-between",
+                            }}
+                          >
+                            <Typography sx={styles.textCardSolicitacao}>
+                              SOLICITAÇÃO DE ENTRADA
+                            </Typography>
+                            <Typography
+                              sx={{
+                                ...styles.textCardSolicitacao,
+                                color: "#ffffff",
+                                fontSize: "9px",
+                              }}
+                            >
+                              {createAt}
+                            </Typography>
+                          </Box>
+
+                          <Box sx={styles.boxDoubleTextSolicitacao}>
+                            <Typography
+                              sx={{
+                                ...styles.textNameSolicitacao,
+                                fontWeight: 600,
+                              }}
+                            >
+                              {nome}
+                            </Typography>
+                            <Typography
+                              sx={{
+                                ...styles.textNameSolicitacao,
+                                color: "#BDBDBD",
+                              }}
+                            >
+                              enviou um pedido de entrada!
+                            </Typography>
+                          </Box>
+                          <Typography
+                            sx={{
+                              ...styles.textCardSolicitacao,
+                              color: "#F3CE24",
+                            }}
+                          >
+                            {email}
+                          </Typography>
+                        </Box>
+                      </Box>
+                      <Box sx={styles.boxAreaBotoesSolicitacao}>
+                        <Button
+                          onClick={() => {
+                            recusarSolicitacao(usuarioDefaultId);
+                          }}
+                          variant="contained"
+                          sx={{
+                            ...styles.botaoDefaultCancelar,
+                            height: "20px",
+                            fontSize: "10px",
+                            padding: "0px 20px",
+                          }}
+                        >
+                          Recusar
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            aceitarSolicitacao(usuarioDefaultId);
+                          }}
+                          variant="contained"
+                          sx={{
+                            ...styles.botaoDefault,
+                            height: "20px",
+                            fontSize: "10px",
+                            mr: "10px",
+                          }}
+                        >
+                          Aceitar
+                        </Button>
+                      </Box>
+                    </Box>
+                  )
+                )}
+
+                {solicitacoesEntrada?.length === 0 && (
+                  <Box sx={{ ...styles.configBox, height: "100%" }}>
+                    <Typography sx={styles.textTitulo}>
+                      Nenhuma solicitação
                     </Typography>
                   </Box>
-
-                  <Box sx={styles.boxDoubleTextSolicitacao}>
-                    <Typography
-                      sx={{ ...styles.textNameSolicitacao, fontWeight: 600 }}
-                    >
-                      Samuel Cardoso Félix
-                    </Typography>
-                    <Typography
-                      sx={{ ...styles.textNameSolicitacao, color: "#BDBDBD" }}
-                    >
-                      enviou um pedido de entrada!
-                    </Typography>
-                  </Box>
-                  <Typography
-                    sx={{ ...styles.textCardSolicitacao, color: "#F3CE24" }}
-                  >
-                    samuelexemplo@adpaz-zs.com.br
-                  </Typography>
-                </Box>
-              </Box>
-              <Box sx={styles.boxAreaBotoesSolicitacao}>
-                <Button
-                  variant="contained"
-                  sx={{
-                    ...styles.botaoDefaultCancelar,
-                    height: "20px",
-                    fontSize: "10px",
-                    padding: "0px 20px",
-                  }}
-                >
-                  Recusar
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{
-                    ...styles.botaoDefault,
-                    height: "20px",
-                    fontSize: "10px",
-                    mr: "10px",
-                  }}
-                >
-                  Aceitar
-                </Button>
-              </Box>
-            </Box>
-          ))} */}
-
-          <Box sx={{ ...styles.configBox, height: "100%" }}>
-            <Typography sx={styles.textTitulo}>Nenhuma solicitação</Typography>
+                )}
+              </>
+            )}
+          </Box>
+          <Box sx={styles.boxAreaBotaoCard}>
+            <Divider sx={styles.divider} />
           </Box>
         </Box>
-        <Box sx={styles.boxAreaBotaoCard}>
-          <Divider sx={styles.divider} />
-        </Box>
-      </Box>
+      )}
       {/* Tabela MINHA EQUIPE */}
       <Box sx={styles.boxCardDefault}>
         {boxTituloCards("Minha equipe")}
@@ -1481,6 +1616,25 @@ const PaginaEquipe = () => {
         openModalCriarEvento={openModalCriarEvento}
         setOpenModalCriarEvento={setOpenModalCriarEvento}
       />
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={handleSnackbarClose}
+        style={{
+          bottom: "20px",
+          left: "50%",
+          transform: "translateX(-50%)",
+        }}
+      >
+        <Alert
+          elevation={6}
+          variant="filled"
+          onClose={handleSnackbarClose}
+          severity={snackbarSeverity}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
