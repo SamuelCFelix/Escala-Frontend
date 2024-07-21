@@ -113,7 +113,6 @@ const Home = () => {
         }
 
         if (response?.status === 200) {
-          console.log(response?.data);
           setUser(response?.data);
         } else {
           setSnackbar("error", "Erro ao conectar com o servidor");

@@ -887,6 +887,16 @@ const styles = {
     width: "100%",
     height: "100%",
   },
+  boxAreaTagsMinhaEquipe: {
+    display: "flex",
+    flexDirection: "column",
+    width: "100%",
+    height: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "4px",
+    overflowY: "auto",
+  },
 };
 
 const PaginaEquipe = (params) => {
@@ -900,7 +910,13 @@ const PaginaEquipe = (params) => {
   const [
     loadingTabelaSolicitacoesEntrada,
     setLoadingTabelaSolicitacoesEntrada,
-  ] = useState(false);
+  ] = useState(true);
+  const [usuarioHostEquipe, setUsuarioHostMinhaEquipe] = useState([]);
+  const [administradoresEquipe, setAdministradoresMinhaEquipe] = useState([]);
+  const [membrosMinhaEquipe, setMembrosMinhaEquipe] = useState([]);
+  const [loadingTabelaMinhaEquipeMembros, setLoadingTabelaMinhaEquipeMembros] =
+    useState(true);
+  const [tagsMinhaEquipe, setTagsMinhaEquipe] = useState([]);
 
   const [proximaEscala, setProximaEscala] = useState([
     {
@@ -932,14 +948,18 @@ const PaginaEquipe = (params) => {
 
   useEffect(() => {
     buscarTabelaSolicitacoesEntrada();
+    buscarMembrosMinhaEquipe();
+    buscarTagsMinhaEquipe();
   }, []);
 
   //API's
 
+  // Tabela Solicitações de Entrada
+
   const buscarTabelaSolicitacoesEntrada = async () => {
     try {
       setLoadingTabelaSolicitacoesEntrada(true);
-      const response = await api.post("/tabelaSolicitacoes", {
+      const response = await api.post("/solicitacoesDeEntrada", {
         equipeId: usuario?.equipeId,
       });
 
@@ -965,6 +985,7 @@ const PaginaEquipe = (params) => {
 
       if (response?.status === 200) {
         buscarTabelaSolicitacoesEntrada();
+        buscarMembrosMinhaEquipe();
       } else {
         setSnackbar("error", "Erro ao conectar com o servidor");
         console.error("erro ao executar ação", response?.status);
@@ -991,6 +1012,69 @@ const PaginaEquipe = (params) => {
     } catch (error) {
       setSnackbar("error", "Erro ao conectar com o servidor");
       console.error("erro ao recusar solicitação de entrada: ", error);
+    }
+  };
+
+  // Tabela Membros da Equipe
+
+  const buscarMembrosMinhaEquipe = async () => {
+    try {
+      setLoadingTabelaMinhaEquipeMembros(true);
+      const response = await api.post("/buscarMembrosEquipe", {
+        equipeId: usuario?.equipeId,
+      });
+
+      if (response?.status === 200) {
+        organizarListaMembros(response?.data);
+      } else {
+        setSnackbar("error", "Erro ao conectar com o servidor");
+        console.error("erro ao executar ação", response?.status);
+      }
+    } catch (error) {
+      setSnackbar("error", "Erro ao conectar com o servidor");
+      console.error("erro ao buscar membros da equipe: ", error);
+    }
+  };
+
+  const organizarListaMembros = (membros) => {
+    const administradoresEquipe = [];
+    const membrosEquipe = [];
+    let usuarioHost = [];
+
+    usuarioHost = membros.filter((membro) => membro.autorizacao === "adm001");
+
+    administradoresEquipe.push(
+      ...membros.filter((membro) => membro.autorizacao === "adm002")
+    );
+
+    membrosEquipe.push(
+      ...membros.filter(
+        (membro) => membro.autorizacao === "" || membro.autorizacao === null
+      )
+    );
+
+    setUsuarioHostMinhaEquipe([...usuarioHost]);
+    setAdministradoresMinhaEquipe([...administradoresEquipe]);
+    setMembrosMinhaEquipe([...membrosEquipe]);
+    setLoadingTabelaMinhaEquipeMembros(false);
+  };
+
+  const buscarTagsMinhaEquipe = async () => {
+    try {
+      setLoadingTabelaMinhaEquipeMembros(true);
+      const response = await api.post("/buscarTagsEquipe", {
+        equipeId: usuario?.equipeId,
+      });
+
+      if (response?.status === 200) {
+        setTagsMinhaEquipe(response?.data);
+      } else {
+        setSnackbar("error", "Erro ao conectar com o servidor");
+        console.error("erro ao executar ação", response?.status);
+      }
+    } catch (error) {
+      setSnackbar("error", "Erro ao conectar com o servidor");
+      console.error("erro ao buscar tags da equipe: ", error);
     }
   };
 
@@ -1356,229 +1440,190 @@ const PaginaEquipe = (params) => {
               </Tabs>
             </Box>
             <Box sx={styles.boxAreaConteudoTabsMinhaEquipe}>
-              {/* {valueTabInformacoes === "membros" && (
-                <Box sx={styles.boxAreaTabMembros}>
-                  <TextField
-                    focused
-                    variant="filled"
-                    placeholder="Procurar membro"
-                    sx={styles.textFieldSearch}
-                    InputProps={{
-                      startAdornment: <Search />,
-                    }}
-                  />
-                  <Box sx={styles.boxAreaPerfisMembros}>
-                    <Box sx={styles.boxAreaListMembros}>
-                      <Box sx={styles.boxDivisaoLista}>
-                        <Typography sx={styles.textTituloListaMembros}>
-                          <StarBorderOutlined
-                            sx={{ color: "#F3A913", fontSize: "16px" }}
-                          />
-                          ADMINISTRADORES: 3
-                        </Typography>
-                        <Divider sx={styles.dividerList} />
-                      </Box>
-                      <Box sx={styles.boxCardMembroList}>
-                        <Avatar sx={styles.avatarMembroList}>
-                          <Person />
-                        </Avatar>
-                        <Box sx={styles.boxAreaInfoMembroList}>
-                          <Box sx={styles.boxAreaTextAndChipMembroLista}>
-                            <Typography sx={styles.textPerfilMembroList}>
-                              João Vinícius Soarez
-                            </Typography>
-                            <Chip
-                              label="Admin"
-                              variant="outlined"
-                              sx={styles.chipName}
-                            />
-                            <FlagOutlinedIcon
-                              sx={{ color: "#F3A913", fontSize: "16px" }}
-                            />
-                          </Box>
-                          <Typography
-                            sx={{
-                              ...styles.textCardSolicitacao,
-                              color: "#F3CE24",
-                            }}
-                          >
-                            joaoexemplo@adpaz-zs.com.br
-                          </Typography>
-                        </Box>
-                        <IconButton sx={styles.configIconButton}>
-                          <ManageAccountsOutlinedIcon
-                            sx={styles.iconListMembro}
-                          />
-                        </IconButton>
-                      </Box>
-                      <Box sx={styles.boxCardMembroList}>
-                        <Avatar sx={styles.avatarMembroList}>
-                          <Person />
-                        </Avatar>
-                        <Box sx={styles.boxAreaInfoMembroList}>
-                          <Box sx={styles.boxAreaTextAndChipMembroLista}>
-                            <Typography sx={styles.textPerfilMembroList}>
-                              Samuel Cardoso Félix
-                            </Typography>
-                            <Chip
-                              label="Admin"
-                              variant="outlined"
-                              sx={styles.chipName}
-                            />
-                          </Box>
-                          <Typography
-                            sx={{
-                              ...styles.textCardSolicitacao,
-                              color: "#F3CE24",
-                            }}
-                          >
-                            samuelexemplo@adpaz-zs.com.br
-                          </Typography>
-                        </Box>
-                        <IconButton sx={styles.configIconButton}>
-                          <ManageAccountsOutlinedIcon
-                            sx={styles.iconListMembro}
-                          />
-                        </IconButton>
-                      </Box>
-                      <Box sx={styles.boxCardMembroList}>
-                        <Avatar sx={styles.avatarMembroList}>
-                          <Person />
-                        </Avatar>
-                        <Box sx={styles.boxAreaInfoMembroList}>
-                          <Box sx={styles.boxAreaTextAndChipMembroLista}>
-                            <Typography sx={styles.textPerfilMembroList}>
-                              Anna Esther Maravilha
-                            </Typography>
-                            <Chip
-                              label="Admin"
-                              variant="outlined"
-                              sx={styles.chipName}
-                            />
-                          </Box>
-                          <Typography
-                            sx={{
-                              ...styles.textCardSolicitacao,
-                              color: "#F3CE24",
-                            }}
-                          >
-                            annaexemplo@adpaz-zs.com.br
-                          </Typography>
-                        </Box>
-                        <IconButton sx={styles.configIconButton}>
-                          <ManageAccountsOutlinedIcon
-                            sx={styles.iconListMembro}
-                          />
-                        </IconButton>
-                      </Box>
-                    </Box>
-                    <Box sx={styles.boxAreaListMembros}>
-                      <Box sx={styles.boxDivisaoLista}>
-                        <Typography sx={styles.textTituloListaMembros}>
-                          <GroupsOutlinedIcon
-                            sx={{ color: "#F3A913", fontSize: "16px" }}
-                          />
-                          MEMBROS: 3
-                        </Typography>
-                        <Divider sx={styles.dividerList} />
-                      </Box>
-                      <Box sx={styles.boxCardMembroList}>
-                        <Avatar sx={styles.avatarMembroList}>
-                          <Person />
-                        </Avatar>
-                        <Box sx={styles.boxAreaInfoMembroList}>
-                          <Box sx={styles.boxAreaTextAndChipMembroLista}>
-                            <Typography sx={styles.textPerfilMembroList}>
-                              João Vinícius Soarez
-                            </Typography>
-                          </Box>
-                          <Typography
-                            sx={{
-                              ...styles.textCardSolicitacao,
-                              color: "#F3CE24",
-                            }}
-                          >
-                            joaoexemplo@adpaz-zs.com.br
-                          </Typography>
-                        </Box>
-                        <IconButton sx={styles.configIconButton}>
-                          <ManageAccountsOutlinedIcon
-                            sx={styles.iconListMembro}
-                          />
-                        </IconButton>
-                      </Box>
-                      <Box sx={styles.boxCardMembroList}>
-                        <Avatar sx={styles.avatarMembroList}>
-                          <Person />
-                        </Avatar>
-                        <Box sx={styles.boxAreaInfoMembroList}>
-                          <Box sx={styles.boxAreaTextAndChipMembroLista}>
-                            <Typography sx={styles.textPerfilMembroList}>
-                              Samuel Cardoso Félix
-                            </Typography>
-                            <Chip
-                              label="Nenhuma TAG"
-                              variant="outlined"
-                              sx={{
-                                ...styles.chipName,
-                                borderColor: "#D32F2F",
-                              }}
-                            />
-                          </Box>
-                          <Typography
-                            sx={{
-                              ...styles.textCardSolicitacao,
-                              color: "#F3CE24",
-                            }}
-                          >
-                            samuelexemplo@adpaz-zs.com.br
-                          </Typography>
-                        </Box>
-                        <IconButton sx={styles.configIconButton}>
-                          <ManageAccountsOutlinedIcon
-                            sx={styles.iconListMembro}
-                          />
-                        </IconButton>
-                      </Box>
-                      <Box sx={styles.boxCardMembroList}>
-                        <Avatar sx={styles.avatarMembroList}>
-                          <Person />
-                        </Avatar>
-                        <Box sx={styles.boxAreaInfoMembroList}>
-                          <Box sx={styles.boxAreaTextAndChipMembroLista}>
-                            <Typography sx={styles.textPerfilMembroList}>
-                              Anna Esther Maravilha
-                            </Typography>
-                          </Box>
-                          <Typography
-                            sx={{
-                              ...styles.textCardSolicitacao,
-                              color: "#F3CE24",
-                            }}
-                          >
-                            annaexemplo@adpaz-zs.com.br
-                          </Typography>
-                        </Box>
-                        <IconButton sx={styles.configIconButton}>
-                          <ManageAccountsOutlinedIcon
-                            sx={styles.iconListMembro}
-                          />
-                        </IconButton>
-                      </Box>
-                    </Box>
-                  </Box>
-                </Box>
-              )} */}
               {valueTabInformacoes === "membros" && (
-                <Box sx={{ ...styles.configBox, height: "100%" }}>
-                  <Typography sx={styles.textTitulo}>Nenhum membro</Typography>
-                </Box>
+                <>
+                  {loadingTabelaMinhaEquipeMembros && (
+                    <Box sx={styles.boxAreaCircularProgress}>
+                      <CircularProgress />
+                    </Box>
+                  )}
+
+                  {!loadingTabelaMinhaEquipeMembros && (
+                    <>
+                      <Box sx={styles.boxAreaTabMembros}>
+                        <TextField
+                          focused
+                          variant="filled"
+                          placeholder="Procurar membro"
+                          sx={styles.textFieldSearch}
+                          InputProps={{
+                            startAdornment: <Search />,
+                          }}
+                        />
+                        <Box sx={styles.boxAreaPerfisMembros}>
+                          <Box sx={styles.boxAreaListMembros}>
+                            <Box sx={styles.boxDivisaoLista}>
+                              <Typography sx={styles.textTituloListaMembros}>
+                                <StarBorderOutlined
+                                  sx={{ color: "#F3A913", fontSize: "16px" }}
+                                />
+                                ADMINISTRADORES:{" "}
+                                {administradoresEquipe?.length + 1}
+                              </Typography>
+                              <Divider sx={styles.dividerList} />
+                            </Box>
+                            {usuarioHostEquipe?.map(
+                              ({ nome, email }, index) => (
+                                <Box sx={styles.boxCardMembroList}>
+                                  <Avatar sx={styles.avatarMembroList}>
+                                    <Person />
+                                  </Avatar>
+                                  <Box sx={styles.boxAreaInfoMembroList}>
+                                    <Box
+                                      sx={styles.boxAreaTextAndChipMembroLista}
+                                    >
+                                      <Typography
+                                        sx={styles.textPerfilMembroList}
+                                      >
+                                        {nome}
+                                      </Typography>
+                                      <Chip
+                                        label="Admin"
+                                        variant="outlined"
+                                        sx={styles.chipName}
+                                      />
+                                      <FlagOutlinedIcon
+                                        sx={{
+                                          color: "#F3A913",
+                                          fontSize: "16px",
+                                        }}
+                                      />
+                                    </Box>
+                                    <Typography
+                                      sx={{
+                                        ...styles.textCardSolicitacao,
+                                        color: "#F3CE24",
+                                      }}
+                                    >
+                                      {email}
+                                    </Typography>
+                                  </Box>
+                                  <IconButton sx={styles.configIconButton}>
+                                    <ManageAccountsOutlinedIcon
+                                      sx={styles.iconListMembro}
+                                    />
+                                  </IconButton>
+                                </Box>
+                              )
+                            )}
+                            {administradoresEquipe?.map(
+                              ({ nome, email }, index) => (
+                                <Box sx={styles.boxCardMembroList}>
+                                  <Avatar sx={styles.avatarMembroList}>
+                                    <Person />
+                                  </Avatar>
+                                  <Box sx={styles.boxAreaInfoMembroList}>
+                                    <Box
+                                      sx={styles.boxAreaTextAndChipMembroLista}
+                                    >
+                                      <Typography
+                                        sx={styles.textPerfilMembroList}
+                                      >
+                                        {nome}
+                                      </Typography>
+                                      <Chip
+                                        label="Admin"
+                                        variant="outlined"
+                                        sx={styles.chipName}
+                                      />
+                                    </Box>
+                                    <Typography
+                                      sx={{
+                                        ...styles.textCardSolicitacao,
+                                        color: "#F3CE24",
+                                      }}
+                                    >
+                                      {email}
+                                    </Typography>
+                                  </Box>
+                                  <IconButton sx={styles.configIconButton}>
+                                    <ManageAccountsOutlinedIcon
+                                      sx={styles.iconListMembro}
+                                    />
+                                  </IconButton>
+                                </Box>
+                              )
+                            )}
+                          </Box>
+                          <Box sx={styles.boxAreaListMembros}>
+                            <Box sx={styles.boxDivisaoLista}>
+                              <Typography sx={styles.textTituloListaMembros}>
+                                <GroupsOutlinedIcon
+                                  sx={{ color: "#F3A913", fontSize: "16px" }}
+                                />
+                                MEMBROS: {membrosMinhaEquipe?.length}
+                              </Typography>
+                              <Divider sx={styles.dividerList} />
+                            </Box>
+                            {membrosMinhaEquipe?.map(
+                              ({ nome, email }, index) => (
+                                <Box sx={styles.boxCardMembroList}>
+                                  <Avatar sx={styles.avatarMembroList}>
+                                    <Person />
+                                  </Avatar>
+                                  <Box sx={styles.boxAreaInfoMembroList}>
+                                    <Box
+                                      sx={styles.boxAreaTextAndChipMembroLista}
+                                    >
+                                      <Typography
+                                        sx={styles.textPerfilMembroList}
+                                      >
+                                        {nome}
+                                      </Typography>
+                                    </Box>
+                                    <Typography
+                                      sx={{
+                                        ...styles.textCardSolicitacao,
+                                        color: "#F3CE24",
+                                      }}
+                                    >
+                                      {email}
+                                    </Typography>
+                                  </Box>
+                                  <IconButton sx={styles.configIconButton}>
+                                    <ManageAccountsOutlinedIcon
+                                      sx={styles.iconListMembro}
+                                    />
+                                  </IconButton>
+                                </Box>
+                              )
+                            )}
+                          </Box>
+                        </Box>
+                      </Box>
+                    </>
+                  )}
+                </>
               )}
               {valueTabInformacoes === "programacoes" && (
                 <Box sx={{ ...styles.configBox, height: "100%" }}>
                   <Typography sx={styles.textTitulo}>Em Breve</Typography>
                 </Box>
               )}
+
+              {/* {valueTabInformacoes === "tags" && (
+                <Box sx={styles.boxAreaTagsMinhaEquipe}>
+                  {tagsMinhaEquipe?.map(({ id, nome }, index) => (
+                    <Chip
+                      key={index}
+                      label={nome}
+                      variant="outlined"
+                      sx={styles.chipDefault}
+                    />
+                  ))}
+                </Box>
+              )} */}
+
               {valueTabInformacoes === "tags" && (
                 <Box sx={{ ...styles.configBox, height: "100%" }}>
                   <Typography sx={styles.textTitulo}>Em Breve</Typography>
