@@ -39,23 +39,16 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import ModalEscalarMembro from "./modais/modalEscalarMembro";
-import ModalCriarAviso from "./modais/modalCriarAviso";
-import AvisoDefault from "./cardsAvisos/avisoDefault";
-import AvisoNovaSolicitacao from "./cardsAvisos/avisoNovaSolicitacao";
-import AvisoSistema from "./cardsAvisos/avisoSistema";
-import AvisoNaoPreenchido from "./cardsAvisos/avisoNaoPreenchido";
-import AvisoFaltaAnunciada from "./cardsAvisos/avisoFaltaAnunciada";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
 import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
-import ModalCriarEvento from "./modais/modalCriarEvento";
-import CardEvento from "./cardEvento";
 import AddchartOutlinedIcon from "@mui/icons-material/AddchartOutlined";
 import ChurchOutlinedIcon from "@mui/icons-material/ChurchOutlined";
 import RestartAltOutlinedIcon from "@mui/icons-material/RestartAltOutlined";
 import FlagOutlinedIcon from "@mui/icons-material/FlagOutlined";
 import ManageAccountsOutlinedIcon from "@mui/icons-material/ManageAccountsOutlined";
 import api from "../../../api";
+import ModalPerfilMembro from "./modais/modalPerfilMembro";
 
 const styles = {
   configBox: {
@@ -918,6 +911,8 @@ const PaginaEquipe = (params) => {
     useState(true);
   const [tagsMinhaEquipe, setTagsMinhaEquipe] = useState([]);
 
+  const [openModalPerfilMembro, setOpenModalPerfilMembro] = useState(false);
+
   const [proximaEscala, setProximaEscala] = useState([
     {
       membro: "João Vinícius Soares",
@@ -940,8 +935,6 @@ const PaginaEquipe = (params) => {
   ]);
   const [editarEscala, setEditarEscala] = useState(false);
   const [openModalEscalarMembro, setOpenModalEscalarMembro] = useState(false);
-  const [openModalCriarAviso, setOpenModalCriarAviso] = useState(false);
-  const [openModalCriarEvento, setOpenModalCriarEvento] = useState(false);
   const [valueTabInformacoes, setValueTabInformacoes] = useState("membros");
 
   //UseEffect's
@@ -1508,7 +1501,12 @@ const PaginaEquipe = (params) => {
                                       {email}
                                     </Typography>
                                   </Box>
-                                  <IconButton sx={styles.configIconButton}>
+                                  <IconButton
+                                    onClick={() => {
+                                      setOpenModalPerfilMembro(true);
+                                    }}
+                                    sx={styles.configIconButton}
+                                  >
                                     <ManageAccountsOutlinedIcon
                                       sx={styles.iconListMembro}
                                     />
@@ -1653,14 +1651,13 @@ const PaginaEquipe = (params) => {
         openModalEscalarMembro={openModalEscalarMembro}
         setOpenModalEscalarMembro={setOpenModalEscalarMembro}
       />
-      <ModalCriarAviso
-        openModalCriarAviso={openModalCriarAviso}
-        setOpenModalCriarAviso={setOpenModalCriarAviso}
+
+      <ModalPerfilMembro
+        usuarioPerfil={usuario}
+        openModalPerfilMembro={openModalPerfilMembro}
+        setOpenModalPerfilMembro={setOpenModalPerfilMembro}
       />
-      <ModalCriarEvento
-        openModalCriarEvento={openModalCriarEvento}
-        setOpenModalCriarEvento={setOpenModalCriarEvento}
-      />
+
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={3000}

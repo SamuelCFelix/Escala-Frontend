@@ -999,7 +999,6 @@ const PaginaGeral = (params) => {
           >
             <Box sx={styles.boxDoubleIconeBotaoEvento}>
               <AddchartOutlinedIcon sx={{ fontSize: "18px" }} />
-              <Star sx={styles.positionStarCalendario} />
             </Box>
             Cadastrar diponibilidade
           </Button>
