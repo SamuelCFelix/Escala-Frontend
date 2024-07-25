@@ -47,6 +47,7 @@ import ChurchOutlinedIcon from "@mui/icons-material/ChurchOutlined";
 import RestartAltOutlinedIcon from "@mui/icons-material/RestartAltOutlined";
 import FlagOutlinedIcon from "@mui/icons-material/FlagOutlined";
 import ManageAccountsOutlinedIcon from "@mui/icons-material/ManageAccountsOutlined";
+import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import api from "../../../api";
 import ModalPerfilMembro from "./modais/modalPerfilMembro";
 
@@ -894,7 +895,6 @@ const styles = {
 
 const PaginaEquipe = (params) => {
   const { usuario } = params;
-  const [userLogin, setUserLogin] = useState(true);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState("");
   const [snackbarMessage, setSnackbarMessage] = useState("");
@@ -909,7 +909,8 @@ const PaginaEquipe = (params) => {
   const [membrosMinhaEquipe, setMembrosMinhaEquipe] = useState([]);
   const [loadingTabelaMinhaEquipeMembros, setLoadingTabelaMinhaEquipeMembros] =
     useState(true);
-  const [tagsMinhaEquipe, setTagsMinhaEquipe] = useState([]);
+  const [tagsEquipe, setTagsEquipe] = useState([]);
+  const [usuarioPerfil, setUsuarioPerfil] = useState([]);
 
   const [openModalPerfilMembro, setOpenModalPerfilMembro] = useState(false);
 
@@ -940,16 +941,34 @@ const PaginaEquipe = (params) => {
   //UseEffect's
 
   useEffect(() => {
-    buscarTabelaSolicitacoesEntrada();
-    buscarMembrosMinhaEquipe();
-    buscarTagsMinhaEquipe();
+    handleBuscarTabelaSolicitacoesEntrada();
+    handleBuscarMembrosMinhaEquipe();
+    handleBuscarTagsEquipe();
   }, []);
 
   //API's
 
+  const handleBuscarTagsEquipe = async () => {
+    try {
+      const response = await api.post("/buscarTagsEquipe", {
+        equipeId: usuario?.equipeId,
+      });
+
+      if (response?.status === 200) {
+        setTagsEquipe(response?.data);
+      } else {
+        setSnackbar("error", "Erro ao conectar com o servidor");
+        console.error("erro ao executar ação", response?.status);
+      }
+    } catch (error) {
+      setSnackbar("error", "Erro ao conectar com o servidor");
+      console.error("erro ao buscar tags da equipe: ", error);
+    }
+  };
+
   // Tabela Solicitações de Entrada
 
-  const buscarTabelaSolicitacoesEntrada = async () => {
+  const handleBuscarTabelaSolicitacoesEntrada = async () => {
     try {
       setLoadingTabelaSolicitacoesEntrada(true);
       const response = await api.post("/solicitacoesDeEntrada", {
@@ -969,7 +988,7 @@ const PaginaEquipe = (params) => {
     }
   };
 
-  const aceitarSolicitacao = async (usuarioDefaultId) => {
+  const handleAceitarSolicitacao = async (usuarioDefaultId) => {
     try {
       const response = await api.put("/aceitarMembroEquipe", {
         usuarioId: usuarioDefaultId,
@@ -977,8 +996,8 @@ const PaginaEquipe = (params) => {
       });
 
       if (response?.status === 200) {
-        buscarTabelaSolicitacoesEntrada();
-        buscarMembrosMinhaEquipe();
+        handleBuscarTabelaSolicitacoesEntrada();
+        handleBuscarMembrosMinhaEquipe();
       } else {
         setSnackbar("error", "Erro ao conectar com o servidor");
         console.error("erro ao executar ação", response?.status);
@@ -989,7 +1008,7 @@ const PaginaEquipe = (params) => {
     }
   };
 
-  const recusarSolicitacao = async (usuarioDefaultId) => {
+  const handleRecusarSolicitacao = async (usuarioDefaultId) => {
     try {
       const response = await api.delete("/recusarMembroEquipe", {
         usuarioId: usuarioDefaultId,
@@ -997,7 +1016,7 @@ const PaginaEquipe = (params) => {
       });
 
       if (response?.status === 200) {
-        buscarTabelaSolicitacoesEntrada();
+        handleBuscarTabelaSolicitacoesEntrada();
       } else {
         setSnackbar("error", "Erro ao conectar com o servidor");
         console.error("erro ao executar ação", response?.status);
@@ -1010,7 +1029,7 @@ const PaginaEquipe = (params) => {
 
   // Tabela Membros da Equipe
 
-  const buscarMembrosMinhaEquipe = async () => {
+  const handleBuscarMembrosMinhaEquipe = async () => {
     try {
       setLoadingTabelaMinhaEquipeMembros(true);
       const response = await api.post("/buscarMembrosEquipe", {
@@ -1018,7 +1037,7 @@ const PaginaEquipe = (params) => {
       });
 
       if (response?.status === 200) {
-        organizarListaMembros(response?.data);
+        handleOrganizarListaMembros(response?.data);
       } else {
         setSnackbar("error", "Erro ao conectar com o servidor");
         console.error("erro ao executar ação", response?.status);
@@ -1029,7 +1048,7 @@ const PaginaEquipe = (params) => {
     }
   };
 
-  const organizarListaMembros = (membros) => {
+  const handleOrganizarListaMembros = (membros) => {
     const administradoresEquipe = [];
     const membrosEquipe = [];
     let usuarioHost = [];
@@ -1050,25 +1069,6 @@ const PaginaEquipe = (params) => {
     setAdministradoresMinhaEquipe([...administradoresEquipe]);
     setMembrosMinhaEquipe([...membrosEquipe]);
     setLoadingTabelaMinhaEquipeMembros(false);
-  };
-
-  const buscarTagsMinhaEquipe = async () => {
-    try {
-      setLoadingTabelaMinhaEquipeMembros(true);
-      const response = await api.post("/buscarTagsEquipe", {
-        equipeId: usuario?.equipeId,
-      });
-
-      if (response?.status === 200) {
-        setTagsMinhaEquipe(response?.data);
-      } else {
-        setSnackbar("error", "Erro ao conectar com o servidor");
-        console.error("erro ao executar ação", response?.status);
-      }
-    } catch (error) {
-      setSnackbar("error", "Erro ao conectar com o servidor");
-      console.error("erro ao buscar tags da equipe: ", error);
-    }
   };
 
   const setSnackbar = (severity, message) => {
@@ -1359,7 +1359,7 @@ const PaginaEquipe = (params) => {
                       <Box sx={styles.boxAreaBotoesSolicitacao}>
                         <Button
                           onClick={() => {
-                            recusarSolicitacao(usuarioDefaultId);
+                            handleRecusarSolicitacao(usuarioDefaultId);
                           }}
                           variant="contained"
                           sx={{
@@ -1373,7 +1373,7 @@ const PaginaEquipe = (params) => {
                         </Button>
                         <Button
                           onClick={() => {
-                            aceitarSolicitacao(usuarioDefaultId);
+                            handleAceitarSolicitacao(usuarioDefaultId);
                           }}
                           variant="contained"
                           sx={{
@@ -1467,7 +1467,7 @@ const PaginaEquipe = (params) => {
                             </Box>
                             {usuarioHostEquipe?.map(
                               ({ nome, email }, index) => (
-                                <Box sx={styles.boxCardMembroList}>
+                                <Box key={index} sx={styles.boxCardMembroList}>
                                   <Avatar sx={styles.avatarMembroList}>
                                     <Person />
                                   </Avatar>
@@ -1503,20 +1503,30 @@ const PaginaEquipe = (params) => {
                                   </Box>
                                   <IconButton
                                     onClick={() => {
+                                      setUsuarioPerfil(
+                                        usuarioHostEquipe[index]
+                                      );
                                       setOpenModalPerfilMembro(true);
                                     }}
                                     sx={styles.configIconButton}
                                   >
-                                    <ManageAccountsOutlinedIcon
-                                      sx={styles.iconListMembro}
-                                    />
+                                    {usuario?.autorizacao === "adm001" ||
+                                    usuario?.autorizacao === "adm002" ? (
+                                      <ManageAccountsOutlinedIcon
+                                        sx={styles.iconListMembro}
+                                      />
+                                    ) : (
+                                      <VisibilityOutlinedIcon
+                                        sx={styles.iconListMembro}
+                                      />
+                                    )}
                                   </IconButton>
                                 </Box>
                               )
                             )}
                             {administradoresEquipe?.map(
                               ({ nome, email }, index) => (
-                                <Box sx={styles.boxCardMembroList}>
+                                <Box key={index} sx={styles.boxCardMembroList}>
                                   <Avatar sx={styles.avatarMembroList}>
                                     <Person />
                                   </Avatar>
@@ -1544,10 +1554,25 @@ const PaginaEquipe = (params) => {
                                       {email}
                                     </Typography>
                                   </Box>
-                                  <IconButton sx={styles.configIconButton}>
-                                    <ManageAccountsOutlinedIcon
-                                      sx={styles.iconListMembro}
-                                    />
+                                  <IconButton
+                                    onClick={() => {
+                                      setUsuarioPerfil(
+                                        administradoresEquipe[index]
+                                      );
+                                      setOpenModalPerfilMembro(true);
+                                    }}
+                                    sx={styles.configIconButton}
+                                  >
+                                    {usuario?.autorizacao === "adm001" ||
+                                    usuario?.autorizacao === "adm002" ? (
+                                      <ManageAccountsOutlinedIcon
+                                        sx={styles.iconListMembro}
+                                      />
+                                    ) : (
+                                      <VisibilityOutlinedIcon
+                                        sx={styles.iconListMembro}
+                                      />
+                                    )}
                                   </IconButton>
                                 </Box>
                               )
@@ -1565,7 +1590,7 @@ const PaginaEquipe = (params) => {
                             </Box>
                             {membrosMinhaEquipe?.map(
                               ({ nome, email }, index) => (
-                                <Box sx={styles.boxCardMembroList}>
+                                <Box key={index} sx={styles.boxCardMembroList}>
                                   <Avatar sx={styles.avatarMembroList}>
                                     <Person />
                                   </Avatar>
@@ -1588,10 +1613,25 @@ const PaginaEquipe = (params) => {
                                       {email}
                                     </Typography>
                                   </Box>
-                                  <IconButton sx={styles.configIconButton}>
-                                    <ManageAccountsOutlinedIcon
-                                      sx={styles.iconListMembro}
-                                    />
+                                  <IconButton
+                                    onClick={() => {
+                                      setUsuarioPerfil(
+                                        membrosMinhaEquipe[index]
+                                      );
+                                      setOpenModalPerfilMembro(true);
+                                    }}
+                                    sx={styles.configIconButton}
+                                  >
+                                    {usuario?.autorizacao === "adm001" ||
+                                    usuario?.autorizacao === "adm002" ? (
+                                      <ManageAccountsOutlinedIcon
+                                        sx={styles.iconListMembro}
+                                      />
+                                    ) : (
+                                      <VisibilityOutlinedIcon
+                                        sx={styles.iconListMembro}
+                                      />
+                                    )}
                                   </IconButton>
                                 </Box>
                               )
@@ -1653,9 +1693,13 @@ const PaginaEquipe = (params) => {
       />
 
       <ModalPerfilMembro
-        usuarioPerfil={usuario}
+        usuarioLogado={usuario}
+        usuarioPerfil={usuarioPerfil}
+        setUsuarioPerfil={setUsuarioPerfil}
         openModalPerfilMembro={openModalPerfilMembro}
         setOpenModalPerfilMembro={setOpenModalPerfilMembro}
+        tagsEquipe={tagsEquipe}
+        handleBuscarMembrosMinhaEquipe={handleBuscarMembrosMinhaEquipe}
       />
 
       <Snackbar

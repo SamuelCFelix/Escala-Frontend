@@ -82,15 +82,26 @@ const Home = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState("");
   const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [loadingPage, setLoadingPage] = useState(true);
 
   useEffect(() => {
-    if (!autenticatedToken) {
+    if (!autenticatedToken || !storedData) {
       localStorage?.clear();
       window.location.href = "/login";
     } else {
-      fetchData(autenticatedToken, storedData);
+      let userDataInitial = JSON?.parse(storedData);
+      if (
+        userDataInitial?.equipeId === null ||
+        userDataInitial?.equipeId === "solicitacao enviada" ||
+        userDataInitial?.equipeId === "sem equipe"
+      ) {
+        localStorage?.clear();
+        window.location.href = "/login";
+      } else {
+        fetchData(autenticatedToken, storedData);
+      }
     }
-  }, [autenticatedToken]);
+  }, [autenticatedToken, storedData]);
 
   const fetchData = async (autenticatedToken, storedData) => {
     const userToken = JSON?.parse(autenticatedToken);
@@ -114,6 +125,7 @@ const Home = () => {
 
         if (response?.status === 200) {
           setUser(response?.data);
+          setLoadingPage(false);
         } else {
           setSnackbar("error", "Erro ao conectar com o servidor");
           console.error("erro ao executar ação", response?.status);
@@ -143,48 +155,52 @@ const Home = () => {
   };
 
   return (
-    <Box sx={styles.container}>
-      <Box sx={styles.boxHome}>
-        <Box sx={{ ...styles.configBox, margin: "12px 0px" }}>
-          <Box sx={styles.boxTabs}>
-            <Tabs
-              value={valueTab}
-              onChange={handleChangeTabs}
-              variant="scrollable"
-              indicatorColor="#F3A913"
-              sx={styles.estiloTabs}
-            >
-              <Tab label="Geral" value="Geral" sx={{ color: "#ffffff" }} />
-              <Tab label="Equipe" value="Equipe" sx={{ color: "#ffffff" }} />
-            </Tabs>
+    <>
+      <Box sx={styles.container}>
+        <Box sx={styles.boxHome}>
+          <Box sx={{ ...styles.configBox, margin: "12px 0px" }}>
+            <Box sx={styles.boxTabs}>
+              <Tabs
+                value={valueTab}
+                onChange={handleChangeTabs}
+                variant="scrollable"
+                indicatorColor="#F3A913"
+                sx={styles.estiloTabs}
+              >
+                <Tab label="Geral" value="Geral" sx={{ color: "#ffffff" }} />
+                <Tab label="Equipe" value="Equipe" sx={{ color: "#ffffff" }} />
+              </Tabs>
+            </Box>
           </Box>
+          {!loadingPage && (
+            <Box sx={{ display: "flex", width: "100%" }}>
+              {valueTab === "Geral" && <PaginaGeral usuario={user} />}
+              {valueTab === "Equipe" && <PaginaEquipe usuario={user} />}
+            </Box>
+          )}
+          <Rodape />
         </Box>
-        <Box sx={{ display: "flex", width: "100%" }}>
-          {valueTab === "Geral" && <PaginaGeral usuario={user} />}
-          {valueTab === "Equipe" && <PaginaEquipe usuario={user} />}
-        </Box>
-        <Rodape />
-      </Box>
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={3000}
-        onClose={handleSnackbarClose}
-        style={{
-          bottom: "20px",
-          left: "50%",
-          transform: "translateX(-50%)",
-        }}
-      >
-        <Alert
-          elevation={6}
-          variant="filled"
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={3000}
           onClose={handleSnackbarClose}
-          severity={snackbarSeverity}
+          style={{
+            bottom: "20px",
+            left: "50%",
+            transform: "translateX(-50%)",
+          }}
         >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
-    </Box>
+          <Alert
+            elevation={6}
+            variant="filled"
+            onClose={handleSnackbarClose}
+            severity={snackbarSeverity}
+          >
+            {snackbarMessage}
+          </Alert>
+        </Snackbar>
+      </Box>
+    </>
   );
 };
 export default Home;

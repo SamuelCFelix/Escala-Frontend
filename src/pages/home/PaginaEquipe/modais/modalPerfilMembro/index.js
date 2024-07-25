@@ -6,6 +6,7 @@ import {
   SellOutlined,
 } from "@mui/icons-material";
 import {
+  Alert,
   Avatar,
   Backdrop,
   Box,
@@ -15,14 +16,21 @@ import {
   Divider,
   Fade,
   FormControlLabel,
+  FormGroup,
   IconButton,
+  Menu,
+  MenuItem,
+  MenuList,
   Modal,
+  Snackbar,
   Tab,
   Tabs,
   tabsClasses,
   Typography,
 } from "@mui/material";
+import FlagOutlinedIcon from "@mui/icons-material/FlagOutlined";
 import { useState } from "react";
+import api from "../../../../../api";
 
 const styles = {
   configBox: {
@@ -41,6 +49,30 @@ const styles = {
     transform: "translate(-50%, -50%)",
     width: "446px",
     height: "450px",
+    boxShadow: 24,
+  },
+  boxModalConfirmacao: {
+    background: "#1B1B1B",
+    border: "1px solid #F3A913",
+    borderRadius: "10px",
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: "400px",
+    height: "auto",
+    boxShadow: 24,
+  },
+  boxModalConfirmacaoPerigo: {
+    background: "#1B1B1B",
+    border: "1px solid #D32F2F",
+    borderRadius: "10px",
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: "400px",
+    height: "auto",
     boxShadow: 24,
   },
   boxConteudoModal: {
@@ -171,7 +203,7 @@ const styles = {
   botaoDefaultCancelar: {
     display: "flex",
     width: "auto",
-    height: "30px",
+    height: "25px",
     padding: "0px 10px",
     borderRadius: "5px",
     fontFamily: "Roboto, sans-serif",
@@ -278,12 +310,6 @@ const styles = {
     lineHeight: "24px",
     letterSpacing: "0.17px",
   },
-  configCheckbox: {
-    color: "#F3A913",
-    "& .MuiSvgIcon-root": {
-      fontSize: "22px",
-    },
-  },
   boxAreaDadosInfo: {
     display: "flex",
     flexDirection: "column",
@@ -321,17 +347,275 @@ const styles = {
     justifyContent: "center",
     mt: "12px",
   },
+  boxModalDelete: {
+    backgroundColor: "#1B1B1B",
+    border: "1px solid #D32F2F",
+    borderRadius: "10px",
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: "400px",
+    height: "auto",
+    paddingBottom: "4px",
+    boxShadow: 24,
+  },
+  boxConteudoModalDelete: {
+    width: "100%",
+    height: "100%",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: "10px",
+  },
+  boxAreaTituloModalDelete: {
+    width: "100%",
+    height: "50px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  boxTituloModalDelete: {
+    width: "auto",
+    height: "100%",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  tituloModalDelete: {
+    color: "#ffffff",
+    textTransform: "uppercase",
+    fontSize: "14px",
+    lineHeight: "16px",
+    letterSpacing: "1.25px",
+    margin: "6% 0%",
+  },
+  baseTituloModalDelete: {
+    background: "#D32F2F",
+    width: "130%",
+    height: "2.5%",
+  },
+  boxBotaoModalDelete: {
+    width: "100%",
+    height: "20%",
+    display: "flex",
+    alignItems: "end",
+    justifyContent: "end",
+    mb: "8px",
+  },
+  boxBotoesModalDelete: {
+    width: "210px",
+    height: "100%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    mr: "10px",
+  },
+  botaoDefaultModal: {
+    width: "100px",
+    height: "25px",
+    padding: "0px 40px",
+    borderRadius: "5px",
+    fontFamily: "Roboto, sans-serif",
+    fontSize: "12px",
+    lineHeight: "36px",
+    letterSpacing: "1.25px",
+    color: "#ffffff",
+    background: "#D32F2F",
+    "&:hover": {
+      background: "#E63737",
+    },
+  },
+  textModal: {
+    color: "#ffffff",
+    fontSize: "15px",
+    lineHeight: "24px",
+    letterSpacing: "0.17px",
+    textAlign: "center",
+  },
+  configCheckbox: {
+    color: "#F3A913",
+    "& .MuiSvgIcon-root": {
+      fontSize: "22px",
+    },
+    "&.MuiButtonBase-root.MuiCheckbox-root.Mui-disabled": {
+      color: "rgba(243, 169, 19, 0.5)",
+    },
+  },
+  configCheckboxMenu: {
+    color: "#565656",
+    "&.Mui-checked": {
+      color: "#F3A913",
+    },
+    "&.MuiButtonBase-root.MuiCheckbox-root:hover": {
+      backgroundColor: "rgba(243, 169, 19, 0.1)",
+    },
+  },
+  configBoxTextMenu: {
+    maxWidth: "240px",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+  },
 };
 
 const ModalPerfilMembro = (params) => {
-  const { usuarioPerfil, openModalPerfilMembro, setOpenModalPerfilMembro } =
-    params;
+  const {
+    usuarioLogado,
+    usuarioPerfil,
+    setUsuarioPerfil,
+    openModalPerfilMembro,
+    setOpenModalPerfilMembro,
+    tagsEquipe,
+    handleBuscarMembrosMinhaEquipe,
+  } = params;
 
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarSeverity, setSnackbarSeverity] = useState("");
+  const [snackbarMessage, setSnackbarMessage] = useState("");
   const [valueTabInformacoes, setValueTabInformacoes] = useState("tags");
-  const [checked, setChecked] = useState(true);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [OpenModalExpulsarMembro, setOpenModalExpulsarMembro] = useState(false);
 
-  const handleChange = (event) => {
-    setChecked(event.target.checked);
+  //API
+
+  const handleUpdateTagsMembroEquipe = async (acao, tagId, host) => {
+    try {
+      let response = null;
+      let usuarioAtualizado = usuarioPerfil;
+      if (host) {
+        if (acao) {
+          response = await api.put("/updateTagsMembroEquipe", {
+            usuarioId: usuarioPerfil?.usuarioHostId,
+            tagId,
+            acao: "adicionar",
+            host,
+          });
+        } else {
+          response = await api.put("/updateTagsMembroEquipe", {
+            usuarioId: usuarioPerfil?.usuarioHostId,
+            tagId,
+            acao: "remover",
+            host,
+          });
+        }
+      } else {
+        if (acao) {
+          response = await api.put("/updateTagsMembroEquipe", {
+            usuarioId: usuarioPerfil?.usuarioDefaultId,
+            tagId,
+            acao: "adicionar",
+          });
+        } else {
+          response = await api.put("/updateTagsMembroEquipe", {
+            usuarioId: usuarioPerfil?.usuarioDefaultId,
+            tagId,
+            acao: "remover",
+          });
+        }
+      }
+
+      if (response?.status === 200) {
+        handleBuscarMembrosMinhaEquipe();
+        usuarioAtualizado.tags = response?.data;
+      } else {
+        setSnackbar("error", "Erro ao conectar com o servidor");
+        console.error("erro ao executar ação", response?.status);
+      }
+    } catch (error) {
+      setSnackbar("error", "Erro ao conectar com o servidor");
+      console.error(
+        "erro ao atualizar autorização do membro da equipe: ",
+        error
+      );
+    }
+  };
+
+  const handleStatusAtivoMembroEquipe = async (acao) => {
+    try {
+      let response = null;
+      let usuarioAtualizado = usuarioPerfil;
+
+      if (acao) {
+        response = await api.put("/updateStatusMembroEquipe", {
+          usuarioId: usuarioPerfil?.usuarioDefaultId,
+          acao: "ativar",
+        });
+      } else {
+        response = await api.put("/updateStatusMembroEquipe", {
+          usuarioId: usuarioPerfil?.usuarioDefaultId,
+          acao: "desativar",
+        });
+      }
+
+      if (response?.status === 200) {
+        handleBuscarMembrosMinhaEquipe();
+        usuarioAtualizado.ativo = response?.data?.ativo;
+      } else {
+        setSnackbar("error", "Erro ao conectar com o servidor");
+        console.error("erro ao executar ação", response?.status);
+      }
+    } catch (error) {
+      setSnackbar("error", "Erro ao conectar com o servidor");
+      console.error(
+        "erro ao atualizar autorização do membro da equipe: ",
+        error
+      );
+    }
+  };
+
+  const handleStatusAdministradorMembroEquipe = async (acao) => {
+    try {
+      let response = null;
+      let usuarioAtualizado = usuarioPerfil;
+
+      if (acao) {
+        response = await api.put("/updateAdmMembroEquipe", {
+          usuarioId: usuarioPerfil?.usuarioDefaultId,
+          acao: "adicionar",
+        });
+      } else {
+        response = await api.put("/updateAdmMembroEquipe", {
+          usuarioId: usuarioPerfil?.usuarioDefaultId,
+          acao: "remover",
+        });
+      }
+
+      if (response?.status === 200) {
+        handleBuscarMembrosMinhaEquipe();
+        usuarioAtualizado.autorizacao = response?.data?.autorizacao;
+      } else {
+        setSnackbar("error", "Erro ao conectar com o servidor");
+        console.error("erro ao executar ação", response?.status);
+      }
+    } catch (error) {
+      setSnackbar("error", "Erro ao conectar com o servidor");
+      console.error(
+        "erro ao atualizar autorização do membro da equipe: ",
+        error
+      );
+    }
+  };
+
+  const handleExpulsarMembroEquipe = async () => {
+    try {
+      const response = await api.put("/expulsarMembroEquipe", {
+        usuarioId: usuarioPerfil?.usuarioDefaultId,
+      });
+
+      if (response?.status === 200) {
+        handleBuscarMembrosMinhaEquipe();
+        handleCloseModal();
+      } else {
+        setSnackbar("error", "Erro ao conectar com o servidor");
+        console.error("erro ao executar ação", response?.status);
+      }
+    } catch (error) {
+      setSnackbar("error", "Erro ao conectar com o servidor");
+      console.error("erro ao expulsar membro da equipe: ", error);
+    }
   };
 
   const boxTituloCards = (titulo) => {
@@ -345,206 +629,445 @@ const ModalPerfilMembro = (params) => {
     );
   };
 
+  function handleCloseModal() {
+    setOpenModalExpulsarMembro(false);
+    setOpenModalPerfilMembro(false);
+    setValueTabInformacoes("tags");
+  }
+
+  const handleChangeCheckTags = (event, tagId, host) => {
+    handleUpdateTagsMembroEquipe(event.target.checked, tagId, host);
+  };
+
+  const handleChangeCheckAtivo = (event) => {
+    handleStatusAtivoMembroEquipe(event.target.checked);
+  };
+
+  const handleChangeCheckAdministrador = (event) => {
+    handleStatusAdministradorMembroEquipe(event.target.checked);
+  };
+
   const handleChangeTabsInformacoes = (event, newValue) => {
     setValueTabInformacoes(newValue);
   };
 
-  const tagsFake = [
-    { nome: "Cortes de Câmera" },
-    { nome: "Câmera Lateral - Esquerda" },
-    { nome: "Câmera Lateral - Direita" },
-    { nome: "Câmera Central" },
-  ];
+  const handleClickMenu = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleCloseMenu = () => {
+    setAnchorEl(null);
+  };
+
+  const setSnackbar = (severity, message) => {
+    setSnackbarSeverity(severity);
+    setSnackbarMessage(message);
+    setSnackbarOpen(true);
+  };
+
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbarOpen(false);
+  };
 
   return (
-    <Modal
-      open={openModalPerfilMembro}
-      onClose={() => {
-        setOpenModalPerfilMembro(false);
-      }}
-      closeAfterTransition
-      slots={{ backdrop: Backdrop }}
-      slotProps={{
-        backdrop: {
-          timeout: 500,
-        },
-      }}
-    >
-      <Fade in={openModalPerfilMembro}>
-        <Box sx={styles.boxModal}>
-          <Box sx={styles.boxConteudoModal}>
-            {boxTituloCards("Perfil")}
-            <IconButton
-              onClick={() => {
-                setOpenModalPerfilMembro(false);
-              }}
-              sx={{ position: "absolute", top: 4, right: 0 }}
-            >
-              <Close sx={{ fontSize: "26px", color: "#ffffff" }} />
-            </IconButton>
-            <Box sx={styles.areaConteudoCard}>
-              <Box sx={styles.boxAreaInformacoesPerfil}>
-                <Avatar sx={styles.avatarIcon}>
-                  <Person sx={{ fontSize: "24px" }} />
-                </Avatar>
-                <Typography sx={styles.textPerfilNome}>
-                  {usuarioPerfil?.nome}
-                  {(usuarioPerfil?.autorizacao === "adm001" ||
-                    usuarioPerfil?.autorizacao === "adm002") && (
-                    <Chip
-                      label="Admin"
-                      variant="outlined"
-                      sx={styles.chipName}
-                    />
-                  )}
-                </Typography>
-
-                <Box sx={styles.boxTabs}>
-                  <Tabs
-                    value={valueTabInformacoes}
-                    onChange={handleChangeTabsInformacoes}
-                    variant="scrollable"
-                    scrollButtons
-                    allowScrollButtonsMobile
-                    sx={styles.estiloTabs}
-                  >
-                    <Tab label="Tags" value="tags" sx={{ color: "#ffffff" }} />
-                    <Tab
-                      label="Dados"
-                      value="dados"
-                      sx={{ color: "#ffffff" }}
-                    />
-                  </Tabs>
-                </Box>
-                <Box sx={styles.boxAreaConteudoTabsInformacoes}>
-                  <Box sx={styles.boxAreaConteudoTabsPerfil}>
-                    {valueTabInformacoes === "tags" && (
-                      <>
-                        <Box sx={styles.boxDivisaoLista}>
-                          <Typography sx={styles.textTituloLista}>
-                            <SellOutlined
-                              sx={{ color: "#F3A913", fontSize: "16px" }}
-                            />
-                            TAGS DO USUÁRIO
-                          </Typography>
-                          <IconButton sx={styles.configIconButton}>
-                            <AddCircleOutline
-                              sx={{ color: "#F3A913", fontSize: "18px" }}
-                            />
-                          </IconButton>
-                          <Divider sx={styles.dividerList} />
-                        </Box>
-                        <Box sx={styles.boxAreaTagsPerfil}>
-                          {tagsFake.map(({ nome }, index) => (
-                            <Chip
-                              key={index}
-                              label={nome}
-                              variant="outlined"
-                              sx={{ ...styles.chipDefault, mb: "" }}
-                            />
-                          ))}
-                        </Box>
-                      </>
+    <>
+      <Modal
+        open={openModalPerfilMembro}
+        onClose={() => {
+          handleCloseModal();
+        }}
+        closeAfterTransition
+        slots={{ backdrop: Backdrop }}
+        slotProps={{
+          backdrop: {
+            timeout: 500,
+          },
+        }}
+      >
+        <Fade in={openModalPerfilMembro}>
+          <Box sx={styles.boxModal}>
+            <Box sx={styles.boxConteudoModal}>
+              {boxTituloCards("Perfil")}
+              <IconButton
+                onClick={() => {
+                  handleCloseModal();
+                }}
+                sx={{ position: "absolute", top: 4, right: 0 }}
+              >
+                <Close sx={{ fontSize: "26px", color: "#ffffff" }} />
+              </IconButton>
+              <Box sx={styles.areaConteudoCard}>
+                <Box sx={styles.boxAreaInformacoesPerfil}>
+                  <Avatar sx={styles.avatarIcon}>
+                    <Person sx={{ fontSize: "24px" }} />
+                  </Avatar>
+                  <Typography sx={styles.textPerfilNome}>
+                    {usuarioPerfil?.nome}
+                    {(usuarioPerfil?.autorizacao === "adm001" ||
+                      usuarioPerfil?.autorizacao === "adm002") && (
+                      <Chip
+                        label="Admin"
+                        variant="outlined"
+                        sx={styles.chipName}
+                      />
                     )}
-                    {valueTabInformacoes === "dados" && (
-                      <>
-                        <Box sx={styles.boxAreaDoubleCheckbox}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={checked}
-                                onChange={handleChange}
-                                inputProps={{ "aria-label": "controlled" }}
-                                sx={styles.configCheckbox}
+                    {usuarioPerfil?.autorizacao === "adm001" && (
+                      <FlagOutlinedIcon
+                        sx={{
+                          color: "#F3A913",
+                          fontSize: "16px",
+                        }}
+                      />
+                    )}
+                  </Typography>
+
+                  <Box sx={styles.boxTabs}>
+                    <Tabs
+                      value={valueTabInformacoes}
+                      onChange={handleChangeTabsInformacoes}
+                      variant="scrollable"
+                      scrollButtons
+                      allowScrollButtonsMobile
+                      sx={styles.estiloTabs}
+                    >
+                      <Tab
+                        label="Tags"
+                        value="tags"
+                        sx={{ color: "#ffffff" }}
+                      />
+                      <Tab
+                        label="Dados"
+                        value="dados"
+                        sx={{ color: "#ffffff" }}
+                      />
+                    </Tabs>
+                  </Box>
+                  <Box sx={styles.boxAreaConteudoTabsInformacoes}>
+                    <Box sx={styles.boxAreaConteudoTabsPerfil}>
+                      {valueTabInformacoes === "tags" && (
+                        <>
+                          <Box sx={styles.boxDivisaoLista}>
+                            <Typography sx={styles.textTituloLista}>
+                              <SellOutlined
+                                sx={{ color: "#F3A913", fontSize: "16px" }}
                               />
-                            }
-                            label={
-                              <Typography sx={styles.textCheckboxLabel}>
-                                Membro ativo
-                              </Typography>
-                            }
-                          />
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={checked}
-                                onChange={handleChange}
-                                inputProps={{ "aria-label": "controlled" }}
-                                sx={styles.configCheckbox}
-                              />
-                            }
-                            label={
-                              <Typography sx={styles.textCheckboxLabel}>
-                                Usuário administrador
-                              </Typography>
-                            }
-                          />
-                        </Box>
-                        <Box sx={styles.boxAreaDadosInfo}>
-                          <Box sx={styles.boxDadosInfo}>
-                            <Typography sx={styles.textDadosLabel}>
-                              Nome completo
+                              TAGS DO USUÁRIO
                             </Typography>
-                            <Typography sx={styles.textDadosInfo}>
-                              João Vinícius Soarez
-                            </Typography>
-                          </Box>
-                          <Box sx={styles.boxDadosInfo}>
-                            <Typography sx={styles.textDadosLabel}>
-                              Email
-                            </Typography>
-                            <Typography sx={styles.textDadosInfo}>
-                              joãoexemplo@adpaz-zs.com.br
-                            </Typography>
-                          </Box>
-                          <Box sx={styles.boxDadosInfo}>
-                            <Typography sx={styles.textDadosLabel}>
-                              Data de nascimento
-                            </Typography>
-                            <Typography sx={styles.textDadosInfo}>
-                              12/12/2000
-                            </Typography>
-                            <Box sx={styles.boxAreaBotao}>
-                              <Button
-                                variant="contained"
-                                sx={{
-                                  ...styles.botaoDefaultCancelar,
-                                  height: "25px",
-                                  gap: "6px",
-                                }}
-                                onClick={() => {}}
+                            {(usuarioLogado?.autorizacao === "adm001" ||
+                              usuarioLogado?.autorizacao === "adm002") &&
+                              !(
+                                usuarioPerfil?.autorizacao === "adm001" &&
+                                usuarioLogado?.autorizacao !== "adm001"
+                              ) && (
+                                <IconButton
+                                  onClick={(event) => {
+                                    handleClickMenu(event);
+                                  }}
+                                  sx={styles.configIconButton}
+                                >
+                                  <AddCircleOutline
+                                    sx={{ color: "#F3A913", fontSize: "18px" }}
+                                  />
+                                </IconButton>
+                              )}
+
+                            <Menu
+                              anchorEl={anchorEl}
+                              open={anchorEl !== null}
+                              onClose={() => {
+                                handleCloseMenu();
+                              }}
+                              PaperProps={{
+                                sx: {
+                                  backgroundColor: "#1B1B1B",
+                                  border: "1px solid #F3A913",
+                                  maxHeight: "152px",
+                                  maxWidth: "286px",
+                                },
+                              }}
+                              MenuListProps={{
+                                "aria-labelledby": "basic-button",
+                              }}
+                            >
+                              <MenuList
+                                sx={{ paddingTop: "4px", paddingBottom: "4px" }}
                               >
-                                <PersonRemoveAlt1Outlined
-                                  sx={{ fontSize: "18px" }}
+                                {tagsEquipe.map((tag) => (
+                                  <MenuItem
+                                    key={tag.id}
+                                    sx={{
+                                      color: "#ffffff",
+                                      height: "42px",
+                                    }}
+                                  >
+                                    <FormGroup>
+                                      <FormControlLabel
+                                        control={
+                                          <Checkbox
+                                            checked={usuarioPerfil?.tags?.some(
+                                              (userTag) => userTag.id === tag.id
+                                            )}
+                                            onChange={(event) => {
+                                              if (
+                                                usuarioLogado?.autorizacao ===
+                                                  "adm001" &&
+                                                usuarioPerfil?.autorizacao ===
+                                                  "adm001"
+                                              ) {
+                                                handleChangeCheckTags(
+                                                  event,
+                                                  tag.id,
+                                                  true
+                                                );
+                                              } else {
+                                                handleChangeCheckTags(
+                                                  event,
+                                                  tag.id
+                                                );
+                                              }
+                                            }}
+                                            sx={styles.configCheckboxMenu}
+                                          />
+                                        }
+                                        label={
+                                          <Typography
+                                            variant="body1"
+                                            sx={styles.configBoxTextMenu}
+                                          >
+                                            {tag.nome}
+                                          </Typography>
+                                        }
+                                      />
+                                    </FormGroup>
+                                  </MenuItem>
+                                ))}
+                              </MenuList>
+                            </Menu>
+                            <Divider sx={styles.dividerList} />
+                          </Box>
+                          <Box sx={styles.boxAreaTagsPerfil}>
+                            {usuarioPerfil.tags?.map(({ nome }, index) => (
+                              <Chip
+                                key={index}
+                                label={nome}
+                                variant="outlined"
+                                sx={styles.chipDefault}
+                              />
+                            ))}
+                          </Box>
+                        </>
+                      )}
+                      {valueTabInformacoes === "dados" && (
+                        <>
+                          <Box sx={styles.boxAreaDoubleCheckbox}>
+                            <FormControlLabel
+                              control={
+                                <Checkbox
+                                  disabled={
+                                    !(
+                                      usuarioLogado?.autorizacao === "adm001" ||
+                                      usuarioLogado?.autorizacao === "adm002"
+                                    ) ||
+                                    (usuarioPerfil?.autorizacao === "adm001" &&
+                                      usuarioLogado?.autorizacao !== "adm001")
+                                  }
+                                  checked={usuarioPerfil?.ativo}
+                                  onChange={handleChangeCheckAtivo}
+                                  inputProps={{ "aria-label": "controlled" }}
+                                  sx={styles.configCheckbox}
                                 />
-                                Expulsar membro
-                              </Button>
+                              }
+                              label={
+                                <Typography sx={styles.textCheckboxLabel}>
+                                  Membro ativo
+                                </Typography>
+                              }
+                            />
+                            <FormControlLabel
+                              control={
+                                <Checkbox
+                                  disabled={
+                                    !(
+                                      usuarioLogado?.autorizacao === "adm001" ||
+                                      usuarioLogado?.autorizacao === "adm002"
+                                    ) || usuarioPerfil?.autorizacao === "adm001"
+                                  }
+                                  checked={
+                                    usuarioPerfil?.autorizacao === "adm001" ||
+                                    usuarioPerfil?.autorizacao === "adm002"
+                                  }
+                                  onChange={handleChangeCheckAdministrador}
+                                  inputProps={{ "aria-label": "controlled" }}
+                                  sx={styles.configCheckbox}
+                                />
+                              }
+                              label={
+                                <Typography sx={styles.textCheckboxLabel}>
+                                  Usuário administrador
+                                </Typography>
+                              }
+                            />
+                          </Box>
+                          <Box sx={styles.boxAreaDadosInfo}>
+                            <Box sx={styles.boxDadosInfo}>
+                              <Typography sx={styles.textDadosLabel}>
+                                Nome completo
+                              </Typography>
+                              <Typography sx={styles.textDadosInfo}>
+                                {usuarioPerfil?.nome}
+                              </Typography>
+                            </Box>
+                            <Box sx={styles.boxDadosInfo}>
+                              <Typography sx={styles.textDadosLabel}>
+                                Email
+                              </Typography>
+                              <Typography sx={styles.textDadosInfo}>
+                                {usuarioPerfil?.email}
+                              </Typography>
+                            </Box>
+                            <Box sx={styles.boxDadosInfo}>
+                              <Typography sx={styles.textDadosLabel}>
+                                Data de nascimento
+                              </Typography>
+                              <Typography sx={styles.textDadosInfo}>
+                                {usuarioPerfil?.dataNascimento}
+                              </Typography>
+                              {(usuarioLogado?.autorizacao === "adm001" ||
+                                usuarioLogado?.autorizacao === "adm002") && (
+                                <Box sx={styles.boxAreaBotao}>
+                                  {usuarioPerfil?.autorizacao !== "adm001" && (
+                                    <Button
+                                      variant="contained"
+                                      sx={{
+                                        ...styles.botaoDefaultCancelar,
+                                        height: "25px",
+                                        gap: "6px",
+                                      }}
+                                      onClick={() => {
+                                        setOpenModalExpulsarMembro(true);
+                                      }}
+                                    >
+                                      <PersonRemoveAlt1Outlined
+                                        sx={{ fontSize: "18px" }}
+                                      />
+                                      Expulsar membro
+                                    </Button>
+                                  )}
+                                </Box>
+                              )}
                             </Box>
                           </Box>
-                        </Box>
-                      </>
-                    )}
-                    {/* {valueTabInformacoes === "dados" && (
+                        </>
+                      )}
+                      {/* {valueTabInformacoes === "dados" && (
                       <Box sx={{ ...styles.configBox, height: "100%" }}>
                         <Typography sx={styles.textTitulo}>
                           Nenhum dado
                         </Typography>
                       </Box>
                     )} */}
-                    {/* {valueTabInformacoes === "tags" && (
+                      {/* {valueTabInformacoes === "tags" && (
                     <Box sx={{ ...styles.configBox, height: "100%" }}>
                       <Typography sx={styles.textTitulo}>Sem TAGS</Typography>
                     </Box>
                   )} */}
-                    <Divider sx={styles.divider} />
+                      <Divider sx={styles.divider} />
+                    </Box>
                   </Box>
                 </Box>
               </Box>
             </Box>
           </Box>
-        </Box>
-      </Fade>
-    </Modal>
+        </Fade>
+      </Modal>
+      <Modal
+        open={OpenModalExpulsarMembro}
+        onClose={() => {
+          setOpenModalExpulsarMembro(false);
+        }}
+        closeAfterTransition
+        slots={{ backdrop: Backdrop }}
+        slotProps={{
+          backdrop: {
+            timeout: 500,
+          },
+        }}
+      >
+        <Fade in={OpenModalExpulsarMembro}>
+          <Box sx={styles.boxModalDelete}>
+            <Box sx={styles.boxConteudoModalDelete}>
+              <Box sx={styles.boxAreaTituloModalDelete}>
+                <Box sx={styles.boxTituloModalDelete}>
+                  <Typography sx={styles.tituloModalDelete}>
+                    Expulsar membro
+                  </Typography>
+                  <Box sx={styles.baseTituloModalDelete} />
+                </Box>
+              </Box>
+              <Box sx={styles.boxInputsModal}>
+                <Typography sx={styles.textModal}>
+                  Você realmente deseja{" "}
+                  <span style={{ color: "red" }}>EXPULSAR</span> esse membro da
+                  sua equipe?
+                </Typography>
+                <Typography sx={styles.textModal}>
+                  Ao confirmar, ele será removido de todas as suas escalações e
+                  também perderá o acesso a sua equipe!
+                </Typography>
+              </Box>
+              <Box sx={styles.boxBotaoModalDelete}>
+                <Box sx={styles.boxBotoesModalDelete}>
+                  <Button
+                    sx={{
+                      ...styles.botaoDefaultModal,
+                      background: "#565656",
+                      "&:hover": {
+                        background: "#666666",
+                      },
+                    }}
+                    onClick={() => {
+                      setOpenModalExpulsarMembro(false);
+                    }}
+                  >
+                    Cancelar
+                  </Button>
+
+                  <Button
+                    sx={styles.botaoDefaultModal}
+                    onClick={() => {
+                      handleExpulsarMembroEquipe();
+                    }}
+                  >
+                    Confirmar
+                  </Button>
+                </Box>
+              </Box>
+            </Box>
+          </Box>
+        </Fade>
+      </Modal>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={handleSnackbarClose}
+        style={{
+          bottom: "20px",
+          left: "50%",
+          transform: "translateX(-50%)",
+        }}
+      >
+        <Alert
+          elevation={6}
+          variant="filled"
+          onClose={handleSnackbarClose}
+          severity={snackbarSeverity}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
+    </>
   );
 };
 export default ModalPerfilMembro;

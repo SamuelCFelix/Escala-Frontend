@@ -318,7 +318,7 @@ const EscolherEquipe = () => {
                       <Box sx={{ ...styles.boxRodapeEquipe, mr: "16px" }}>
                         <GroupsOutlinedIcon sx={{ color: "#F3A913" }} />
                         <Typography sx={styles.textoDefault}>
-                          Servindo: {equipe?.UsuarioDefault?.length}
+                          Membros: {equipe?.UsuarioDefault?.length + 1}
                         </Typography>
                       </Box>
                     </Box>
