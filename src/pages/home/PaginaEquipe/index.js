@@ -1420,6 +1420,10 @@ const PaginaEquipe = (params) => {
                 sx={styles.estiloTabs}
               >
                 <Tab
+                  onClick={() => {
+                    handleBuscarMembrosMinhaEquipe();
+                    handleBuscarTagsEquipe();
+                  }}
                   label="Membros"
                   value="membros"
                   sx={{ color: "#ffffff" }}
@@ -1466,7 +1470,7 @@ const PaginaEquipe = (params) => {
                               <Divider sx={styles.dividerList} />
                             </Box>
                             {usuarioHostEquipe?.map(
-                              ({ nome, email }, index) => (
+                              ({ nome, email, tags }, index) => (
                                 <Box key={index} sx={styles.boxCardMembroList}>
                                   <Avatar sx={styles.avatarMembroList}>
                                     <Person />
@@ -1485,6 +1489,16 @@ const PaginaEquipe = (params) => {
                                         variant="outlined"
                                         sx={styles.chipName}
                                       />
+                                      {tags?.length === 0 && (
+                                        <Chip
+                                          label="Nenhuma TAG"
+                                          variant="outlined"
+                                          sx={{
+                                            ...styles.chipName,
+                                            borderColor: "#D32F2F",
+                                          }}
+                                        />
+                                      )}
                                       <FlagOutlinedIcon
                                         sx={{
                                           color: "#F3A913",
@@ -1525,7 +1539,7 @@ const PaginaEquipe = (params) => {
                               )
                             )}
                             {administradoresEquipe?.map(
-                              ({ nome, email }, index) => (
+                              ({ nome, email, tags }, index) => (
                                 <Box key={index} sx={styles.boxCardMembroList}>
                                   <Avatar sx={styles.avatarMembroList}>
                                     <Person />
@@ -1544,6 +1558,16 @@ const PaginaEquipe = (params) => {
                                         variant="outlined"
                                         sx={styles.chipName}
                                       />
+                                      {tags?.length === 0 && (
+                                        <Chip
+                                          label="Nenhuma TAG"
+                                          variant="outlined"
+                                          sx={{
+                                            ...styles.chipName,
+                                            borderColor: "#D32F2F",
+                                          }}
+                                        />
+                                      )}
                                     </Box>
                                     <Typography
                                       sx={{
@@ -1589,7 +1613,7 @@ const PaginaEquipe = (params) => {
                               <Divider sx={styles.dividerList} />
                             </Box>
                             {membrosMinhaEquipe?.map(
-                              ({ nome, email }, index) => (
+                              ({ nome, email, tags }, index) => (
                                 <Box key={index} sx={styles.boxCardMembroList}>
                                   <Avatar sx={styles.avatarMembroList}>
                                     <Person />
@@ -1603,6 +1627,16 @@ const PaginaEquipe = (params) => {
                                       >
                                         {nome}
                                       </Typography>
+                                      {tags?.length === 0 && (
+                                        <Chip
+                                          label="Nenhuma TAG"
+                                          variant="outlined"
+                                          sx={{
+                                            ...styles.chipName,
+                                            borderColor: "#D32F2F",
+                                          }}
+                                        />
+                                      )}
                                     </Box>
                                     <Typography
                                       sx={{
@@ -1695,7 +1729,6 @@ const PaginaEquipe = (params) => {
       <ModalPerfilMembro
         usuarioLogado={usuario}
         usuarioPerfil={usuarioPerfil}
-        setUsuarioPerfil={setUsuarioPerfil}
         openModalPerfilMembro={openModalPerfilMembro}
         setOpenModalPerfilMembro={setOpenModalPerfilMembro}
         tagsEquipe={tagsEquipe}

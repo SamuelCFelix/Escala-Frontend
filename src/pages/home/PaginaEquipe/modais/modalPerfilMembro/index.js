@@ -465,7 +465,6 @@ const ModalPerfilMembro = (params) => {
   const {
     usuarioLogado,
     usuarioPerfil,
-    setUsuarioPerfil,
     openModalPerfilMembro,
     setOpenModalPerfilMembro,
     tagsEquipe,
@@ -477,7 +476,9 @@ const ModalPerfilMembro = (params) => {
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [valueTabInformacoes, setValueTabInformacoes] = useState("tags");
   const [anchorEl, setAnchorEl] = useState(null);
-  const [OpenModalExpulsarMembro, setOpenModalExpulsarMembro] = useState(false);
+  const [openModalExpulsarMembro, setOpenModalExpulsarMembro] = useState(false);
+  const [openModalDesativarMembro, setOpenModalDesativarMembro] =
+    useState(false);
 
   //API
 
@@ -548,6 +549,7 @@ const ModalPerfilMembro = (params) => {
           usuarioId: usuarioPerfil?.usuarioDefaultId,
           acao: "desativar",
         });
+        setOpenModalDesativarMembro(false);
       }
 
       if (response?.status === 200) {
@@ -640,7 +642,11 @@ const ModalPerfilMembro = (params) => {
   };
 
   const handleChangeCheckAtivo = (event) => {
-    handleStatusAtivoMembroEquipe(event.target.checked);
+    if (event.target.checked) {
+      handleStatusAtivoMembroEquipe(event.target.checked);
+    } else {
+      setOpenModalDesativarMembro(true);
+    }
   };
 
   const handleChangeCheckAdministrador = (event) => {
@@ -794,7 +800,7 @@ const ModalPerfilMembro = (params) => {
                               <MenuList
                                 sx={{ paddingTop: "4px", paddingBottom: "4px" }}
                               >
-                                {tagsEquipe.map((tag) => (
+                                {tagsEquipe?.map((tag) => (
                                   <MenuItem
                                     key={tag.id}
                                     sx={{
@@ -848,7 +854,7 @@ const ModalPerfilMembro = (params) => {
                             <Divider sx={styles.dividerList} />
                           </Box>
                           <Box sx={styles.boxAreaTagsPerfil}>
-                            {usuarioPerfil.tags?.map(({ nome }, index) => (
+                            {usuarioPerfil?.tags?.map(({ nome }, index) => (
                               <Chip
                                 key={index}
                                 label={nome}
@@ -856,6 +862,13 @@ const ModalPerfilMembro = (params) => {
                                 sx={styles.chipDefault}
                               />
                             ))}
+                            {usuarioPerfil?.tags?.length === 0 && (
+                              <Box sx={{ ...styles.configBox, height: "100%" }}>
+                                <Typography sx={styles.textTitulo}>
+                                  Nenhuma TAG
+                                </Typography>
+                              </Box>
+                            )}
                           </Box>
                         </>
                       )}
@@ -983,7 +996,7 @@ const ModalPerfilMembro = (params) => {
         </Fade>
       </Modal>
       <Modal
-        open={OpenModalExpulsarMembro}
+        open={openModalExpulsarMembro}
         onClose={() => {
           setOpenModalExpulsarMembro(false);
         }}
@@ -995,7 +1008,7 @@ const ModalPerfilMembro = (params) => {
           },
         }}
       >
-        <Fade in={OpenModalExpulsarMembro}>
+        <Fade in={openModalExpulsarMembro}>
           <Box sx={styles.boxModalDelete}>
             <Box sx={styles.boxConteudoModalDelete}>
               <Box sx={styles.boxAreaTituloModalDelete}>
@@ -1038,6 +1051,71 @@ const ModalPerfilMembro = (params) => {
                     sx={styles.botaoDefaultModal}
                     onClick={() => {
                       handleExpulsarMembroEquipe();
+                    }}
+                  >
+                    Confirmar
+                  </Button>
+                </Box>
+              </Box>
+            </Box>
+          </Box>
+        </Fade>
+      </Modal>
+      <Modal
+        open={openModalDesativarMembro}
+        onClose={() => {
+          setOpenModalDesativarMembro(false);
+        }}
+        closeAfterTransition
+        slots={{ backdrop: Backdrop }}
+        slotProps={{
+          backdrop: {
+            timeout: 500,
+          },
+        }}
+      >
+        <Fade in={openModalDesativarMembro}>
+          <Box sx={styles.boxModalDelete}>
+            <Box sx={styles.boxConteudoModalDelete}>
+              <Box sx={styles.boxAreaTituloModalDelete}>
+                <Box sx={styles.boxTituloModalDelete}>
+                  <Typography sx={styles.tituloModalDelete}>
+                    Desativar membro
+                  </Typography>
+                  <Box sx={styles.baseTituloModalDelete} />
+                </Box>
+              </Box>
+              <Box sx={styles.boxInputsModal}>
+                <Typography sx={styles.textModal}>
+                  Você realmente deseja desativar esse membro da sua equipe?
+                </Typography>
+                <Typography sx={styles.textModal}>
+                  Ao confirmar, ele será removido de todas as suas escalações,
+                  não será inserido na criação de escalas futuras e não poderá
+                  mais se candidatar
+                </Typography>
+              </Box>
+              <Box sx={styles.boxBotaoModalDelete}>
+                <Box sx={styles.boxBotoesModalDelete}>
+                  <Button
+                    sx={{
+                      ...styles.botaoDefaultModal,
+                      background: "#565656",
+                      "&:hover": {
+                        background: "#666666",
+                      },
+                    }}
+                    onClick={() => {
+                      setOpenModalDesativarMembro(false);
+                    }}
+                  >
+                    Cancelar
+                  </Button>
+
+                  <Button
+                    sx={styles.botaoDefaultModal}
+                    onClick={() => {
+                      handleStatusAtivoMembroEquipe(false);
                     }}
                   >
                     Confirmar

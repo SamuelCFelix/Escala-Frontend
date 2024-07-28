@@ -17,20 +17,23 @@ import {
   Star,
 } from "@mui/icons-material";
 import {
+  Alert,
   Avatar,
   Box,
   Button,
   Chip,
+  CircularProgress,
   Divider,
   IconButton,
   Pagination,
+  Snackbar,
   Stack,
   Tab,
   Tabs,
   Typography,
   tabsClasses,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ModalEscalarMembro from "./modais/modalEscalarMembro";
 import ModalCriarAviso from "./modais/modalCriarAviso";
 import AvisoDefault from "./cardsAvisos/avisoDefault";
@@ -44,6 +47,7 @@ import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
 import ModalCriarEvento from "./modais/modalCriarEvento";
 import CardEvento from "./cardEvento";
 import AddchartOutlinedIcon from "@mui/icons-material/AddchartOutlined";
+import api from "../../../api";
 
 const styles = {
   configBox: {
@@ -595,11 +599,29 @@ const styles = {
     height: "32px",
     minHeight: "32px",
   },
+  boxAreaCircularProgress: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+    height: "100%",
+  },
 };
 
 const PaginaGeral = (params) => {
   const { usuario } = params;
-  const [userLogin, setUserLogin] = useState(true); // Simula se o usuário logado está na escala
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarSeverity, setSnackbarSeverity] = useState("");
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+
+  const [editarEscala, setEditarEscala] = useState(false);
+  const [openModalEscalarMembro, setOpenModalEscalarMembro] = useState(false);
+  const [openModalCriarAviso, setOpenModalCriarAviso] = useState(false);
+  const [openModalCriarEvento, setOpenModalCriarEvento] = useState(false);
+  const [valueTabInformacoes, setValueTabInformacoes] = useState("escalado");
+  const [loadingTabelaInformacoesTags, setLoadingTabelaInformacoesTags] =
+    useState(false);
+  const [tagsUsuario, setTagsUsuario] = useState([]);
 
   const [proximaEscala, setProximaEscala] = useState([
     {
@@ -621,11 +643,57 @@ const PaginaGeral = (params) => {
     { membro: "Renata Xavier Silva", tag: "Gimball 1", possuiTag: true },
     { membro: "Samuel Silva Xavier", tag: "Gimball 2", possuiTag: true },
   ]);
-  const [editarEscala, setEditarEscala] = useState(false);
-  const [openModalEscalarMembro, setOpenModalEscalarMembro] = useState(false);
-  const [openModalCriarAviso, setOpenModalCriarAviso] = useState(false);
-  const [openModalCriarEvento, setOpenModalCriarEvento] = useState(false);
-  const [valueTabInformacoes, setValueTabInformacoes] = useState("escalado");
+
+  //UseEffect's
+
+  useEffect(() => {}, []);
+
+  //API's
+
+  //Tabela Informações
+
+  const handleBuscarTagsMembroEquipe = async () => {
+    try {
+      let response = null;
+      setLoadingTabelaInformacoesTags(true);
+
+      if (usuario?.usuarioHostId) {
+        response = await api.post("/buscarTagsMembroEquipe", {
+          usuarioId: usuario?.usuarioHostId,
+          host: true,
+        });
+      } else {
+        response = await api.post("/buscarTagsMembroEquipe", {
+          usuarioId: usuario?.usuarioDefaultId,
+        });
+      }
+
+      if (response?.status === 200) {
+        console.log(response?.data);
+        setTagsUsuario(response?.data);
+        setLoadingTabelaInformacoesTags(false);
+      } else {
+        setSnackbar("error", "Erro ao conectar com o servidor");
+        console.error("erro ao executar ação", response?.status);
+      }
+    } catch (error) {
+      setSnackbar("error", "Erro ao conectar com o servidor");
+      console.error("erro ao buscar tags do usuário: ", error);
+    }
+  };
+
+  const setSnackbar = (severity, message) => {
+    setSnackbarSeverity(severity);
+    setSnackbarMessage(message);
+    setSnackbarOpen(true);
+  };
+
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbarOpen(false);
+  };
 
   const boxTituloCards = (titulo) => {
     return (
@@ -923,7 +991,14 @@ const PaginaGeral = (params) => {
                   value="escalado"
                   sx={{ color: "#ffffff" }}
                 />
-                <Tab label="Tags" value="tags" sx={{ color: "#ffffff" }} />
+                <Tab
+                  onClick={() => {
+                    handleBuscarTagsMembroEquipe();
+                  }}
+                  label="Tags"
+                  value="tags"
+                  sx={{ color: "#ffffff" }}
+                />
               </Tabs>
             </Box>
             <Box sx={styles.boxAreaConteudoTabsInformacoes}>
@@ -965,16 +1040,6 @@ const PaginaGeral = (params) => {
                       </Typography>
                     </Box>
                   </Box>
-                ))}
-
-              {valueTabInformacoes === "tags" &&
-                proximaEscala.map(({ tag }, index) => (
-                  <Chip
-                    key={index}
-                    label={tag}
-                    variant="outlined"
-                    sx={styles.chipDefault}
-                  />
                 ))} */}
 
               {valueTabInformacoes === "escalado" && (
@@ -982,10 +1047,34 @@ const PaginaGeral = (params) => {
                   <Typography sx={styles.textTitulo}>Nenhuma escala</Typography>
                 </Box>
               )}
+
               {valueTabInformacoes === "tags" && (
-                <Box sx={{ ...styles.configBox, height: "100%" }}>
-                  <Typography sx={styles.textTitulo}>Sem TAGS</Typography>
-                </Box>
+                <>
+                  {loadingTabelaInformacoesTags && (
+                    <Box sx={styles.boxAreaCircularProgress}>
+                      <CircularProgress />
+                    </Box>
+                  )}
+                  {!loadingTabelaInformacoesTags && (
+                    <>
+                      {tagsUsuario?.map(({ nome }, index) => (
+                        <Chip
+                          key={index}
+                          label={nome}
+                          variant="outlined"
+                          sx={styles.chipDefault}
+                        />
+                      ))}
+                      {tagsUsuario?.length === 0 && (
+                        <Box sx={{ ...styles.configBox, height: "100%" }}>
+                          <Typography sx={styles.textTitulo}>
+                            Nenhuma TAG
+                          </Typography>
+                        </Box>
+                      )}
+                    </>
+                  )}
+                </>
               )}
             </Box>
           </Box>
@@ -1018,6 +1107,26 @@ const PaginaGeral = (params) => {
         openModalCriarEvento={openModalCriarEvento}
         setOpenModalCriarEvento={setOpenModalCriarEvento}
       />
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={handleSnackbarClose}
+        style={{
+          bottom: "20px",
+          left: "50%",
+          transform: "translateX(-50%)",
+        }}
+      >
+        <Alert
+          elevation={6}
+          variant="filled"
+          onClose={handleSnackbarClose}
+          severity={snackbarSeverity}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

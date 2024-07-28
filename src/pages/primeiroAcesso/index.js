@@ -16,6 +16,7 @@ import {
 import { motion } from "framer-motion";
 import "../../../src/style.css";
 import imagemLider from "../../img/zs-lider.JPG";
+import imagemPastor from "../../img/zs-pastor.jpg";
 import imagemServo from "../../img/zs-servo.JPG";
 import { Fragment, useEffect, useState } from "react";
 import api from "../../api";
@@ -396,7 +397,7 @@ const PrimerioAcesso = () => {
               <Button
                 sx={{
                   ...styles.boxButton,
-                  backgroundImage: `url(${imagemLider})`,
+                  backgroundImage: `url(${imagemPastor})`,
                   border: selectLider
                     ? "4px solid #F3A913"
                     : "4px solid #ffffff",
@@ -418,7 +419,7 @@ const PrimerioAcesso = () => {
                       perfil de liderança:
                       <br />
                       <br /> criará uma equipe e será responsável por
-                      administrar as escalas e servos que fazem parte dela
+                      administrar as escalas e membros que fazem parte dela
                     </Typography>
                   </Box>
                 </motion.div>
@@ -470,8 +471,8 @@ const PrimerioAcesso = () => {
                 onClick={handleSelectServo}
               >
                 <Box sx={styles.boxTituloCards}>
-                  <Typography sx={styles.tituloCards}>Servo</Typography>
-                  <Box sx={styles.baseTituloCards} />
+                  <Typography sx={styles.tituloCards}>Membro</Typography>
+                  <Box sx={{ ...styles.baseTituloCards, width: "100%" }} />
                 </Box>
                 <motion.div
                   className="motionDiv"
@@ -481,7 +482,7 @@ const PrimerioAcesso = () => {
                 >
                   <Box sx={styles.conteudoCards}>
                     <Typography sx={styles.descricaoCards}>
-                      perfil de servo:
+                      perfil de membro:
                       <br />
                       <br />
                       entrará em uma equipe e será responsável por informar sua
