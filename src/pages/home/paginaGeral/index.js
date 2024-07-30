@@ -48,6 +48,7 @@ import ModalCriarEvento from "./modais/modalCriarEvento";
 import CardEvento from "./cardEvento";
 import AddchartOutlinedIcon from "@mui/icons-material/AddchartOutlined";
 import api from "../../../api";
+import ModalDisponibilidade from "./modais/modalDisponibilidade";
 
 const styles = {
   configBox: {
@@ -622,6 +623,8 @@ const PaginaGeral = (params) => {
   const [loadingTabelaInformacoesTags, setLoadingTabelaInformacoesTags] =
     useState(false);
   const [tagsUsuario, setTagsUsuario] = useState([]);
+  const [openModalDisponibilidade, setOpenModalDisponibilidade] =
+    useState(false);
 
   const [proximaEscala, setProximaEscala] = useState([
     {
@@ -1084,7 +1087,9 @@ const PaginaGeral = (params) => {
           <Button
             variant="contained"
             sx={{ ...styles.botaoDefault, mb: "8px", gap: "4px" }}
-            onClick={() => {}}
+            onClick={() => {
+              setOpenModalDisponibilidade(true);
+            }}
           >
             <Box sx={styles.boxDoubleIconeBotaoEvento}>
               <AddchartOutlinedIcon sx={{ fontSize: "18px" }} />
@@ -1106,6 +1111,11 @@ const PaginaGeral = (params) => {
       <ModalCriarEvento
         openModalCriarEvento={openModalCriarEvento}
         setOpenModalCriarEvento={setOpenModalCriarEvento}
+      />
+      <ModalDisponibilidade
+        usuarioLogado={usuario}
+        openModalDisponibilidade={openModalDisponibilidade}
+        setOpenModalDisponibilidade={setOpenModalDisponibilidade}
       />
 
       <Snackbar

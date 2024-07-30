@@ -1,5 +1,6 @@
 import { Box, Button, Snackbar, TextField, Typography } from "@mui/material";
 import BackgroundImage from "../../img/fotoProducaoSamuel.jpeg";
+import BackgroundImage2 from "../../img/zs-samuel.jpg";
 import { forwardRef, useState } from "react";
 import LogoRodape from "../../img/logoZS.png";
 import { Link, useNavigate } from "react-router-dom";
@@ -30,7 +31,8 @@ const styles = {
     minWidth: 340,
     minHeight: 390,
     marginLeft: "auto",
-    marginRight: "150px",
+    /* marginRight: "150px", */
+    marginRight: "50px",
     background: "rgba(2, 2, 2, 0.7)",
     boxShadow: `
                 0px 4px 4px 0px rgba(0, 0, 0, 0.25),

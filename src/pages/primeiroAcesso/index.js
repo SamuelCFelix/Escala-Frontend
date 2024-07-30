@@ -17,7 +17,8 @@ import { motion } from "framer-motion";
 import "../../../src/style.css";
 import imagemLider from "../../img/zs-lider.JPG";
 import imagemPastor from "../../img/zs-pastor.jpg";
-import imagemServo from "../../img/zs-servo.JPG";
+import imagemServo from "../../img/zs-vini.png";
+import imagemServo2 from "../../img/zs-servo.JPG";
 import { Fragment, useEffect, useState } from "react";
 import api from "../../api";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
@@ -464,6 +465,8 @@ const PrimerioAcesso = () => {
                 sx={{
                   ...styles.boxButton,
                   backgroundImage: `url(${imagemServo})`,
+                  backgroundSize: "200%",
+                  backgroundPosition: "center 74%",
                   border: selectServo
                     ? "4px solid #F3A913"
                     : "4px solid #ffffff",
