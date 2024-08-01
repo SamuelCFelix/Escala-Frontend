@@ -344,6 +344,102 @@ const styles = {
     width: "100%",
     height: "100%",
   },
+  boxModalAviso: {
+    backgroundColor: "#1B1B1B",
+    border: "1px solid #F3A913",
+    borderRadius: "10px",
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: "400px",
+    height: "auto",
+    paddingBottom: "4px",
+    boxShadow: 24,
+  },
+  boxConteudoModalAviso: {
+    width: "100%",
+    height: "100%",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: "10px",
+  },
+  boxAreaTituloModalAviso: {
+    width: "100%",
+    height: "50px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  boxTituloModalAviso: {
+    width: "auto",
+    height: "100%",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  tituloModalAviso: {
+    color: "#ffffff",
+    textTransform: "uppercase",
+    fontSize: "14px",
+    lineHeight: "16px",
+    letterSpacing: "1.25px",
+    margin: "6% 0%",
+  },
+  baseTituloModalAviso: {
+    background: "#F3A913",
+    width: "130%",
+    height: "2.5%",
+  },
+  boxInputsModalAviso: {
+    width: "90%",
+    height: "auto",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  boxBotaoModalAviso: {
+    width: "100%",
+    height: "20%",
+    display: "flex",
+    alignItems: "end",
+    justifyContent: "end",
+    mb: "8px",
+  },
+  boxBotoesModalAviso: {
+    width: "210px",
+    height: "100%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    mr: "10px",
+  },
+  botaoDefaultModal: {
+    width: "100px",
+    height: "25px",
+    padding: "0px 40px",
+    borderRadius: "5px",
+    fontFamily: "Roboto, sans-serif",
+    fontSize: "12px",
+    lineHeight: "36px",
+    letterSpacing: "1.25px",
+    color: "#ffffff",
+    background: "#F3A913",
+    "&:hover": {
+      background: "#FEBC36",
+    },
+  },
+  textModal: {
+    color: "#ffffff",
+    fontSize: "15px",
+    lineHeight: "24px",
+    letterSpacing: "0.17px",
+    textAlign: "center",
+  },
 };
 
 const ModalDisponibilidade = (params) => {
@@ -363,6 +459,10 @@ const ModalDisponibilidade = (params) => {
   const [anchorEls, setAnchorEls] = useState({});
   const [loadingModal, setLoadingModal] = useState(false);
   const [loadingModalSave, setLoadingModalSave] = useState(false);
+  const [
+    openModalConfirmarDisponibilidade,
+    setOpenModalConfirmarDisponibilidade,
+  ] = useState(false);
 
   //UseEffect's
 
@@ -383,7 +483,20 @@ const ModalDisponibilidade = (params) => {
 
       if (response?.status === 200) {
         setProgramacoes(response?.data);
-        configIniciaisModal(response?.data);
+
+        let disponibilidadeSalva = await handleBuscarDisponibilidadeMembro();
+
+        if (disponibilidadeSalva) {
+          const disponibilidadeObject = JSON.parse(
+            disponibilidadeSalva.disponibilidade
+          );
+          configDisponibilidadeMembroModal(
+            response?.data,
+            disponibilidadeObject
+          );
+        } else {
+          configIniciaisModal(response?.data);
+        }
       } else {
         setSnackbar("error", "Erro ao conectar com o servidor");
         console.error("erro ao executar ação", response?.status);
@@ -394,8 +507,38 @@ const ModalDisponibilidade = (params) => {
     }
   };
 
+  const handleBuscarDisponibilidadeMembro = async () => {
+    try {
+      let response = null;
+
+      if (usuarioLogado?.usuarioHostId) {
+        response = await api.post("/buscarDisponibilidadeMembro", {
+          usuarioId: usuarioLogado?.usuarioHostId,
+          host: true,
+        });
+      } else {
+        response = await api.post("/buscarDisponibilidadeMembro", {
+          usuarioId: usuarioLogado?.usuarioDefaultId,
+        });
+      }
+
+      if (response?.status === 200) {
+        return response?.data;
+      } else {
+        return null;
+      }
+    } catch (error) {
+      setSnackbar("error", "Erro ao conectar com o servidor");
+      console.error(
+        "erro ao buscar disponibilidade salva de membro da equipe: ",
+        error
+      );
+    }
+  };
+
   const handleSalvarDisponibilidade = async () => {
     try {
+      setOpenModalConfirmarDisponibilidade(false);
       setLoadingModalSave(true);
 
       const disponibilidade = programacoes?.map(({ id, culto }) => {
@@ -450,6 +593,62 @@ const ModalDisponibilidade = (params) => {
     }
   };
 
+  const configDisponibilidadeMembroModal = async (
+    programacoes,
+    disponibilidadeObject
+  ) => {
+    // Inicializa o estado checkedDisponibilidade com os ids das programações e suas disponibilidades salvas
+    const initialCheckedDisponibilidade = programacoes?.reduce(
+      (acc, programacao) => {
+        const disponibilidadeEncontrada = disponibilidadeObject.find(
+          (dispo) => dispo.programacaoId === programacao.id
+        );
+        acc[programacao.id] = disponibilidadeEncontrada
+          ? disponibilidadeEncontrada.disponibilidade
+          : false;
+        return acc;
+      },
+      {}
+    );
+
+    setCheckedDisponibilidade(initialCheckedDisponibilidade);
+
+    // Inicializa o estado checkedDatasIndisponibilidade com as datas como posição do array e suas indisponibilidades salvas
+    const initialCheckedIndisponibilidade = programacoes?.reduce(
+      (acc, programacao) => {
+        const disponibilidadeEncontrada = disponibilidadeObject.find(
+          (dispo) => dispo.programacaoId === programacao.id
+        );
+
+        programacao.datasMesSeguinte.forEach((data) => {
+          const indisponibilidadeEncontrada = disponibilidadeEncontrada
+            ? disponibilidadeEncontrada.indisponibilidade.find(
+                (indispo) => indispo.data === data.data
+              )
+            : false;
+          acc[data.dataId] = indisponibilidadeEncontrada
+            ? {
+                programacaoId: programacao.id,
+                value: true,
+                dataIndisponibilidade: data.data,
+              }
+            : {
+                programacaoId: programacao.id,
+                value: false,
+                dataIndisponibilidade: data.data,
+              };
+        });
+
+        return acc;
+      },
+      {}
+    );
+
+    setCheckedDatasIndisponibilidade(initialCheckedIndisponibilidade);
+
+    setLoadingModal(false);
+  };
+
   const configIniciaisModal = async (programacoes) => {
     // Inicializa o estado checkedDisponibilidade com os ids das programações
     const initialCheckedDisponibilidade = programacoes?.reduce(
@@ -499,6 +698,7 @@ const ModalDisponibilidade = (params) => {
   };
 
   function handleCloseModal() {
+    setOpenModalConfirmarDisponibilidade(false);
     setOpenModalDisponibilidade(false);
   }
 
@@ -663,7 +863,14 @@ const ModalDisponibilidade = (params) => {
                                 />
                               }
                               label={
-                                <Typography sx={styles.textCheckboxLabel}>
+                                <Typography
+                                  sx={{
+                                    ...styles.textCheckboxLabel,
+                                    color: checkedDisponibilidade[id]
+                                      ? "#4CAF50"
+                                      : "#ffffff",
+                                  }}
+                                >
                                   Disponível
                                 </Typography>
                               }
@@ -704,13 +911,19 @@ const ModalDisponibilidade = (params) => {
                                 />
                                 Indisponibilidade
                                 <IconButton
+                                  disabled={!checkedDisponibilidade[id]}
                                   onClick={(event) =>
                                     handleClickMenu(event, id)
                                   }
                                   sx={styles.configIconButton}
                                 >
                                   <AddCircleOutline
-                                    sx={styles.botaoAddIndisponibilidade}
+                                    sx={{
+                                      ...styles.botaoAddIndisponibilidade,
+                                      color: checkedDisponibilidade[id]
+                                        ? "#F3A913"
+                                        : "rgba(243, 169, 19, 0.4)",
+                                    }}
                                   />
                                 </IconButton>
                                 <Menu
@@ -843,7 +1056,7 @@ const ModalDisponibilidade = (params) => {
                       <Button
                         disabled={loadingModalSave}
                         onClick={() => {
-                          handleSalvarDisponibilidade();
+                          setOpenModalConfirmarDisponibilidade(true);
                         }}
                         variant="contained"
                         sx={{ ...styles.botaoDefault, mb: "8px" }}
@@ -866,6 +1079,77 @@ const ModalDisponibilidade = (params) => {
                       </Button>
                     </>
                   )}
+                </Box>
+              </Box>
+            </Box>
+          </Box>
+        </Fade>
+      </Modal>
+      <Modal
+        open={openModalConfirmarDisponibilidade}
+        onClose={() => {
+          setOpenModalConfirmarDisponibilidade(false);
+        }}
+        closeAfterTransition
+        slots={{ backdrop: Backdrop }}
+        slotProps={{
+          backdrop: {
+            timeout: 500,
+          },
+        }}
+      >
+        <Fade in={openModalConfirmarDisponibilidade}>
+          <Box sx={styles.boxModalAviso}>
+            <Box sx={styles.boxConteudoModalAviso}>
+              <Box sx={styles.boxAreaTituloModalAviso}>
+                <Box sx={styles.boxTituloModalAviso}>
+                  <Typography sx={styles.tituloModalAviso}>
+                    Confirmar disponibilidade
+                  </Typography>
+                  <Box sx={styles.baseTituloModalAviso} />
+                </Box>
+              </Box>
+              <Box sx={styles.boxInputsModalAviso}>
+                <Typography sx={styles.textModal}>
+                  <span style={{ color: "#F3A913" }}>ATENÇÃO!</span>
+                </Typography>
+                <Typography sx={styles.textModal}>
+                  As escalas são geradas automaticamente
+                </Typography>
+                <Typography sx={styles.textModal}>
+                  às <span style={{ color: "#F3A913" }}>00:00</span> do dia{" "}
+                  <span style={{ color: "#F3A913" }}>1º</span> de cada{" "}
+                  <span style={{ color: "#F3A913" }}>mês</span>.
+                </Typography>
+                <Typography sx={styles.textModal}>
+                  As informações de disponibilidade serão mantidas para os meses
+                  seguintes. Caso precise adicionar ou retirar alguma
+                  disponibilidade, ou{" "}
+                  <span style={{ color: "#D32F2F" }}>
+                    informar alguma indisponibilidade
+                  </span>
+                  , faça isso antes que as escalas sejam geradas novamente.
+                </Typography>
+              </Box>
+              <Box sx={styles.boxBotaoModalAviso}>
+                <Box sx={styles.boxBotoesModalAviso}>
+                  <Button
+                    sx={styles.botaoDefaultModal}
+                    onClick={() => {
+                      setOpenModalConfirmarDisponibilidade(false);
+                    }}
+                  >
+                    Cancelar
+                  </Button>
+
+                  <Button
+                    sx={styles.botaoDefaultModal}
+                    onClick={() => {
+                      handleSalvarDisponibilidade();
+                    }}
+                  >
+                    Confirmar
+                  </Button>
                 </Box>
               </Box>
             </Box>
