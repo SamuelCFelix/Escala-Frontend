@@ -7,6 +7,7 @@ import {
   Button,
   Checkbox,
   Chip,
+  CircularProgress,
   Divider,
   Fade,
   FormControlLabel,
@@ -100,6 +101,10 @@ const styles = {
     background: "#F3A913",
     "&:hover": {
       background: "#FEBC36",
+    },
+    "&.MuiButtonBase-root.MuiButton-root.Mui-disabled": {
+      color: "#ffffffc5",
+      background: "rgba(243, 169, 19, 0.5)",
     },
   },
   boxAreaConteudoModal: {
@@ -332,6 +337,13 @@ const styles = {
     whiteSpace: "nowrap",
     fontSize: "14px",
   },
+  boxAreaCircularProgress: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+    height: "100%",
+  },
 };
 
 const ModalDisponibilidade = (params) => {
@@ -349,14 +361,8 @@ const ModalDisponibilidade = (params) => {
   const [checkedDatasIndisponibilidade, setCheckedDatasIndisponibilidade] =
     useState({});
   const [anchorEls, setAnchorEls] = useState({});
-
-  const disponibilidade = [
-    {
-      programacaoId: "12312312-2f12f1-f12-f12-12f-f12f12-f12",
-      disponibilidade: true,
-      indisponibilidade: [{ data: "2024-02-08" }, { data: "2024-02-16" }],
-    },
-  ];
+  const [loadingModal, setLoadingModal] = useState(false);
+  const [loadingModalSave, setLoadingModalSave] = useState(false);
 
   //UseEffect's
 
@@ -368,39 +374,16 @@ const ModalDisponibilidade = (params) => {
 
   //API's
 
-  const handleBuscarProgramacoesEquipe = async (acao) => {
+  const handleBuscarProgramacoesEquipe = async () => {
     try {
+      setLoadingModal(true);
       const response = await api.post("/buscarProgramacoesEquipe", {
         equipeId: usuarioLogado?.equipeId,
       });
 
       if (response?.status === 200) {
-        const programacoes = response?.data;
-        setProgramacoes(programacoes);
-
-        // Inicializa o estado checkedDisponibilidade com os ids das programações
-        const initialCheckedDisponibilidade = programacoes?.reduce(
-          (acc, programacao) => {
-            acc[programacao.id] = false; // Inicializa todos os checkboxes como desmarcados
-            return acc;
-          },
-          {}
-        );
-
-        setCheckedDisponibilidade(initialCheckedDisponibilidade);
-
-        // Inicializa o estado checkedDatasIndisponibilidade com as datas como posição do array
-        const initialCheckedIndisponibilidade = programacoes?.reduce(
-          (acc, programacao) => {
-            programacao.datasMesSeguinte.forEach((data) => {
-              acc[data.dataId] = false; // Inicializa todos os checkboxes como desmarcados
-            });
-            return acc;
-          },
-          {}
-        );
-
-        setCheckedDatasIndisponibilidade(initialCheckedIndisponibilidade);
+        setProgramacoes(response?.data);
+        configIniciaisModal(response?.data);
       } else {
         setSnackbar("error", "Erro ao conectar com o servidor");
         console.error("erro ao executar ação", response?.status);
@@ -409,6 +392,90 @@ const ModalDisponibilidade = (params) => {
       setSnackbar("error", "Erro ao conectar com o servidor");
       console.error("erro ao buscar programações da equipe: ", error);
     }
+  };
+
+  const handleSalvarDisponibilidade = async () => {
+    try {
+      setLoadingModalSave(true);
+
+      const disponibilidade = programacoes?.map(({ id, culto }) => {
+        return {
+          culto,
+          programacaoId: id,
+          disponibilidade: checkedDisponibilidade[id],
+          indisponibilidade: Object?.entries(checkedDatasIndisponibilidade)
+            ?.filter(
+              ([key, value]) =>
+                value.programacaoId === id &&
+                value.value &&
+                value.dataIndisponibilidade
+            )
+            ?.map(([key, value]) => {
+              return {
+                data: value.dataIndisponibilidade,
+              };
+            }),
+        };
+      });
+      let response = null;
+
+      if (usuarioLogado?.usuarioHostId) {
+        response = await api.put("/salvarDisponibilidadeMembro", {
+          usuarioId: usuarioLogado?.usuarioHostId,
+          disponibilidade: JSON.stringify(disponibilidade),
+          host: true,
+        });
+      } else {
+        response = await api.put("/salvarDisponibilidadeMembro", {
+          usuarioId: usuarioLogado?.usuarioDefaultId,
+          disponibilidade: JSON.stringify(disponibilidade),
+        });
+      }
+
+      if (response?.status === 200) {
+        handleCloseModal();
+        setSnackbar("success", "Disponibilidade salva com sucesso");
+      } else {
+        setSnackbar("error", "Erro ao conectar com o servidor");
+        console.error("erro ao executar ação", response?.status);
+      }
+    } catch (error) {
+      setSnackbar("error", "Erro ao conectar com o servidor");
+      console.error(
+        "erro ao salvar disponibilidade de membro da equipe: ",
+        error
+      );
+    } finally {
+      setLoadingModalSave(false);
+    }
+  };
+
+  const configIniciaisModal = async (programacoes) => {
+    // Inicializa o estado checkedDisponibilidade com os ids das programações
+    const initialCheckedDisponibilidade = programacoes?.reduce(
+      (acc, programacao) => {
+        acc[programacao.id] = false; // Inicializa todos os checkboxes como desmarcados
+        return acc;
+      },
+      {}
+    );
+
+    setCheckedDisponibilidade(initialCheckedDisponibilidade);
+
+    // Inicializa o estado checkedDatasIndisponibilidade com as datas como posição do array
+    const initialCheckedIndisponibilidade = programacoes?.reduce(
+      (acc, programacao) => {
+        programacao.datasMesSeguinte.forEach((data) => {
+          acc[data.dataId] = false; // Inicializa todos os checkboxes como desmarcados
+        });
+        return acc;
+      },
+      {}
+    );
+
+    setCheckedDatasIndisponibilidade(initialCheckedIndisponibilidade);
+
+    setLoadingModal(false);
   };
 
   const getNextMonth = () => {
@@ -481,18 +548,23 @@ const ModalDisponibilidade = (params) => {
     }));
   };
 
-  const handleChangeCheckDataIndisponibilidade = (dataId) => (event) => {
-    const isChecked = event.target.checked;
-    setCheckedDatasIndisponibilidade((prevCheckedDatasIndisponibilidade) => ({
-      ...prevCheckedDatasIndisponibilidade,
-      [dataId]: isChecked,
-    }));
-  };
+  const handleChangeCheckDataIndisponibilidade =
+    (programacaoId, dataId, dataIndisponibilidade) => (event) => {
+      const isChecked = event.target.checked;
+      setCheckedDatasIndisponibilidade((prevCheckedDatasIndisponibilidade) => ({
+        ...prevCheckedDatasIndisponibilidade,
+        [dataId]: { programacaoId, value: isChecked, dataIndisponibilidade },
+      }));
+    };
 
-  const handleDeleteIndisponibilidade = (dataId) => {
+  const handleDeleteIndisponibilidade = (
+    programacaoId,
+    dataId,
+    dataIndisponibilidade
+  ) => {
     setCheckedDatasIndisponibilidade((prevCheckedDatasIndisponibilidade) => ({
       ...prevCheckedDatasIndisponibilidade,
-      [dataId]: false,
+      [dataId]: { programacaoId, value: false, dataIndisponibilidade },
     }));
   };
 
@@ -512,7 +584,7 @@ const ModalDisponibilidade = (params) => {
       <Modal
         open={openModalDisponibilidade}
         onClose={() => {
-          setOpenModalDisponibilidade(false);
+          handleCloseModal();
         }}
         closeAfterTransition
         slots={{ backdrop: Backdrop }}
@@ -528,222 +600,272 @@ const ModalDisponibilidade = (params) => {
               {boxTituloCards("Disponibilidade")}
               <IconButton
                 onClick={() => {
-                  setOpenModalDisponibilidade(false);
+                  handleCloseModal();
                 }}
                 sx={{ position: "absolute", top: 4, right: 0 }}
               >
                 <Close sx={{ fontSize: "26px", color: "#ffffff" }} />
               </IconButton>
               <Box sx={styles.boxAreaConteudoModal}>
-                <Box sx={styles.boxCheckboxAndSearch}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={Object.values(checkedDisponibilidade).every(
-                          (prev) => prev === true
-                        )}
-                        onChange={handleChangeCheckTodos}
-                        inputProps={{ "aria-label": "controlled" }}
-                        sx={{
-                          ...styles.configCheckbox,
-                          "& .MuiSvgIcon-root": {
-                            fontSize: "20px",
-                          },
+                {loadingModal ? (
+                  <Box sx={styles.boxAreaCircularProgress}>
+                    <CircularProgress />
+                  </Box>
+                ) : (
+                  <>
+                    <Box sx={styles.boxCheckboxAndSearch}>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={Object.values(
+                              checkedDisponibilidade
+                            ).every((prev) => prev === true)}
+                            onChange={handleChangeCheckTodos}
+                            inputProps={{ "aria-label": "controlled" }}
+                            sx={{
+                              ...styles.configCheckbox,
+                              "& .MuiSvgIcon-root": {
+                                fontSize: "20px",
+                              },
+                            }}
+                          />
+                        }
+                        label={
+                          <Typography sx={styles.textCheckboxLabel}>
+                            Marcar todos
+                          </Typography>
+                        }
+                      />
+                      <TextField
+                        focused
+                        variant="filled"
+                        placeholder="Procurar programação"
+                        sx={styles.textFieldSearch}
+                        InputProps={{
+                          startAdornment: <Search />,
                         }}
                       />
-                    }
-                    label={
-                      <Typography sx={styles.textCheckboxLabel}>
-                        Marcar todos
-                      </Typography>
-                    }
-                  />
-                  <TextField
-                    focused
-                    variant="filled"
-                    placeholder="Procurar programação"
-                    sx={styles.textFieldSearch}
-                    InputProps={{
-                      startAdornment: <Search />,
-                    }}
-                  />
-                </Box>
-                <Box sx={styles.boxAreaCardsProgramacao}>
-                  {programacoes?.map(
-                    (
-                      { id, culto, dia, horario, tags, datasMesSeguinte },
-                      index
-                    ) => (
-                      <Box key={id} sx={styles.boxProgramacao}>
-                        <FormControlLabel
-                          control={
-                            <Checkbox
-                              checked={checkedDisponibilidade[id]}
-                              onChange={handleChangeIndividualCheck(id)}
-                              inputProps={{ "aria-label": "controlled" }}
-                              sx={styles.configCheckbox}
+                    </Box>
+                    <Box sx={styles.boxAreaCardsProgramacao}>
+                      {programacoes?.map(
+                        (
+                          { id, culto, dia, horario, tags, datasMesSeguinte },
+                          index
+                        ) => (
+                          <Box key={id} sx={styles.boxProgramacao}>
+                            <FormControlLabel
+                              control={
+                                <Checkbox
+                                  checked={checkedDisponibilidade[id]}
+                                  onChange={handleChangeIndividualCheck(id)}
+                                  inputProps={{ "aria-label": "controlled" }}
+                                  sx={styles.configCheckbox}
+                                />
+                              }
+                              label={
+                                <Typography sx={styles.textCheckboxLabel}>
+                                  Disponível
+                                </Typography>
+                              }
                             />
-                          }
-                          label={
-                            <Typography sx={styles.textCheckboxLabel}>
-                              Disponível
-                            </Typography>
-                          }
-                        />
-                        <Box sx={styles.cardProgramacao}>
-                          <Typography sx={styles.dataText}>
-                            <ChurchOutlinedIcon sx={styles.dataIcon} />
-                            {culto}
-                          </Typography>
-                          <Typography sx={styles.dataText}>
-                            <Box sx={styles.boxDoubleIcon}>
-                              <CalendarMonthOutlinedIcon sx={styles.dataIcon} />
-                              <AccessTimeOutlinedIcon
-                                sx={styles.dataIconInsid}
-                              />
-                            </Box>
-                            {`${dia} - ${horario}`}
-                          </Typography>
-                          <Typography sx={styles.dataText}>
-                            <GroupsOutlinedIcon sx={styles.dataIcon} />
-                            {tags?.length}
-                          </Typography>
-                          <Box sx={styles.boxAreaTagsCard}>
-                            {tags?.map(({ id, nome }, index) => (
-                              <Chip
-                                key={index}
-                                label={nome}
-                                variant="outlined"
-                                sx={styles.chipDefault}
-                              />
-                            ))}
-                          </Box>
-                          <Typography sx={styles.dataText}>
-                            <ReportProblemOutlinedIcon
-                              sx={{ ...styles.dataIcon, color: "#FF8C00" }}
-                            />
-                            Indisponibilidade
-                            <IconButton
-                              onClick={(event) => handleClickMenu(event, id)}
-                              sx={styles.configIconButton}
-                            >
-                              <AddCircleOutline
-                                sx={styles.botaoAddIndisponibilidade}
-                              />
-                            </IconButton>
-                            <Menu
-                              anchorEl={anchorEls[id]}
-                              open={Boolean(anchorEls[id])}
-                              onClose={() => handleCloseMenu(id)}
-                              PaperProps={{
-                                sx: {
-                                  backgroundColor: "#1B1B1B",
-                                  border: "1px solid #F3A913",
-                                  maxHeight: "152px",
-                                  maxWidth: "286px",
-                                },
-                              }}
-                              MenuListProps={{
-                                "aria-labelledby": "basic-button",
-                              }}
-                            >
-                              <MenuList
-                                sx={{ paddingTop: "4px", paddingBottom: "4px" }}
+                            <Box sx={styles.cardProgramacao}>
+                              <Typography sx={styles.dataText}>
+                                <ChurchOutlinedIcon sx={styles.dataIcon} />
+                                {culto}
+                              </Typography>
+                              <Typography sx={styles.dataText}>
+                                <Box sx={styles.boxDoubleIcon}>
+                                  <CalendarMonthOutlinedIcon
+                                    sx={styles.dataIcon}
+                                  />
+                                  <AccessTimeOutlinedIcon
+                                    sx={styles.dataIconInsid}
+                                  />
+                                </Box>
+                                {`${dia} - ${horario}`}
+                              </Typography>
+                              <Typography sx={styles.dataText}>
+                                <GroupsOutlinedIcon sx={styles.dataIcon} />
+                                {tags?.length}
+                              </Typography>
+                              <Box sx={styles.boxAreaTagsCard}>
+                                {tags?.map(({ id, nome }, index) => (
+                                  <Chip
+                                    key={index}
+                                    label={nome}
+                                    variant="outlined"
+                                    sx={styles.chipDefault}
+                                  />
+                                ))}
+                              </Box>
+                              <Typography sx={styles.dataText}>
+                                <ReportProblemOutlinedIcon
+                                  sx={{ ...styles.dataIcon, color: "#FF8C00" }}
+                                />
+                                Indisponibilidade
+                                <IconButton
+                                  onClick={(event) =>
+                                    handleClickMenu(event, id)
+                                  }
+                                  sx={styles.configIconButton}
+                                >
+                                  <AddCircleOutline
+                                    sx={styles.botaoAddIndisponibilidade}
+                                  />
+                                </IconButton>
+                                <Menu
+                                  anchorEl={anchorEls[id]}
+                                  open={Boolean(anchorEls[id])}
+                                  onClose={() => handleCloseMenu(id)}
+                                  PaperProps={{
+                                    sx: {
+                                      backgroundColor: "#1B1B1B",
+                                      border: "1px solid #F3A913",
+                                      maxHeight: "152px",
+                                      maxWidth: "286px",
+                                    },
+                                  }}
+                                  MenuListProps={{
+                                    "aria-labelledby": "basic-button",
+                                  }}
+                                >
+                                  <MenuList
+                                    sx={{
+                                      paddingTop: "4px",
+                                      paddingBottom: "4px",
+                                    }}
+                                  >
+                                    {datasMesSeguinte?.map(
+                                      ({ dataId, data }, index) => (
+                                        <MenuItem
+                                          key={index + data}
+                                          sx={{
+                                            color: "#ffffff",
+                                            height: "34px",
+                                          }}
+                                        >
+                                          <FormGroup>
+                                            <FormControlLabel
+                                              control={
+                                                <Checkbox
+                                                  checked={
+                                                    checkedDatasIndisponibilidade[
+                                                      dataId
+                                                    ]?.value
+                                                  }
+                                                  onChange={handleChangeCheckDataIndisponibilidade(
+                                                    id,
+                                                    dataId,
+                                                    data
+                                                  )}
+                                                  sx={styles.configCheckboxMenu}
+                                                />
+                                              }
+                                              label={
+                                                <Typography
+                                                  variant="body1"
+                                                  sx={styles.configBoxTextMenu}
+                                                >
+                                                  {data}
+                                                </Typography>
+                                              }
+                                            />
+                                          </FormGroup>
+                                        </MenuItem>
+                                      )
+                                    )}
+                                  </MenuList>
+                                </Menu>
+                              </Typography>
+                              <Typography
+                                sx={{
+                                  ...styles.dataText,
+                                  fontSize: "11px",
+                                  color: "#F3A913",
+                                  mt: "-8px",
+                                }}
+                              >
+                                Indisponibilidade referente ao mês de{" "}
+                                <span style={{ color: "#ffffff" }}>
+                                  {getNextMonth()}
+                                </span>
+                              </Typography>
+                              <Box
+                                sx={{ ...styles.boxAreaTagsCard, mb: "0px" }}
                               >
                                 {datasMesSeguinte?.map(
                                   ({ dataId, data }, index) => (
-                                    <MenuItem
-                                      key={index + data}
-                                      sx={{ color: "#ffffff", height: "34px" }}
-                                    >
-                                      <FormGroup>
-                                        <FormControlLabel
-                                          control={
-                                            <Checkbox
-                                              checked={
-                                                checkedDatasIndisponibilidade[
-                                                  dataId
-                                                ]
-                                              }
-                                              onChange={handleChangeCheckDataIndisponibilidade(
-                                                dataId
-                                              )}
-                                              sx={styles.configCheckboxMenu}
-                                            />
+                                    <>
+                                      {checkedDatasIndisponibilidade[dataId]
+                                        ?.value && (
+                                        <Chip
+                                          key={index}
+                                          label={data}
+                                          variant="outlined"
+                                          onDelete={() =>
+                                            handleDeleteIndisponibilidade(
+                                              id,
+                                              dataId,
+                                              data
+                                            )
                                           }
-                                          label={
-                                            <Typography
-                                              variant="body1"
-                                              sx={styles.configBoxTextMenu}
-                                            >
-                                              {data}
-                                            </Typography>
-                                          }
+                                          sx={styles.chipIndisponibilidade}
                                         />
-                                      </FormGroup>
-                                    </MenuItem>
+                                      )}
+                                    </>
                                   )
                                 )}
-                              </MenuList>
-                            </Menu>
-                          </Typography>
-                          <Typography
-                            sx={{
-                              ...styles.dataText,
-                              fontSize: "11px",
-                              color: "#F3A913",
-                              mt: "-8px",
-                            }}
-                          >
-                            Indisponibilidade referente ao mês de{" "}
-                            <span style={{ color: "#ffffff" }}>
-                              {getNextMonth()}
-                            </span>
-                          </Typography>
-                          <Box sx={{ ...styles.boxAreaTagsCard, mb: "0px" }}>
-                            {datasMesSeguinte?.map(
-                              ({ dataId, data }, index) => (
-                                <>
-                                  {checkedDatasIndisponibilidade[dataId] && (
-                                    <Chip
-                                      key={index}
-                                      label={data}
-                                      variant="outlined"
-                                      onDelete={() =>
-                                        handleDeleteIndisponibilidade(dataId)
-                                      }
-                                      sx={styles.chipIndisponibilidade}
-                                    />
-                                  )}
-                                </>
-                              )
-                            )}
+                              </Box>
+                            </Box>
                           </Box>
-                        </Box>
-                      </Box>
-                    )
-                  )}
-                </Box>
+                        )
+                      )}
+                    </Box>
+                  </>
+                )}
               </Box>
               <Box sx={styles.boxAreaBotaoCard}>
                 <Divider sx={styles.divider} />
                 <Box sx={styles.boxDoubleBotoes}>
-                  <Button
-                    onClick={() => {
-                      handleCloseModal();
-                    }}
-                    variant="contained"
-                    sx={{ ...styles.botaoDefault, mb: "8px" }}
-                  >
-                    Cancelar
-                  </Button>
-                  <Button
-                    onClick={() => {}}
-                    variant="contained"
-                    sx={{ ...styles.botaoDefault, mb: "8px" }}
-                  >
-                    Salvar
-                  </Button>
+                  {!loadingModal && (
+                    <>
+                      {" "}
+                      <Button
+                        disabled={loadingModalSave}
+                        onClick={() => {
+                          handleCloseModal();
+                        }}
+                        variant="contained"
+                        sx={{ ...styles.botaoDefault, mb: "8px" }}
+                      >
+                        Cancelar
+                      </Button>
+                      <Button
+                        disabled={loadingModalSave}
+                        onClick={() => {
+                          handleSalvarDisponibilidade();
+                        }}
+                        variant="contained"
+                        sx={{ ...styles.botaoDefault, mb: "8px" }}
+                      >
+                        {loadingModalSave ? (
+                          <Box
+                            sx={{
+                              ...styles.boxAreaCircularProgress,
+                              width: "54px",
+                            }}
+                          >
+                            <CircularProgress
+                              sx={{ color: "#ffffff" }}
+                              size={16}
+                            />
+                          </Box>
+                        ) : (
+                          "Salvar"
+                        )}
+                      </Button>
+                    </>
+                  )}
                 </Box>
               </Box>
             </Box>

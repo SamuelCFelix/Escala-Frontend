@@ -1,4 +1,11 @@
-import { Box, Button, Snackbar, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Snackbar,
+  TextField,
+  Typography,
+} from "@mui/material";
 import BackgroundImage from "../../img/fotoProducaoSamuel.jpeg";
 import BackgroundImage2 from "../../img/zs-samuel.jpg";
 import { forwardRef, useState } from "react";
@@ -156,6 +163,10 @@ const styles = {
     "&:hover": {
       background: "#FEBC36",
     },
+    "&.MuiButtonBase-root.MuiButton-root.Mui-disabled": {
+      color: "#ffffffc5",
+      background: "rgba(243, 169, 19, 0.5)",
+    },
   },
   botaoCadastrar: {
     height: "5px",
@@ -203,6 +214,13 @@ const styles = {
     alignItems: "center",
     justifyContent: "center",
   },
+  boxAreaCircularProgress: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+    height: "100%",
+  },
 };
 
 const Login = () => {
@@ -212,6 +230,7 @@ const Login = () => {
   const { hidePopup } = useAuth();
   const { showCadastroFeitoPopup } = useAuth();
   const [showPopup, setShowPopup] = useState(showCadastroFeitoPopup);
+  const [loadingLogin, setLoadingLogin] = useState(false);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -274,6 +293,7 @@ const Login = () => {
       handleOpenPopUpError();
     } else {
       try {
+        setLoadingLogin(true);
         const response = await api.post("/loginAuth", {
           email: email,
           senha: password,
@@ -304,6 +324,8 @@ const Login = () => {
         }
       } catch (error) {
         setSnackbar("error", "Login ou senha incorreta");
+      } finally {
+        setLoadingLogin(false);
       }
     }
   };
@@ -397,11 +419,18 @@ const Login = () => {
           </Box>
           <Button sx={styles.botaoEqueciSenha}>Esqueci minha senha</Button>
           <Button
+            disabled={loadingLogin}
             variant="contained"
             onClick={(event) => handleLogin(event)}
             sx={styles.botaoEntrar}
           >
-            ENTRAR
+            {loadingLogin ? (
+              <Box sx={styles.boxAreaCircularProgress}>
+                <CircularProgress sx={{ color: "#ffffff" }} size={22} />
+              </Box>
+            ) : (
+              "ENTRAR"
+            )}
           </Button>
           <Button
             onClick={handleOpenPopUpSuccess}
