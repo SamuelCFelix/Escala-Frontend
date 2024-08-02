@@ -522,7 +522,10 @@ const ModalDisponibilidade = (params) => {
         });
       }
 
-      if (response?.status === 200) {
+      if (
+        response?.status === 200 &&
+        response?.data?.disponibilidade !== null
+      ) {
         return response?.data;
       } else {
         return null;
