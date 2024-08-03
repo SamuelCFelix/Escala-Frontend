@@ -534,22 +534,39 @@ const ModalPerfilMembro = (params) => {
     }
   };
 
-  const handleStatusAtivoMembroEquipe = async (acao) => {
+  const handleStatusAtivoMembroEquipe = async (acao, host) => {
     try {
       let response = null;
       let usuarioAtualizado = usuarioPerfil;
 
-      if (acao) {
-        response = await api.put("/updateStatusMembroEquipe", {
-          usuarioId: usuarioPerfil?.usuarioDefaultId,
-          acao: "ativar",
-        });
+      if (host) {
+        if (acao) {
+          response = await api.put("/updateStatusMembroEquipe", {
+            usuarioId: usuarioPerfil?.usuarioHostId,
+            acao: "ativar",
+            host: true,
+          });
+        } else {
+          response = await api.put("/updateStatusMembroEquipe", {
+            usuarioId: usuarioPerfil?.usuarioHostId,
+            acao: "desativar",
+            host: true,
+          });
+          setOpenModalDesativarMembro(false);
+        }
       } else {
-        response = await api.put("/updateStatusMembroEquipe", {
-          usuarioId: usuarioPerfil?.usuarioDefaultId,
-          acao: "desativar",
-        });
-        setOpenModalDesativarMembro(false);
+        if (acao) {
+          response = await api.put("/updateStatusMembroEquipe", {
+            usuarioId: usuarioPerfil?.usuarioDefaultId,
+            acao: "ativar",
+          });
+        } else {
+          response = await api.put("/updateStatusMembroEquipe", {
+            usuarioId: usuarioPerfil?.usuarioDefaultId,
+            acao: "desativar",
+          });
+          setOpenModalDesativarMembro(false);
+        }
       }
 
       if (response?.status === 200) {
@@ -561,10 +578,7 @@ const ModalPerfilMembro = (params) => {
       }
     } catch (error) {
       setSnackbar("error", "Erro ao conectar com o servidor");
-      console.error(
-        "erro ao atualizar autorização do membro da equipe: ",
-        error
-      );
+      console.error("erro ao atualizar status do membro da equipe: ", error);
     }
   };
 
@@ -641,9 +655,9 @@ const ModalPerfilMembro = (params) => {
     handleUpdateTagsMembroEquipe(event.target.checked, tagId, host);
   };
 
-  const handleChangeCheckAtivo = (event) => {
+  const handleChangeCheckAtivo = (event, host) => {
     if (event.target.checked) {
-      handleStatusAtivoMembroEquipe(event.target.checked);
+      handleStatusAtivoMembroEquipe(event.target.checked, host);
     } else {
       setOpenModalDesativarMembro(true);
     }
@@ -887,7 +901,16 @@ const ModalPerfilMembro = (params) => {
                                       usuarioLogado?.autorizacao !== "adm001")
                                   }
                                   checked={usuarioPerfil?.ativo}
-                                  onChange={handleChangeCheckAtivo}
+                                  onChange={(event) => {
+                                    if (
+                                      usuarioLogado?.autorizacao === "adm001" &&
+                                      usuarioPerfil?.autorizacao === "adm001"
+                                    ) {
+                                      handleChangeCheckAtivo(event, true);
+                                    } else {
+                                      handleChangeCheckAtivo(event);
+                                    }
+                                  }}
                                   inputProps={{ "aria-label": "controlled" }}
                                   sx={styles.configCheckbox}
                                 />
@@ -974,18 +997,6 @@ const ModalPerfilMembro = (params) => {
                           </Box>
                         </>
                       )}
-                      {/* {valueTabInformacoes === "dados" && (
-                      <Box sx={{ ...styles.configBox, height: "100%" }}>
-                        <Typography sx={styles.textTitulo}>
-                          Nenhum dado
-                        </Typography>
-                      </Box>
-                    )} */}
-                      {/* {valueTabInformacoes === "tags" && (
-                    <Box sx={{ ...styles.configBox, height: "100%" }}>
-                      <Typography sx={styles.textTitulo}>Sem TAGS</Typography>
-                    </Box>
-                  )} */}
                       <Divider sx={styles.divider} />
                     </Box>
                   </Box>
@@ -1114,8 +1125,15 @@ const ModalPerfilMembro = (params) => {
 
                   <Button
                     sx={styles.botaoDefaultModal}
-                    onClick={() => {
-                      handleStatusAtivoMembroEquipe(false);
+                    onClick={(event) => {
+                      if (
+                        usuarioLogado?.autorizacao === "adm001" &&
+                        usuarioPerfil?.autorizacao === "adm001"
+                      ) {
+                        handleStatusAtivoMembroEquipe(false, true);
+                      } else {
+                        handleStatusAtivoMembroEquipe(false);
+                      }
                     }}
                   >
                     Confirmar

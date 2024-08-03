@@ -1240,39 +1240,12 @@ const PaginaEquipe = (params) => {
         </Box>
         <Box sx={styles.boxAreaBotaoCard}>
           <Divider sx={styles.divider} />
-          {editarEscala ? (
-            <Box sx={{ ...styles.configBox, gap: "16px" }}>
-              <Button
-                variant="contained"
-                sx={{
-                  ...styles.botaoDefaultCancelar,
-                  mb: "8px",
-                  gap: "4px",
-                  padding: "0px 20px",
-                }}
-                onClick={() => setEditarEscala(false)}
-              >
-                <Close sx={{ fontSize: "18px" }} />
-                Cancelar
-              </Button>
-              <Button
-                variant="contained"
-                sx={{
-                  ...styles.botaoDefault,
-                  mb: "8px",
-                  gap: "4px",
-                }}
-                onClick={() => setEditarEscala(false)}
-              >
-                <SaveOutlined sx={{ fontSize: "18px" }} />
-                Salvar
-              </Button>
-            </Box>
-          ) : (
+          {(usuario?.autorizacao === "adm001" ||
+            usuario?.autorizacao === "adm002") && (
             <Button
               variant="contained"
               sx={{ ...styles.botaoDefault, mb: "8px", gap: "4px" }}
-              onClick={() => setEditarEscala(true)}
+              onClick={() => {}}
             >
               <RestartAltOutlinedIcon sx={{ fontSize: "18px" }} />
               Gerar escala novamente

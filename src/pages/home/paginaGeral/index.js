@@ -854,43 +854,48 @@ const PaginaGeral = (params) => {
         </Box>
         <Box sx={styles.boxAreaBotaoCard}>
           <Divider sx={styles.divider} />
-          {editarEscala ? (
-            <Box sx={{ ...styles.configBox, gap: "16px" }}>
-              <Button
-                variant="contained"
-                sx={{
-                  ...styles.botaoDefaultCancelar,
-                  mb: "8px",
-                  gap: "4px",
-                  padding: "0px 20px",
-                }}
-                onClick={() => setEditarEscala(false)}
-              >
-                <Close sx={{ fontSize: "18px" }} />
-                Cancelar
-              </Button>
-              <Button
-                variant="contained"
-                sx={{
-                  ...styles.botaoDefault,
-                  mb: "8px",
-                  gap: "4px",
-                }}
-                onClick={() => setEditarEscala(false)}
-              >
-                <SaveOutlined sx={{ fontSize: "18px" }} />
-                Salvar
-              </Button>
-            </Box>
-          ) : (
-            <Button
-              variant="contained"
-              sx={{ ...styles.botaoDefault, mb: "8px", gap: "4px" }}
-              onClick={() => setEditarEscala(true)}
-            >
-              <EditCalendarOutlined sx={{ fontSize: "18px" }} />
-              Editar Escala
-            </Button>
+          {(usuario?.autorizacao === "adm001" ||
+            usuario?.autorizacao === "adm002") && (
+            <>
+              {editarEscala ? (
+                <Box sx={{ ...styles.configBox, gap: "16px" }}>
+                  <Button
+                    variant="contained"
+                    sx={{
+                      ...styles.botaoDefaultCancelar,
+                      mb: "8px",
+                      gap: "4px",
+                      padding: "0px 20px",
+                    }}
+                    onClick={() => setEditarEscala(false)}
+                  >
+                    <Close sx={{ fontSize: "18px" }} />
+                    Cancelar
+                  </Button>
+                  <Button
+                    variant="contained"
+                    sx={{
+                      ...styles.botaoDefault,
+                      mb: "8px",
+                      gap: "4px",
+                    }}
+                    onClick={() => setEditarEscala(false)}
+                  >
+                    <SaveOutlined sx={{ fontSize: "18px" }} />
+                    Salvar
+                  </Button>
+                </Box>
+              ) : (
+                <Button
+                  variant="contained"
+                  sx={{ ...styles.botaoDefault, mb: "8px", gap: "4px" }}
+                  onClick={() => setEditarEscala(true)}
+                >
+                  <EditCalendarOutlined sx={{ fontSize: "18px" }} />
+                  Editar Escala
+                </Button>
+              )}
+            </>
           )}
         </Box>
       </Box>
