@@ -1121,8 +1121,8 @@ const ModalDisponibilidade = (params) => {
                   As escalas são geradas automaticamente
                 </Typography>
                 <Typography sx={styles.textModal}>
-                  às <span style={{ color: "#F3A913" }}>00:00</span> do dia{" "}
-                  <span style={{ color: "#F3A913" }}>1º</span> de cada{" "}
+                  às <span style={{ color: "#F3A913" }}>23:30</span> do{" "}
+                  <span style={{ color: "#F3A913" }}>último dia</span> de cada{" "}
                   <span style={{ color: "#F3A913" }}>mês</span>.
                 </Typography>
                 <Typography sx={styles.textModal}>

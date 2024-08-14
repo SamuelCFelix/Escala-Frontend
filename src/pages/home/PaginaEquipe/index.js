@@ -937,6 +937,9 @@ const PaginaEquipe = (params) => {
   const [editarEscala, setEditarEscala] = useState(false);
   const [openModalEscalarMembro, setOpenModalEscalarMembro] = useState(false);
   const [valueTabInformacoes, setValueTabInformacoes] = useState("membros");
+  const [escalaMensal, setEscalaMensal] = useState([]);
+  const [loadingTabelaEscalaMensal, setLoadingTabelaEscalaMensal] =
+    useState(true);
 
   //UseEffect's
 
@@ -944,6 +947,7 @@ const PaginaEquipe = (params) => {
     handleBuscarTabelaSolicitacoesEntrada();
     handleBuscarMembrosMinhaEquipe();
     handleBuscarTagsEquipe();
+    handleBuscarEscalaMensal();
   }, []);
 
   //API's
@@ -963,6 +967,28 @@ const PaginaEquipe = (params) => {
     } catch (error) {
       setSnackbar("error", "Erro ao conectar com o servidor");
       console.error("erro ao buscar tags da equipe: ", error);
+    }
+  };
+
+  // Tabela Escala do Mês
+
+  const handleBuscarEscalaMensal = async () => {
+    try {
+      setLoadingTabelaEscalaMensal(true);
+      const response = await api.post("/buscarEscalaMensal", {
+        equipeId: usuario?.equipeId,
+      });
+
+      if (response?.status === 200) {
+        setEscalaMensal(response?.data);
+        setLoadingTabelaEscalaMensal(false);
+      } else {
+        setSnackbar("error", "Erro ao conectar com o servidor");
+        console.error("erro ao executar ação", response?.status);
+      }
+    } catch (error) {
+      setSnackbar("error", "Erro ao conectar com o servidor");
+      console.error("erro ao buscar escala mensal da equipe: ", error);
     }
   };
 
@@ -1116,65 +1142,95 @@ const PaginaEquipe = (params) => {
       <Box sx={styles.boxCardDefault}>
         {boxTituloCards("Escala do mês")}
         <Box sx={{ ...styles.areaConteudoCard, overflowY: "auto" }}>
-          {/* {Array.from({ length: 10 }).map((_, index) => (
-            <Box sx={styles.boxCardEscalaMensal}>
-              <Box sx={styles.boxInfoEscalaMensal}>
-                <Typography sx={styles.textTituloInfoEscala}>
-                  <CalendarMonthOutlined
-                    sx={{ color: "#F3A913", fontSize: "16px" }}
-                  />
-                  19/05/24 - DOMINGO
-                </Typography>
-                <Divider
-                  sx={{
-                    ...styles.divider,
-                    justifySelf: "flex-start",
-                    position: "absolute",
-                    bottom: 0,
-                  }}
-                />
-              </Box>
-              <Box sx={styles.boxCardInfoEscaladosMensal}>
-                <Box sx={styles.boxInfoCultoEscalaMensal}>
-                  <Typography sx={styles.textInfoCultoEscalaMensal}>
-                    <ChurchOutlinedIcon sx={styles.iconEscalaMensal} />
-                    Culto Celebração - ZS16
-                  </Typography>
-                  <Typography sx={styles.textInfoCultoEscalaMensal}>
-                    <AccessTimeOutlinedIcon sx={styles.iconEscalaMensal} />
-                    Domingo - 16:00
-                  </Typography>
-                </Box>
-                {proximaEscala?.map(({ membro, tag, possuiTag }, index) => (
-                  <Box key={index} sx={styles.boxPerfis}>
-                    <Avatar
+          {loadingTabelaEscalaMensal && (
+            <Box sx={styles.boxAreaCircularProgress}>
+              <CircularProgress />
+            </Box>
+          )}
+
+          {!loadingTabelaEscalaMensal && (
+            <>
+              {escalaMensal?.map(
+                ({ programacaoId, data, dia, horario, culto, escalados }) => (
+                  <Box sx={styles.boxCardEscalaMensal}>
+                    <Box sx={styles.boxInfoEscalaMensal}>
+                      <Typography sx={styles.textTituloInfoEscala}>
+                        <CalendarMonthOutlined
+                          sx={{ color: "#F3A913", fontSize: "16px" }}
+                        />
+                        {`${data} - ${dia}`}
+                      </Typography>
+                      <Divider
+                        sx={{
+                          ...styles.divider,
+                          justifySelf: "flex-start",
+                          position: "absolute",
+                          bottom: 0,
+                        }}
+                      />
+                    </Box>
+                    <Box
                       sx={{
-                        ...styles.avatarMembro,
-                        background:
-                          membro !== "NÃO PREENCHIDO" ? "#F3A913" : "#D32F2F",
+                        ...styles.boxCardInfoEscaladosMensal,
+                        borderColor: escalados?.some(
+                          ({ membroId }) => membroId === "sem membro"
+                        )
+                          ? "#D32F2F"
+                          : "#F3A913",
                       }}
                     >
-                      {membro !== "NÃO PREENCHIDO" ? (
-                        <Person sx={{ fontSize: "18px" }} />
-                      ) : (
-                        <ReportProblemOutlined
-                          sx={{ fontSize: "18px", color: "#F3A913" }}
-                        />
-                      )}{" "}
-                    </Avatar>
-                    <Box sx={styles.boxInfoPerfil}>
-                      <Typography
-                        sx={{
-                          ...styles.textInfoPerfil,
-                          ...styles.configBox,
-                          width: "auto",
-                          gap: "4px",
-                          color:
-                            membro !== "NÃO PREENCHIDO" ? "#ffffff" : "#D32F2F",
-                        }}
-                      >
-                        {membro}
-                        {!possuiTag && membro !== "NÃO PREENCHIDO" && (
+                      <Box sx={styles.boxInfoCultoEscalaMensal}>
+                        <Typography sx={styles.textInfoCultoEscalaMensal}>
+                          <ChurchOutlinedIcon sx={styles.iconEscalaMensal} />
+                          {culto}
+                        </Typography>
+                        <Typography sx={styles.textInfoCultoEscalaMensal}>
+                          <AccessTimeOutlinedIcon
+                            sx={styles.iconEscalaMensal}
+                          />
+                          {`${dia} - ${horario}`}
+                        </Typography>
+                      </Box>
+                      {escalados?.map(
+                        (
+                          { tagId, tagNome, membroId, membroNome, possuiTag },
+                          index
+                        ) => (
+                          <Box key={index} sx={styles.boxPerfis}>
+                            <Avatar
+                              sx={{
+                                ...styles.avatarMembro,
+                                background:
+                                  membroId !== "sem membro"
+                                    ? "#F3A913"
+                                    : "#D32F2F",
+                              }}
+                            >
+                              {membroId !== "sem membro" ? (
+                                <Person sx={{ fontSize: "18px" }} />
+                              ) : (
+                                <ReportProblemOutlined
+                                  sx={{ fontSize: "18px", color: "#F3A913" }}
+                                />
+                              )}{" "}
+                            </Avatar>
+                            <Box sx={styles.boxInfoPerfil}>
+                              <Typography
+                                sx={{
+                                  ...styles.textInfoPerfil,
+                                  ...styles.configBox,
+                                  width: "auto",
+                                  gap: "4px",
+                                  color:
+                                    membroId !== "sem membro"
+                                      ? "#ffffff"
+                                      : "#D32F2F",
+                                }}
+                              >
+                                {membroId !== "sem membro"
+                                  ? membroNome
+                                  : "NÃO PREENCHIDO"}
+                                {/* {!possuiTag && membroId !== "sem membro" && (
                           <Chip
                             label="Sem TAG"
                             variant="outlined"
@@ -1183,60 +1239,70 @@ const PaginaEquipe = (params) => {
                               borderColor: "#D32F2F",
                             }}
                           />
-                        )}
-                        {userLogin && index === 1 && (
-                          <Chip
-                            label="Eu"
-                            variant="outlined"
-                            sx={styles.chipName}
-                          />
-                        )}
-                      </Typography>
-                      <Typography
-                        sx={{
-                          ...styles.textInfoPerfil,
-                          color: "#F3CE24",
-                        }}
-                      >
-                        {tag}
-                      </Typography>
+                        )} */}
+                                {(usuario.usuarioHostId === membroId ||
+                                  usuario.usuarioDefaultId === membroId) && (
+                                  <Chip
+                                    label="Eu"
+                                    variant="outlined"
+                                    sx={styles.chipName}
+                                  />
+                                )}
+                              </Typography>
+                              <Typography
+                                sx={{
+                                  ...styles.textInfoPerfil,
+                                  color: "#F3CE24",
+                                }}
+                              >
+                                {tagNome}
+                              </Typography>
+                            </Box>
+                            {/* {editarEscala && membroId !== "sem membro" && (
+                              <IconButton
+                                sx={{
+                                  "&.MuiButtonBase-root.MuiIconButton-root:hover ":
+                                    {
+                                      backgroundColor: "rgba(211, 47, 47, 0.2)",
+                                    },
+                                }}
+                              >
+                                <PersonRemoveAlt1Outlined
+                                  sx={{
+                                    color: "#D32F2F",
+                                    fontSize: "22px",
+                                  }}
+                                />
+                              </IconButton>
+                            )} */}
+                            {membroId === "sem membro" && (
+                              <IconButton
+                                sx={styles.IconButtonHover}
+                                onClick={() => {
+                                  setOpenModalEscalarMembro(true);
+                                }}
+                              >
+                                <PersonAddAlt1Outlined
+                                  sx={{ color: "#F3A913", fontSize: "22px" }}
+                                />
+                              </IconButton>
+                            )}
+                          </Box>
+                        )
+                      )}
                     </Box>
-                    {editarEscala && membro !== "NÃO PREENCHIDO" && (
-                      <IconButton
-                        sx={{
-                          "&.MuiButtonBase-root.MuiIconButton-root:hover ": {
-                            backgroundColor: "rgba(211, 47, 47, 0.2)",
-                          },
-                        }}
-                      >
-                        <PersonRemoveAlt1Outlined
-                          sx={{
-                            color: "#D32F2F",
-                            fontSize: "22px",
-                          }}
-                        />
-                      </IconButton>
-                    )}
-                    {membro === "NÃO PREENCHIDO" && (
-                      <IconButton
-                        sx={styles.IconButtonHover}
-                        onClick={() => {
-                          setOpenModalEscalarMembro(true);
-                        }}
-                      >
-                        <PersonAddAlt1Outlined
-                          sx={{ color: "#F3A913", fontSize: "22px" }}
-                        />
-                      </IconButton>
-                    )}
                   </Box>
-                ))}
-              </Box>
-            </Box>
-          ))} */}
-          <Box sx={{ ...styles.configBox, height: "100%" }}>
-            <Typography sx={styles.textTitulo}>Escala não gerada</Typography>
-          </Box>
+                )
+              )}
+              {escalaMensal?.length === 0 && (
+                <Box sx={{ ...styles.configBox, height: "100%" }}>
+                  <Typography sx={styles.textTitulo}>
+                    Escala não gerada
+                  </Typography>
+                </Box>
+              )}
+            </>
+          )}
         </Box>
         <Box sx={styles.boxAreaBotaoCard}>
           <Divider sx={styles.divider} />
