@@ -544,6 +544,7 @@ const styles = {
     overflowY: "auto",
   },
   boxCardEscalado: {
+    position: "relative",
     width: "98.5%",
     height: "66px",
     display: "flex",
@@ -607,6 +608,17 @@ const styles = {
     width: "100%",
     height: "100%",
   },
+  boxLinhaDivisoria: {
+    position: "absolute",
+    top: "50%",
+    left: 0,
+    width: "1px",
+    height: "88%",
+    border: "1px solid #F3A913",
+    borderRadius: "5px",
+    backgroundColor: "#F3A913",
+    transform: "translateY(-50%)",
+  },
 };
 
 const PaginaGeral = (params) => {
@@ -623,37 +635,80 @@ const PaginaGeral = (params) => {
   const [loadingTabelaInformacoesTags, setLoadingTabelaInformacoesTags] =
     useState(false);
   const [tagsUsuario, setTagsUsuario] = useState([]);
+  const [
+    loadingTabelaInformacoesEscalado,
+    setLoadingTabelaInformacoesEscalado,
+  ] = useState(true);
+  const [escalacoesUsuario, setEscalacoesUsuario] = useState([]);
   const [openModalDisponibilidade, setOpenModalDisponibilidade] =
     useState(false);
 
-  const [proximaEscala, setProximaEscala] = useState([
-    {
-      membro: "João Vinícius Soares",
-      tag: "Cortes de Câmera",
-      possuiTag: true,
-    },
-    {
-      membro: "Samuel Cardoso Félix",
-      tag: "Câmera Lateral - Direita",
-      possuiTag: true,
-    },
-    {
-      membro: "Hatus Yodes Santos",
-      tag: "Câmera Lateral - Esquerda",
-      possuiTag: false,
-    },
-    { membro: "NÃO PREENCHIDO", tag: "Câmera Central", possuiTag: null },
-    { membro: "Renata Xavier Silva", tag: "Gimball 1", possuiTag: true },
-    { membro: "Samuel Silva Xavier", tag: "Gimball 2", possuiTag: true },
-  ]);
+  const [proximaEscala, setProximaEscala] = useState([]);
+  const [loadingTabelaProximaEscala, setLoadingTabelaProximaEscala] =
+    useState(true);
 
   //UseEffect's
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    handleBuscarProximaEscala();
+    handleBuscarEscalacoesUsuario();
+  }, []);
 
   //API's
 
+  //Tabela Próximo Culto
+
+  const handleBuscarProximaEscala = async () => {
+    try {
+      setLoadingTabelaProximaEscala(true);
+      const response = await api.post("/buscarProximaEscala", {
+        equipeId: usuario?.equipeId,
+      });
+
+      if (response?.status === 200) {
+        setProximaEscala(response?.data);
+        setLoadingTabelaProximaEscala(false);
+      } else {
+        setSnackbar("error", "Erro ao conectar com o servidor");
+        console.error("erro ao executar ação", response?.status);
+      }
+    } catch (error) {
+      setSnackbar("error", "Erro ao conectar com o servidor");
+      console.error("erro ao buscar próxima escala: ", error);
+    }
+  };
+
   //Tabela Informações
+
+  const handleBuscarEscalacoesUsuario = async () => {
+    try {
+      let response = null;
+      setLoadingTabelaInformacoesEscalado(true);
+
+      if (usuario?.usuarioHostId) {
+        response = await api.post("/buscarEscalacoesUsuario", {
+          equipeId: usuario?.equipeId,
+          usuarioId: usuario?.usuarioHostId,
+        });
+      } else {
+        response = await api.post("/buscarEscalacoesUsuario", {
+          equipeId: usuario?.equipeId,
+          usuarioId: usuario?.usuarioDefaultId,
+        });
+      }
+
+      if (response?.status === 200) {
+        setEscalacoesUsuario(response?.data);
+        setLoadingTabelaInformacoesEscalado(false);
+      } else {
+        setSnackbar("error", "Erro ao conectar com o servidor");
+        console.error("erro ao executar ação", response?.status);
+      }
+    } catch (error) {
+      setSnackbar("error", "Erro ao conectar com o servidor");
+      console.error("erro ao buscar escalações do usuário: ", error);
+    }
+  };
 
   const handleBuscarTagsMembroEquipe = async () => {
     try {
@@ -672,7 +727,6 @@ const PaginaGeral = (params) => {
       }
 
       if (response?.status === 200) {
-        console.log(response?.data);
         setTagsUsuario(response?.data);
         setLoadingTabelaInformacoesTags(false);
       } else {
@@ -730,127 +784,167 @@ const PaginaGeral = (params) => {
       <Box sx={styles.boxCardDefault}>
         {boxTituloCards("Próximo Culto")}
         <Box sx={styles.areaConteudoCard}>
-          {/*  <Box sx={styles.boxInfoProximoCulto}>
-            <Typography
-              sx={{ ...styles.textTitulo, fontSize: "18px", fontWeight: 600 }}
-            >
-              CULTO CELEBRAÇÃO - ZS16
-            </Typography>
-            <Typography sx={{ ...styles.textTitulo, fontSize: "18px" }}>
-              16:00
-            </Typography>
-            <Typography sx={styles.textTituloInfoEscala}>
-              <CalendarMonthOutlined
-                sx={{ color: "#F3A913", fontSize: "16px" }}
-              />
-              19/05/24 - DOMINGO
-            </Typography>
-            <Divider
-              sx={{
-                ...styles.divider,
-                justifySelf: "flex-start",
-                position: "absolute",
-                bottom: 0,
-              }}
-            />
-          </Box>
-          <Box sx={styles.boxEscalaProximoCulto}>
-            {proximaEscala?.map(({ membro, tag, possuiTag }, index) => (
-              <Box key={index} sx={styles.areaPerfilEscalado}>
-                <Avatar
-                  sx={{
-                    ...styles.avatarIcon,
-                    background:
-                      membro !== "NÃO PREENCHIDO" ? "#F3A913" : "#D32F2F",
-                  }}
-                >
-                  {membro !== "NÃO PREENCHIDO" ? (
-                    <Person sx={{ fontSize: "24px" }} />
-                  ) : (
-                    <ReportProblemOutlined
-                      sx={{ fontSize: "24px", color: "#F3A913" }}
-                    />
-                  )}{" "}
-                </Avatar>
-                <Box sx={styles.boxInfoPerfilProximoCulto}>
-                  <Typography
-                    sx={{
-                      ...styles.textPerfilProximoCulto,
-                      ...styles.configBox,
-                      width: "auto",
-                      gap: "4px",
-                      color:
-                        membro !== "NÃO PREENCHIDO" ? "#ffffff" : "#D32F2F",
-                    }}
-                  >
-                    {membro}
-                    {!possuiTag && membro !== "NÃO PREENCHIDO" && (
-                      <Chip
-                        label="Sem TAG"
-                        variant="outlined"
-                        sx={{ ...styles.chipName, borderColor: "#D32F2F" }}
-                      />
-                    )}
-                    {userLogin && index === 1 && (
-                      <Chip
-                        label="Eu"
-                        variant="outlined"
-                        sx={styles.chipName}
-                      />
-                    )}
-                  </Typography>
-                  <Typography
-                    sx={{
-                      ...styles.textPerfilProximoCulto,
-                      color: "#F3CE24",
-                      fontSize: "14px",
-                    }}
-                  >
-                    {tag}
-                  </Typography>
-                </Box>
-                {editarEscala && membro !== "NÃO PREENCHIDO" && (
-                  <IconButton
-                    sx={{
-                      "&.MuiButtonBase-root.MuiIconButton-root:hover ": {
-                        backgroundColor: "rgba(211, 47, 47, 0.2)",
-                      },
-                    }}
-                  >
-                    <PersonRemoveAlt1Outlined
+          {loadingTabelaProximaEscala && (
+            <Box sx={styles.boxAreaCircularProgress}>
+              <CircularProgress />
+            </Box>
+          )}
+
+          {!loadingTabelaProximaEscala && (
+            <>
+              {proximaEscala !== null ? (
+                <>
+                  <Box sx={styles.boxInfoProximoCulto}>
+                    <Typography
                       sx={{
-                        color: "#D32F2F",
-                        fontSize: "24px",
+                        ...styles.textTitulo,
+                        fontSize: "18px",
+                        fontWeight: 600,
+                      }}
+                    >
+                      {proximaEscala.culto}
+                    </Typography>
+                    <Typography sx={{ ...styles.textTitulo, fontSize: "18px" }}>
+                      {proximaEscala.horario}
+                    </Typography>
+                    <Typography sx={styles.textTituloInfoEscala}>
+                      <CalendarMonthOutlined
+                        sx={{ color: "#F3A913", fontSize: "16px" }}
+                      />
+                      {`${proximaEscala.data} - ${proximaEscala.dia}`}
+                    </Typography>
+                    <Divider
+                      sx={{
+                        ...styles.divider,
+                        justifySelf: "flex-start",
+                        position: "absolute",
+                        bottom: 0,
                       }}
                     />
-                  </IconButton>
-                )}
-                {membro === "NÃO PREENCHIDO" && (
-                  <IconButton
-                    sx={styles.IconButtonHover}
-                    onClick={() => {
-                      setOpenModalEscalarMembro(true);
-                    }}
+                  </Box>
+                  <Box
+                    key={proximaEscala.programacaoId + 1}
+                    sx={styles.boxEscalaProximoCulto}
                   >
-                    <PersonAddAlt1Outlined
-                      sx={{ color: "#F3A913", fontSize: "24px" }}
-                    />
-                  </IconButton>
-                )}
-                <Divider
-                  sx={{
-                    ...styles.divider,
-                    width: "100%",
-                    position: "absolute",
-                    bottom: 0,
-                  }}
-                />
-              </Box>
-            ))}
-          </Box> */}
-          <Box sx={{ ...styles.configBox, height: "100%" }}>
-            <Typography sx={styles.textTitulo}>Sem programação</Typography>
-          </Box>
+                    {proximaEscala?.escalados?.map(
+                      (
+                        { membroId, membroNome, tagId, tagNome, possuiTag },
+                        index
+                      ) => (
+                        <Box key={index} sx={styles.areaPerfilEscalado}>
+                          <Avatar
+                            sx={{
+                              ...styles.avatarIcon,
+                              background:
+                                membroId !== "sem membro"
+                                  ? "#F3A913"
+                                  : "#D32F2F",
+                            }}
+                          >
+                            {membroId !== "sem membro" ? (
+                              <Person sx={{ fontSize: "24px" }} />
+                            ) : (
+                              <ReportProblemOutlined
+                                sx={{ fontSize: "24px", color: "#F3A913" }}
+                              />
+                            )}{" "}
+                          </Avatar>
+                          <Box sx={styles.boxInfoPerfilProximoCulto}>
+                            <Typography
+                              sx={{
+                                ...styles.textPerfilProximoCulto,
+                                ...styles.configBox,
+                                width: "auto",
+                                gap: "4px",
+                                color:
+                                  membroId !== "sem membro"
+                                    ? "#ffffff"
+                                    : "#D32F2F",
+                              }}
+                            >
+                              {membroId !== "sem membro"
+                                ? membroNome
+                                : "NÃO PREENCHIDO"}
+                              {/* {!possuiTag && membroId !== "sem membro" && (
+                              <Chip
+                                label="Sem TAG"
+                                variant="outlined"
+                                sx={{
+                                  ...styles.chipName,
+                                  borderColor: "#D32F2F",
+                                }}
+                              />
+                            )} */}
+                              {(usuario.usuarioHostId === membroId ||
+                                usuario.usuarioDefaultId === membroId) && (
+                                <Chip
+                                  label="Eu"
+                                  variant="outlined"
+                                  sx={styles.chipName}
+                                />
+                              )}
+                            </Typography>
+                            <Typography
+                              sx={{
+                                ...styles.textPerfilProximoCulto,
+                                color: "#F3CE24",
+                                fontSize: "14px",
+                              }}
+                            >
+                              {tagNome}
+                            </Typography>
+                          </Box>
+                          {editarEscala && membroId !== "sem membro" && (
+                            <IconButton
+                              sx={{
+                                "&.MuiButtonBase-root.MuiIconButton-root:hover ":
+                                  {
+                                    backgroundColor: "rgba(211, 47, 47, 0.2)",
+                                  },
+                              }}
+                            >
+                              <PersonRemoveAlt1Outlined
+                                sx={{
+                                  color: "#D32F2F",
+                                  fontSize: "24px",
+                                }}
+                              />
+                            </IconButton>
+                          )}
+                          {membroId === "sem membro" && (
+                            <IconButton
+                              sx={styles.IconButtonHover}
+                              onClick={() => {
+                                setOpenModalEscalarMembro(true);
+                              }}
+                            >
+                              <PersonAddAlt1Outlined
+                                sx={{ color: "#F3A913", fontSize: "24px" }}
+                              />
+                            </IconButton>
+                          )}
+                          <Divider
+                            sx={{
+                              ...styles.divider,
+                              width: "100%",
+                              position: "absolute",
+                              bottom: 0,
+                            }}
+                          />
+                        </Box>
+                      )
+                    )}
+                  </Box>
+                </>
+              ) : (
+                <Box sx={{ ...styles.configBox, height: "100%" }}>
+                  <Typography sx={styles.textTitulo}>
+                    Sem programação
+                  </Typography>
+                </Box>
+              )}
+            </>
+          )}
         </Box>
         <Box sx={styles.boxAreaBotaoCard}>
           <Divider sx={styles.divider} />
@@ -995,13 +1089,20 @@ const PaginaGeral = (params) => {
                 sx={styles.estiloTabs}
               >
                 <Tab
+                  onClick={() => {
+                    if (valueTabInformacoes !== "escalado") {
+                      handleBuscarEscalacoesUsuario();
+                    }
+                  }}
                   label="Escalado"
                   value="escalado"
                   sx={{ color: "#ffffff" }}
                 />
                 <Tab
                   onClick={() => {
-                    handleBuscarTagsMembroEquipe();
+                    if (valueTabInformacoes !== "tags") {
+                      handleBuscarTagsMembroEquipe();
+                    }
                   }}
                   label="Tags"
                   value="tags"
@@ -1010,50 +1111,78 @@ const PaginaGeral = (params) => {
               </Tabs>
             </Box>
             <Box sx={styles.boxAreaConteudoTabsInformacoes}>
-              {/* {valueTabInformacoes === "escalado" &&
-                Array.from({ length: 6 }).map((_, index) => (
-                  <Box key={index} sx={styles.boxCardEscalado}>
-                    <Box sx={styles.boxInfoEscalado1}>
-                      <Typography
-                        sx={{ ...styles.textDataCardEscalado, width: "auto" }}
-                      >
-                        Domingo
-                        <Divider
-                          sx={{
-                            ...styles.divider,
-                            width: "104%",
-                            mt: "-2px",
-                            mb: "2px",
-                          }}
-                        />
-                      </Typography>
-                      <Typography sx={styles.textDataCardEscaladoCulto}>
-                        Culto Celebração - ZS16
-                      </Typography>
-                      <Typography
-                        sx={{
-                          ...styles.textDataCardEscalado,
-                          color: "#F3CE24",
-                        }}
-                      >
-                        Câmera Lateral - Direita
-                      </Typography>
-                    </Box>
-                    <Box sx={styles.boxInfoEscalado2}>
-                      <Typography sx={styles.text2DataCardEscalado}>
-                        18/01
-                      </Typography>
-                      <Typography sx={styles.text2DataCardEscalado}>
-                        17:00
-                      </Typography>
-                    </Box>
-                  </Box>
-                ))} */}
-
               {valueTabInformacoes === "escalado" && (
-                <Box sx={{ ...styles.configBox, height: "100%" }}>
-                  <Typography sx={styles.textTitulo}>Nenhuma escala</Typography>
-                </Box>
+                <>
+                  {loadingTabelaInformacoesEscalado && (
+                    <Box sx={styles.boxAreaCircularProgress}>
+                      <CircularProgress />
+                    </Box>
+                  )}
+                  {!loadingTabelaInformacoesEscalado && (
+                    <>
+                      {escalacoesUsuario?.map(
+                        (
+                          { data, dia, horario, culto, usuarioEscalado },
+                          index
+                        ) => (
+                          <>
+                            <Box key={index} sx={styles.boxCardEscalado}>
+                              <Box sx={styles.boxInfoEscalado1}>
+                                <Typography
+                                  sx={{
+                                    ...styles.textDataCardEscalado,
+                                    width: "auto",
+                                  }}
+                                >
+                                  {dia}
+                                  <Divider
+                                    sx={{
+                                      ...styles.divider,
+                                      width: "104%",
+                                      mt: "-2px",
+                                      mb: "2px",
+                                    }}
+                                  />
+                                </Typography>
+                                <Typography
+                                  sx={styles.textDataCardEscaladoCulto}
+                                >
+                                  {culto}
+                                </Typography>
+                                <Typography
+                                  sx={{
+                                    ...styles.textDataCardEscalado,
+                                    color: "#F3CE24",
+                                  }}
+                                >
+                                  {usuarioEscalado.tagNome}
+                                </Typography>
+                              </Box>
+                              <Box sx={styles.boxInfoEscalado2}>
+                                <Typography sx={styles.text2DataCardEscalado}>
+                                  {data.split("/").slice(0, 2).join("/")}
+                                </Typography>
+
+                                <Typography sx={styles.text2DataCardEscalado}>
+                                  {horario}
+                                </Typography>
+                              </Box>
+                              <Box sx={styles.boxLinhaDivisoria} />
+                            </Box>
+                          </>
+                        )
+                      )}
+
+                      {escalacoesUsuario?.length === 0 && (
+                        <Box sx={{ ...styles.configBox, height: "100%" }}>
+                          <Typography sx={styles.textTitulo}>
+                            Nenhuma escala
+                          </Typography>
+                        </Box>
+                      )}
+                    </>
+                  )}
+                </>
               )}
 
               {valueTabInformacoes === "tags" && (
