@@ -180,6 +180,10 @@ const styles = {
     "&:hover": {
       background: "#FEBC36",
     },
+    "&:disabled": {
+      color: "#ffffff",
+      background: "rgba(243, 169, 19, 0.6)",
+    },
   },
   botaoDefaultCancelar: {
     display: "flex",
@@ -644,8 +648,11 @@ const PaginaGeral = (params) => {
     useState(false);
 
   const [proximaEscala, setProximaEscala] = useState([]);
+  const [copyProximaEscala, setCopyProximaEscala] = useState([]);
   const [loadingTabelaProximaEscala, setLoadingTabelaProximaEscala] =
     useState(true);
+  const [infoEscalarMembro, setInfoEscalarMembro] = useState([]);
+  const [loadingApiEscalarMembro, setLoadingApiEscalarMembro] = useState(false);
 
   //UseEffect's
 
@@ -667,6 +674,7 @@ const PaginaGeral = (params) => {
 
       if (response?.status === 200) {
         setProximaEscala(response?.data);
+        setCopyProximaEscala(response?.data);
         setLoadingTabelaProximaEscala(false);
       } else {
         setSnackbar("error", "Erro ao conectar com o servidor");
@@ -675,6 +683,50 @@ const PaginaGeral = (params) => {
     } catch (error) {
       setSnackbar("error", "Erro ao conectar com o servidor");
       console.error("erro ao buscar próxima escala: ", error);
+    }
+  };
+
+  const handleAtualizarEscalaData = async () => {
+    try {
+      setLoadingApiEscalarMembro(true);
+
+      const response = await api.post("/updateEscalaData", {
+        equipeId: usuario?.equipeId,
+        escalaDataId: proximaEscala?.escalaDataId,
+        escalados: proximaEscala?.escalados,
+      });
+
+      if (response?.status === 200) {
+        setEditarEscala(false);
+        setLoadingApiEscalarMembro(false);
+        handleBuscarProximaEscala();
+        if (
+          proximaEscala?.escalados?.some(
+            (escalados) =>
+              escalados.membroId === usuario?.usuarioHostId ||
+              escalados.membroId === usuario?.usuarioDefaultId
+          ) ||
+          (copyProximaEscala?.escalados?.some(
+            (escalados) =>
+              escalados.membroId === usuario?.usuarioHostId ||
+              escalados.membroId === usuario?.usuarioDefaultId
+          ) &&
+            !proximaEscala?.escalados?.some(
+              (escalados) =>
+                escalados.membroId === usuario?.usuarioHostId ||
+                escalados.membroId === usuario?.usuarioDefaultId
+            ))
+        ) {
+          handleBuscarEscalacoesUsuario();
+        }
+        setSnackbar("success", "Escala salva com sucesso");
+      } else {
+        setSnackbar("error", "Erro ao conectar com o servidor");
+        console.error("erro ao executar ação", response?.status);
+      }
+    } catch (error) {
+      setSnackbar("error", "Erro ao conectar com o servidor");
+      console.error("erro ao buscar usuários disponíveis para escala: ", error);
     }
   };
 
@@ -738,6 +790,23 @@ const PaginaGeral = (params) => {
       console.error("erro ao buscar tags do usuário: ", error);
     }
   };
+
+  function handleRemoveUsuarioEscala(membroId) {
+    const indexEscalado = proximaEscala.escalados.findIndex(
+      (escalado) => escalado.membroId === membroId
+    );
+
+    if (indexEscalado !== -1) {
+      const novosEscalados = [...proximaEscala.escalados];
+      novosEscalados[indexEscalado] = {
+        ...novosEscalados[indexEscalado],
+        membroId: "sem membro",
+        membroNome: "sem membro",
+      };
+
+      setProximaEscala({ ...proximaEscala, escalados: novosEscalados });
+    }
+  }
 
   const setSnackbar = (severity, message) => {
     setSnackbarSeverity(severity);
@@ -896,6 +965,9 @@ const PaginaGeral = (params) => {
                           </Box>
                           {editarEscala && membroId !== "sem membro" && (
                             <IconButton
+                              onClick={() => {
+                                handleRemoveUsuarioEscala(membroId);
+                              }}
                               sx={{
                                 "&.MuiButtonBase-root.MuiIconButton-root:hover ":
                                   {
@@ -915,6 +987,17 @@ const PaginaGeral = (params) => {
                             <IconButton
                               sx={styles.IconButtonHover}
                               onClick={() => {
+                                setInfoEscalarMembro({
+                                  escalaDataId: proximaEscala?.escalaDataId,
+                                  programacaoId: proximaEscala?.programacaoId,
+                                  culto: proximaEscala?.culto,
+                                  data: proximaEscala?.data,
+                                  horario: proximaEscala?.horario,
+                                  dia: proximaEscala?.dia,
+                                  tagId: tagId,
+                                  tagNome: tagNome,
+                                  escalados: proximaEscala?.escalados,
+                                });
                                 setOpenModalEscalarMembro(true);
                               }}
                             >
@@ -961,19 +1044,29 @@ const PaginaGeral = (params) => {
                       gap: "4px",
                       padding: "0px 20px",
                     }}
-                    onClick={() => setEditarEscala(false)}
+                    onClick={() => {
+                      setProximaEscala(copyProximaEscala);
+                      setEditarEscala(false);
+                    }}
                   >
                     <Close sx={{ fontSize: "18px" }} />
                     Cancelar
                   </Button>
                   <Button
+                    disabled={
+                      proximaEscala?.escalados ===
+                        copyProximaEscala?.escalados || loadingApiEscalarMembro
+                    }
                     variant="contained"
                     sx={{
                       ...styles.botaoDefault,
                       mb: "8px",
                       gap: "4px",
                     }}
-                    onClick={() => setEditarEscala(false)}
+                    onClick={() => {
+                      handleAtualizarEscalaData();
+                      setEditarEscala(false);
+                    }}
                   >
                     <SaveOutlined sx={{ fontSize: "18px" }} />
                     Salvar
@@ -1022,17 +1115,20 @@ const PaginaGeral = (params) => {
           </Box>
           <Box sx={styles.boxAreaBotaoCard}>
             <Divider sx={styles.divider} />
-            <Button
-              disabled
-              variant="contained"
-              sx={{ ...styles.botaoDefault, mb: "8px", gap: "4px" }}
-              onClick={() => {
-                setOpenModalCriarAviso(true);
-              }}
-            >
-              <AssignmentLateOutlined sx={{ fontSize: "18px" }} />
-              Criar Aviso
-            </Button>
+            {(usuario?.autorizacao === "adm001" ||
+              usuario?.autorizacao === "adm002") && (
+              <Button
+                disabled
+                variant="contained"
+                sx={{ ...styles.botaoDefault, mb: "8px", gap: "4px" }}
+                onClick={() => {
+                  setOpenModalCriarAviso(true);
+                }}
+              >
+                <AssignmentLateOutlined sx={{ fontSize: "18px" }} />
+                Criar Aviso
+              </Button>
+            )}
           </Box>
         </Box>
         {/* Tabela EVENTOS */}
@@ -1046,20 +1142,23 @@ const PaginaGeral = (params) => {
           </Box>
           <Box sx={styles.boxAreaBotaoCard}>
             <Divider sx={styles.divider} />
-            <Button
-              disabled
-              variant="contained"
-              sx={{ ...styles.botaoDefault, mb: "8px", gap: "4px" }}
-              onClick={() => {
-                setOpenModalCriarEvento(true);
-              }}
-            >
-              <Box sx={styles.boxDoubleIconeBotaoEvento}>
-                <CalendarTodayOutlinedIcon sx={{ fontSize: "18px" }} />
-                <Star sx={styles.positionStarCalendario} />
-              </Box>
-              Criar Evento
-            </Button>
+            {(usuario?.autorizacao === "adm001" ||
+              usuario?.autorizacao === "adm002") && (
+              <Button
+                disabled
+                variant="contained"
+                sx={{ ...styles.botaoDefault, mb: "8px", gap: "4px" }}
+                onClick={() => {
+                  setOpenModalCriarEvento(true);
+                }}
+              >
+                <Box sx={styles.boxDoubleIconeBotaoEvento}>
+                  <CalendarTodayOutlinedIcon sx={{ fontSize: "18px" }} />
+                  <Star sx={styles.positionStarCalendario} />
+                </Box>
+                Criar Evento
+              </Button>
+            )}
           </Box>
         </Box>
       </Box>
@@ -1235,8 +1334,14 @@ const PaginaGeral = (params) => {
 
       {/* Modais */}
       <ModalEscalarMembro
+        usuarioLogado={usuario}
+        infoEscalarMembro={infoEscalarMembro}
         openModalEscalarMembro={openModalEscalarMembro}
         setOpenModalEscalarMembro={setOpenModalEscalarMembro}
+        handleBuscarProximaEscala={handleBuscarProximaEscala}
+        handleBuscarEscalacoesUsuario={handleBuscarEscalacoesUsuario}
+        editarEscala={editarEscala}
+        setProximaEscala={setProximaEscala}
       />
       <ModalCriarAviso
         openModalCriarAviso={openModalCriarAviso}
