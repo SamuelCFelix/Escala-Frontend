@@ -677,7 +677,6 @@ const CriarEquipe = () => {
   const [servindo, setServindo] = useState();
   const [tituloCulto, setTituloCulto] = useState("");
   const [anchorEl, setAnchorEl] = useState(null);
-  const [anchorElTags, setAnchorElTags] = useState(null);
   const [programacoes, setProgramacoes] = useState([]);
   const [positionProgramacao, setPositionProgramacao] = useState("");
   const [tags, setTags] = useState([]);

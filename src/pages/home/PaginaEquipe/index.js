@@ -21,13 +21,21 @@ import {
 import {
   Alert,
   Avatar,
+  Backdrop,
   Box,
   Button,
   Chip,
   CircularProgress,
   Divider,
+  Fade,
   IconButton,
   LinearProgress,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+  MenuList,
+  Modal,
   Pagination,
   Snackbar,
   Stack,
@@ -50,6 +58,9 @@ import ManageAccountsOutlinedIcon from "@mui/icons-material/ManageAccountsOutlin
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import api from "../../../api";
 import ModalPerfilMembro from "./modais/modalPerfilMembro";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import ModalConfirmarCandidatura from "./modais/modalConfirmarCandidatura";
 
 const styles = {
   configBox: {
@@ -181,6 +192,10 @@ const styles = {
     "&:hover": {
       background: "#FEBC36",
     },
+    "&:disabled": {
+      color: "#ffffff",
+      background: "rgba(243, 169, 19, 0.6)",
+    },
   },
   botaoDefaultCancelar: {
     display: "flex",
@@ -205,6 +220,7 @@ const styles = {
   },
   boxCardEscalaMensal: {
     /* background: "green", */
+    position: "relative",
     display: "flex",
     flexDirection: "column",
     width: "100%",
@@ -601,6 +617,7 @@ const styles = {
   },
   boxCardInfoEscaladosMensal: {
     background: "#1B1B1B",
+    position: "relative",
     display: "flex",
     flexDirection: "column",
     width: "95%",
@@ -891,10 +908,59 @@ const styles = {
     gap: "4px",
     overflowY: "auto",
   },
+  boxButtonConfigEscala: {
+    position: "absolute",
+    display: "flex",
+    top: "6px",
+    right: "7px",
+  },
+  boxModal: {
+    backgroundColor: "#000000",
+    border: "1px solid #F3A913",
+    borderRadius: "10px",
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: "446px",
+    height: "70vh",
+    boxShadow: 24,
+  },
+  boxConteudoModal: {
+    position: "relative",
+    width: "100%",
+    height: "100%",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    gap: "10px",
+  },
+  dataTextModal: {
+    color: "#ffffff",
+    fontSize: "14px",
+    lineHeight: "24px",
+    letterSpacing: "0.17px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    textAlign: "center",
+    gap: "6px",
+  },
+  boxBotoesModal: {
+    display: "flex",
+    width: "100%",
+    gap: "6px",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    margin: "10px 0px",
+    mr: "20px",
+  },
 };
 
 const PaginaEquipe = (params) => {
   const { usuario } = params;
+  const [isAdm, setIsAdm] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState("");
   const [snackbarMessage, setSnackbarMessage] = useState("");
@@ -913,42 +979,43 @@ const PaginaEquipe = (params) => {
   const [usuarioPerfil, setUsuarioPerfil] = useState([]);
 
   const [openModalPerfilMembro, setOpenModalPerfilMembro] = useState(false);
+  const [anchorElsMenuEscala, setAnchorElsMenuEscala] = useState({});
 
-  const [proximaEscala, setProximaEscala] = useState([
-    {
-      membro: "João Vinícius Soares",
-      tag: "Cortes de Câmera",
-      possuiTag: true,
-    },
-    {
-      membro: "Samuel Cardoso Félix",
-      tag: "Câmera Lateral - Direita",
-      possuiTag: true,
-    },
-    {
-      membro: "Hatus Yodes Santos",
-      tag: "Câmera Lateral - Esquerda",
-      possuiTag: false,
-    },
-    { membro: "NÃO PREENCHIDO", tag: "Câmera Central", possuiTag: null },
-    { membro: "Renata Xavier Silva", tag: "Gimball 1", possuiTag: true },
-    { membro: "Samuel Silva Xavier", tag: "Gimball 2", possuiTag: true },
-  ]);
-  const [editarEscala, setEditarEscala] = useState(false);
+  const [editarEscala, setEditarEscala] = useState({});
   const [openModalEscalarMembro, setOpenModalEscalarMembro] = useState(false);
   const [valueTabInformacoes, setValueTabInformacoes] = useState("membros");
   const [escalaMensal, setEscalaMensal] = useState([]);
+  const [copyEscalaMensal, setCopyEscalaMensal] = useState([]);
   const [loadingTabelaEscalaMensal, setLoadingTabelaEscalaMensal] =
     useState(true);
+  const [loadingApiEscalarMembro, setLoadingApiEscalarMembro] = useState(false);
+  const [infoEscalarMembro, setInfoEscalarMembro] = useState([]);
+  const [openModalConfirmarCandidatar, setOpenModalConfirmarCandidatar] =
+    useState(false);
+  const [tagsUsuario, setTagsUsuario] = useState([]);
 
   //UseEffect's
 
   useEffect(() => {
+    handleBuscarTagsMembroEquipe();
     handleBuscarTabelaSolicitacoesEntrada();
     handleBuscarMembrosMinhaEquipe();
     handleBuscarTagsEquipe();
     handleBuscarEscalaMensal();
   }, []);
+
+  useEffect(() => {
+    if (usuario) {
+      if (
+        usuario?.autorizacao === "adm001" ||
+        usuario?.autorizacao === "adm002"
+      ) {
+        setIsAdm(true);
+      } else {
+        setIsAdm(false);
+      }
+    }
+  }, [usuario]);
 
   //API's
 
@@ -980,6 +1047,7 @@ const PaginaEquipe = (params) => {
       });
 
       if (response?.status === 200) {
+        setCopyEscalaMensal(response?.data);
         setEscalaMensal(response?.data);
         setLoadingTabelaEscalaMensal(false);
       } else {
@@ -989,6 +1057,36 @@ const PaginaEquipe = (params) => {
     } catch (error) {
       setSnackbar("error", "Erro ao conectar com o servidor");
       console.error("erro ao buscar escala mensal da equipe: ", error);
+    }
+  };
+
+  const handleAtualizarEscala = async (escalaDataId) => {
+    try {
+      setLoadingApiEscalarMembro(true);
+      let indexEscala = escalaMensal?.findIndex(
+        (escala) => escala.escalaDataId === escalaDataId
+      );
+
+      const response = await api.post("/updateEscalaData", {
+        equipeId: usuario?.equipeId,
+        escalaDataId: escalaDataId,
+        escalados: escalaMensal[indexEscala]?.escalados,
+      });
+
+      if (response?.status === 200) {
+        handleEditarEscala(escalaDataId, false);
+        setLoadingApiEscalarMembro(false);
+        handleBuscarEscalaMensal();
+        setSnackbar("success", "Escala salva com sucesso");
+      } else {
+        setSnackbar("error", "Erro ao conectar com o servidor");
+        console.error("erro ao executar ação", response?.status);
+      }
+    } catch (error) {
+      setSnackbar("error", "Erro ao conectar com o servidor");
+      console.error("erro salvar alterações da escala: ", error);
+    } finally {
+      setLoadingApiEscalarMembro(false);
     }
   };
 
@@ -1074,6 +1172,33 @@ const PaginaEquipe = (params) => {
     }
   };
 
+  const handleBuscarTagsMembroEquipe = async () => {
+    try {
+      let response = null;
+
+      if (usuario?.usuarioHostId) {
+        response = await api.post("/buscarTagsMembroEquipe", {
+          usuarioId: usuario?.usuarioHostId,
+          host: true,
+        });
+      } else {
+        response = await api.post("/buscarTagsMembroEquipe", {
+          usuarioId: usuario?.usuarioDefaultId,
+        });
+      }
+
+      if (response?.status === 200) {
+        setTagsUsuario(response?.data);
+      } else {
+        setSnackbar("error", "Erro ao conectar com o servidor");
+        console.error("erro ao executar ação", response?.status);
+      }
+    } catch (error) {
+      setSnackbar("error", "Erro ao conectar com o servidor");
+      console.error("erro ao buscar tags do usuário: ", error);
+    }
+  };
+
   const handleOrganizarListaMembros = (membros) => {
     const administradoresEquipe = [];
     const membrosEquipe = [];
@@ -1096,6 +1221,56 @@ const PaginaEquipe = (params) => {
     setMembrosMinhaEquipe([...membrosEquipe]);
     setLoadingTabelaMinhaEquipeMembros(false);
   };
+
+  const handleOpenMenuEscala = (event, id) => {
+    setAnchorElsMenuEscala((prevAnchorEls) => ({
+      ...prevAnchorEls,
+      [id]: event.currentTarget,
+    }));
+  };
+
+  const handleCloseMenuEscala = (id) => {
+    setAnchorElsMenuEscala((prevAnchorEls) => ({
+      ...prevAnchorEls,
+      [id]: null,
+    }));
+  };
+
+  const handleEditarEscala = (id, valor) => {
+    setEditarEscala((prevAnchorEls) => ({
+      ...prevAnchorEls,
+      [id]: valor,
+    }));
+  };
+
+  function handleRemoveUsuarioEscala(escalaDataId, membroId) {
+    const indexEscala = escalaMensal?.findIndex(
+      (escala) => escala.escalaDataId === escalaDataId
+    );
+
+    if (indexEscala !== -1) {
+      const indexEscalado = escalaMensal[indexEscala]?.escalados?.findIndex(
+        (escalado) => escalado.membroId === membroId
+      );
+
+      if (indexEscalado !== -1) {
+        const novosEscalados = [...escalaMensal[indexEscala]?.escalados];
+        novosEscalados[indexEscalado] = {
+          ...novosEscalados[indexEscalado],
+          membroId: "sem membro",
+          membroNome: "sem membro",
+        };
+
+        const novaEscalaMensal = [...escalaMensal];
+        novaEscalaMensal[indexEscala] = {
+          ...novaEscalaMensal[indexEscala],
+          escalados: novosEscalados,
+        };
+
+        setEscalaMensal(novaEscalaMensal);
+      }
+    }
+  }
 
   const setSnackbar = (severity, message) => {
     setSnackbarSeverity(severity);
@@ -1151,7 +1326,16 @@ const PaginaEquipe = (params) => {
           {!loadingTabelaEscalaMensal && (
             <>
               {escalaMensal?.map(
-                ({ programacaoId, data, dia, horario, culto, escalados }) => (
+                ({
+                  programacaoId,
+                  escalaDataId,
+                  data,
+                  dia,
+                  horario,
+                  culto,
+                  escalados,
+                  index,
+                }) => (
                   <Box sx={styles.boxCardEscalaMensal}>
                     <Box sx={styles.boxInfoEscalaMensal}>
                       <Typography sx={styles.textTituloInfoEscala}>
@@ -1258,37 +1442,229 @@ const PaginaEquipe = (params) => {
                                 {tagNome}
                               </Typography>
                             </Box>
-                            {/* {editarEscala && membroId !== "sem membro" && (
-                              <IconButton
-                                sx={{
-                                  "&.MuiButtonBase-root.MuiIconButton-root:hover ":
-                                    {
-                                      backgroundColor: "rgba(211, 47, 47, 0.2)",
-                                    },
-                                }}
-                              >
-                                <PersonRemoveAlt1Outlined
-                                  sx={{
-                                    color: "#D32F2F",
-                                    fontSize: "22px",
+                            {editarEscala[escalaDataId] &&
+                              membroId !== "sem membro" && (
+                                <IconButton
+                                  onClick={() => {
+                                    handleRemoveUsuarioEscala(
+                                      escalaDataId,
+                                      membroId
+                                    );
                                   }}
-                                />
-                              </IconButton>
-                            )} */}
-                            {membroId === "sem membro" && (
-                              <IconButton
-                                sx={styles.IconButtonHover}
-                                onClick={() => {
-                                  setOpenModalEscalarMembro(true);
-                                }}
-                              >
-                                <PersonAddAlt1Outlined
-                                  sx={{ color: "#F3A913", fontSize: "22px" }}
-                                />
-                              </IconButton>
-                            )}
+                                  sx={{
+                                    "&.MuiButtonBase-root.MuiIconButton-root:hover ":
+                                      {
+                                        backgroundColor:
+                                          "rgba(211, 47, 47, 0.2)",
+                                      },
+                                  }}
+                                >
+                                  <PersonRemoveAlt1Outlined
+                                    sx={{
+                                      color: "#D32F2F",
+                                      fontSize: "22px",
+                                    }}
+                                  />
+                                </IconButton>
+                              )}
+                            {membroId === "sem membro" &&
+                              ((isAdm && (
+                                <IconButton
+                                  sx={styles.IconButtonHover}
+                                  onClick={() => {
+                                    setInfoEscalarMembro({
+                                      escalaDataId,
+                                      programacaoId,
+                                      culto,
+                                      data,
+                                      horario,
+                                      dia,
+                                      tagId,
+                                      tagNome,
+                                      escalados,
+                                    });
+
+                                    setOpenModalEscalarMembro(true);
+                                  }}
+                                >
+                                  <PersonAddAlt1Outlined
+                                    sx={{ color: "#F3A913", fontSize: "22px" }}
+                                  />
+                                </IconButton>
+                              )) ||
+                                (!escalados.some(
+                                  (escala) =>
+                                    escala.membroId ===
+                                    usuario?.usuarioDefaultId
+                                ) &&
+                                  tagsUsuario?.some(
+                                    (userTags) => userTags.id === tagId
+                                  ) && (
+                                    <IconButton
+                                      sx={styles.IconButtonHover}
+                                      onClick={() => {
+                                        setInfoEscalarMembro({
+                                          escalaDataId,
+                                          programacaoId,
+                                          culto,
+                                          data,
+                                          horario,
+                                          dia,
+                                          tagId,
+                                          tagNome,
+                                          escalados,
+                                        });
+
+                                        setOpenModalConfirmarCandidatar(true);
+                                      }}
+                                    >
+                                      <PersonAddAlt1Outlined
+                                        sx={{
+                                          color: "#F3A913",
+                                          fontSize: "22px",
+                                        }}
+                                      />
+                                    </IconButton>
+                                  )))}
                           </Box>
                         )
+                      )}
+                      {isAdm && editarEscala[escalaDataId] && (
+                        <>
+                          <Box
+                            sx={{
+                              ...styles.boxAreaBotaoCard,
+                              height: "36px",
+                            }}
+                          >
+                            <Divider sx={styles.divider} />
+
+                            <Box
+                              sx={{
+                                ...styles.configBox,
+                                gap: "16px",
+                                mb: "4px",
+                              }}
+                            >
+                              <Button
+                                variant="contained"
+                                sx={{
+                                  ...styles.botaoDefaultCancelar,
+                                  gap: "4px",
+                                  padding: "0px 16px",
+                                  fontSize: "10px",
+                                  height: "22px",
+                                }}
+                                onClick={() => {
+                                  setEscalaMensal(copyEscalaMensal);
+                                  handleEditarEscala(escalaDataId, false);
+                                }}
+                              >
+                                <Close sx={{ fontSize: "16px" }} />
+                                Cancelar
+                              </Button>
+                              <Button
+                                disabled={loadingApiEscalarMembro}
+                                variant="contained"
+                                sx={{
+                                  ...styles.botaoDefault,
+                                  gap: "4px",
+                                  fontSize: "10px",
+                                  height: "22px",
+                                }}
+                                onClick={() => {
+                                  handleAtualizarEscala(escalaDataId);
+                                }}
+                              >
+                                <SaveOutlined sx={{ fontSize: "16px" }} />
+                                Salvar
+                              </Button>
+                            </Box>
+                          </Box>
+                        </>
+                      )}
+
+                      {isAdm && (
+                        <>
+                          <Box sx={styles.boxButtonConfigEscala}>
+                            <IconButton
+                              onClick={(event) => {
+                                handleOpenMenuEscala(event, escalaDataId);
+                              }}
+                              sx={styles.IconButtonHover}
+                            >
+                              <SettingsOutlined
+                                sx={{ fontSize: "18px", color: "#F3A913" }}
+                              />
+                            </IconButton>
+                            <Menu
+                              anchorEl={anchorElsMenuEscala[escalaDataId]}
+                              open={Boolean(anchorElsMenuEscala[escalaDataId])}
+                              onClose={() =>
+                                handleCloseMenuEscala(escalaDataId)
+                              }
+                              PaperProps={{
+                                sx: {
+                                  backgroundColor: "#565656",
+                                  "& .MuiList-root.MuiMenu-list": {
+                                    paddingTop: "2px",
+                                    paddingBottom: "2px",
+                                  },
+                                },
+                              }}
+                              MenuListProps={{
+                                "aria-labelledby": "basic-button",
+                              }}
+                            >
+                              <MenuList
+                                sx={{
+                                  paddingTop: "0px",
+                                  paddingBottom: "0px",
+                                }}
+                              >
+                                <MenuItem
+                                  sx={{
+                                    color: "#ffffff",
+                                    "& .MuiTypography-root": {
+                                      fontSize: "14px",
+                                    },
+                                  }}
+                                  onClick={() => {
+                                    handleEditarEscala(escalaDataId, true);
+                                    handleCloseMenuEscala(escalaDataId);
+                                  }}
+                                >
+                                  <ListItemIcon>
+                                    <EditOutlinedIcon
+                                      sx={{ color: "#F3A913" }}
+                                      fontSize="small"
+                                    />
+                                  </ListItemIcon>
+                                  <ListItemText>Editar</ListItemText>
+                                </MenuItem>
+                                <MenuItem
+                                  sx={{
+                                    color: "#ffffff",
+                                    "& .MuiTypography-root": {
+                                      fontSize: "14px",
+                                    },
+                                  }}
+                                  onClick={() => {
+                                    handleCloseMenuEscala(escalaDataId);
+                                  }}
+                                >
+                                  <ListItemIcon>
+                                    <DeleteOutlineOutlinedIcon
+                                      color="error"
+                                      fontSize="small"
+                                    />
+                                  </ListItemIcon>
+                                  <ListItemText>Deletar</ListItemText>
+                                </MenuItem>
+                              </MenuList>
+                            </Menu>
+                          </Box>
+                        </>
                       )}
                     </Box>
                   </Box>
@@ -1306,8 +1682,7 @@ const PaginaEquipe = (params) => {
         </Box>
         <Box sx={styles.boxAreaBotaoCard}>
           <Divider sx={styles.divider} />
-          {(usuario?.autorizacao === "adm001" ||
-            usuario?.autorizacao === "adm002") && (
+          {isAdm && (
             <Button
               variant="contained"
               sx={{ ...styles.botaoDefault, mb: "8px", gap: "4px" }}
@@ -1321,8 +1696,7 @@ const PaginaEquipe = (params) => {
       </Box>
 
       {/* Tabela SOLICITAÇÕES DE ENTRADA */}
-      {(usuario?.autorizacao === "adm001" ||
-        usuario?.autorizacao === "adm002") && (
+      {isAdm && (
         <Box sx={styles.boxCardDefault}>
           {boxTituloCards("Solicitações de entrada")}
           <Box sx={{ ...styles.areaConteudoCard, overflowY: "auto" }}>
@@ -1563,8 +1937,7 @@ const PaginaEquipe = (params) => {
                                     }}
                                     sx={styles.configIconButton}
                                   >
-                                    {usuario?.autorizacao === "adm001" ||
-                                    usuario?.autorizacao === "adm002" ? (
+                                    {isAdm ? (
                                       <ManageAccountsOutlinedIcon
                                         sx={styles.iconListMembro}
                                       />
@@ -1626,8 +1999,7 @@ const PaginaEquipe = (params) => {
                                     }}
                                     sx={styles.configIconButton}
                                   >
-                                    {usuario?.autorizacao === "adm001" ||
-                                    usuario?.autorizacao === "adm002" ? (
+                                    {isAdm ? (
                                       <ManageAccountsOutlinedIcon
                                         sx={styles.iconListMembro}
                                       />
@@ -1695,8 +2067,7 @@ const PaginaEquipe = (params) => {
                                     }}
                                     sx={styles.configIconButton}
                                   >
-                                    {usuario?.autorizacao === "adm001" ||
-                                    usuario?.autorizacao === "adm002" ? (
+                                    {isAdm ? (
                                       <ManageAccountsOutlinedIcon
                                         sx={styles.iconListMembro}
                                       />
@@ -1761,8 +2132,14 @@ const PaginaEquipe = (params) => {
 
       {/* Modais */}
       <ModalEscalarMembro
+        usuarioLogado={usuario}
+        infoEscalarMembro={infoEscalarMembro}
         openModalEscalarMembro={openModalEscalarMembro}
         setOpenModalEscalarMembro={setOpenModalEscalarMembro}
+        handleBuscarEscalaMensal={handleBuscarEscalaMensal}
+        editarEscala={editarEscala}
+        escalaMensal={escalaMensal}
+        setEscalaMensal={setEscalaMensal}
       />
 
       <ModalPerfilMembro
@@ -1772,6 +2149,14 @@ const PaginaEquipe = (params) => {
         setOpenModalPerfilMembro={setOpenModalPerfilMembro}
         tagsEquipe={tagsEquipe}
         handleBuscarMembrosMinhaEquipe={handleBuscarMembrosMinhaEquipe}
+      />
+
+      <ModalConfirmarCandidatura
+        usuarioLogado={usuario}
+        openModalConfirmarCandidatar={openModalConfirmarCandidatar}
+        setOpenModalConfirmarCandidatar={setOpenModalConfirmarCandidatar}
+        infoEscalarMembro={infoEscalarMembro}
+        handleBuscarEscalaMensal={handleBuscarEscalaMensal}
       />
 
       <Snackbar

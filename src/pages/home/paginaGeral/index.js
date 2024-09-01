@@ -49,6 +49,7 @@ import CardEvento from "./cardEvento";
 import AddchartOutlinedIcon from "@mui/icons-material/AddchartOutlined";
 import api from "../../../api";
 import ModalDisponibilidade from "./modais/modalDisponibilidade";
+import ModalConfirmarCandidatura from "../paginaGeral/modais/modalConfirmarCandidatura";
 
 const styles = {
   configBox: {
@@ -627,6 +628,7 @@ const styles = {
 
 const PaginaGeral = (params) => {
   const { usuario } = params;
+  const [isAdm, setIsAdm] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState("");
   const [snackbarMessage, setSnackbarMessage] = useState("");
@@ -653,13 +655,29 @@ const PaginaGeral = (params) => {
     useState(true);
   const [infoEscalarMembro, setInfoEscalarMembro] = useState([]);
   const [loadingApiEscalarMembro, setLoadingApiEscalarMembro] = useState(false);
+  const [openModalConfirmarCandidatar, setOpenModalConfirmarCandidatar] =
+    useState(false);
 
   //UseEffect's
 
   useEffect(() => {
+    handleBuscarTagsMembroEquipe();
     handleBuscarProximaEscala();
     handleBuscarEscalacoesUsuario();
   }, []);
+
+  useEffect(() => {
+    if (usuario) {
+      if (
+        usuario?.autorizacao === "adm001" ||
+        usuario?.autorizacao === "adm002"
+      ) {
+        setIsAdm(true);
+      } else {
+        setIsAdm(false);
+      }
+    }
+  }, [usuario]);
 
   //API's
 
@@ -726,7 +744,9 @@ const PaginaGeral = (params) => {
       }
     } catch (error) {
       setSnackbar("error", "Erro ao conectar com o servidor");
-      console.error("erro ao buscar usuários disponíveis para escala: ", error);
+      console.error("erro salvar alterações da escala: ", error);
+    } finally {
+      setLoadingApiEscalarMembro(false);
     }
   };
 
@@ -983,29 +1003,66 @@ const PaginaGeral = (params) => {
                               />
                             </IconButton>
                           )}
-                          {membroId === "sem membro" && (
-                            <IconButton
-                              sx={styles.IconButtonHover}
-                              onClick={() => {
-                                setInfoEscalarMembro({
-                                  escalaDataId: proximaEscala?.escalaDataId,
-                                  programacaoId: proximaEscala?.programacaoId,
-                                  culto: proximaEscala?.culto,
-                                  data: proximaEscala?.data,
-                                  horario: proximaEscala?.horario,
-                                  dia: proximaEscala?.dia,
-                                  tagId: tagId,
-                                  tagNome: tagNome,
-                                  escalados: proximaEscala?.escalados,
-                                });
-                                setOpenModalEscalarMembro(true);
-                              }}
-                            >
-                              <PersonAddAlt1Outlined
-                                sx={{ color: "#F3A913", fontSize: "24px" }}
-                              />
-                            </IconButton>
-                          )}
+                          {membroId === "sem membro" &&
+                            ((isAdm && (
+                              <IconButton
+                                sx={styles.IconButtonHover}
+                                onClick={() => {
+                                  setInfoEscalarMembro({
+                                    escalaDataId: proximaEscala?.escalaDataId,
+                                    programacaoId: proximaEscala?.programacaoId,
+                                    culto: proximaEscala?.culto,
+                                    data: proximaEscala?.data,
+                                    horario: proximaEscala?.horario,
+                                    dia: proximaEscala?.dia,
+                                    tagId: tagId,
+                                    tagNome: tagNome,
+                                    escalados: proximaEscala?.escalados,
+                                  });
+
+                                  setOpenModalEscalarMembro(true);
+                                }}
+                              >
+                                <PersonAddAlt1Outlined
+                                  sx={{ color: "#F3A913", fontSize: "22px" }}
+                                />
+                              </IconButton>
+                            )) ||
+                              (!proximaEscala?.escalados.some(
+                                (escala) =>
+                                  escala.membroId === usuario?.usuarioDefaultId
+                              ) &&
+                                tagsUsuario?.some(
+                                  (userTags) => userTags.id === tagId
+                                ) && (
+                                  <IconButton
+                                    sx={styles.IconButtonHover}
+                                    onClick={() => {
+                                      setInfoEscalarMembro({
+                                        escalaDataId:
+                                          proximaEscala?.escalaDataId,
+                                        programacaoId:
+                                          proximaEscala?.programacaoId,
+                                        culto: proximaEscala?.culto,
+                                        data: proximaEscala?.data,
+                                        horario: proximaEscala?.horario,
+                                        dia: proximaEscala?.dia,
+                                        tagId: tagId,
+                                        tagNome: tagNome,
+                                        escalados: proximaEscala?.escalados,
+                                      });
+
+                                      setOpenModalConfirmarCandidatar(true);
+                                    }}
+                                  >
+                                    <PersonAddAlt1Outlined
+                                      sx={{
+                                        color: "#F3A913",
+                                        fontSize: "22px",
+                                      }}
+                                    />
+                                  </IconButton>
+                                )))}
                           <Divider
                             sx={{
                               ...styles.divider,
@@ -1031,8 +1088,7 @@ const PaginaGeral = (params) => {
         </Box>
         <Box sx={styles.boxAreaBotaoCard}>
           <Divider sx={styles.divider} />
-          {(usuario?.autorizacao === "adm001" ||
-            usuario?.autorizacao === "adm002") && (
+          {isAdm && (
             <>
               {editarEscala ? (
                 <Box sx={{ ...styles.configBox, gap: "16px" }}>
@@ -1087,20 +1143,21 @@ const PaginaGeral = (params) => {
         </Box>
       </Box>
 
-      <Box sx={styles.areaBoxMid}>
-        {/* Tabela AVISOS */}
-        <Box sx={styles.boxCardDefaultMid}>
+      {/* TABELA DE AVISOS E EVENTOS */}
+      {/* <Box sx={styles.areaBoxMid}>
+         *****Tabela AVISOS******* 
+        < Box sx={styles.boxCardDefaultMid}>
           <Box sx={{ ...styles.areaBoxTitulo, position: "relative" }}>
             <Box sx={styles.boxTitulo}>
               <Typography sx={styles.textTitulo}>Avisos</Typography>
               <Box sx={styles.baseTitulo} />
             </Box>
-            {/* <Box sx={styles.boxNumeroAvisos}>
+            <Box sx={styles.boxNumeroAvisos}>
               <Typography sx={styles.numeroAvisos}>7</Typography>
-            </Box> */}
+            </Box>
           </Box>
           <Box sx={{ ...styles.areaConteudoCard, overflowY: "auto" }}>
-            {/* <AvisoDefault />
+            <AvisoDefault />
 
             <AvisoNovaSolicitacao />
 
@@ -1108,15 +1165,14 @@ const PaginaGeral = (params) => {
 
             <AvisoNaoPreenchido />
 
-            <AvisoFaltaAnunciada /> */}
+            <AvisoFaltaAnunciada />
             <Box sx={{ ...styles.configBox, height: "100%" }}>
               <Typography sx={styles.textTitulo}>Em Breve</Typography>
             </Box>
           </Box>
           <Box sx={styles.boxAreaBotaoCard}>
             <Divider sx={styles.divider} />
-            {(usuario?.autorizacao === "adm001" ||
-              usuario?.autorizacao === "adm002") && (
+            {isAdm && (
               <Button
                 disabled
                 variant="contained"
@@ -1131,19 +1187,18 @@ const PaginaGeral = (params) => {
             )}
           </Box>
         </Box>
-        {/* Tabela EVENTOS */}
+        *********Tabela EVENTOS*********
         <Box sx={styles.boxCardDefaultMid}>
           {boxTituloCards("Eventos")}
           <Box sx={styles.areaConteudoCard}>
-            {/* <CardEvento /> */}
+            <CardEvento />
             <Box sx={{ ...styles.configBox, height: "100%" }}>
               <Typography sx={styles.textTitulo}>Em Breve</Typography>
             </Box>
           </Box>
           <Box sx={styles.boxAreaBotaoCard}>
             <Divider sx={styles.divider} />
-            {(usuario?.autorizacao === "adm001" ||
-              usuario?.autorizacao === "adm002") && (
+            {isAdm && (
               <Button
                 disabled
                 variant="contained"
@@ -1161,7 +1216,7 @@ const PaginaGeral = (params) => {
             )}
           </Box>
         </Box>
-      </Box>
+      </Box> */}
       {/* Tabela INFORMAÇÕES */}
       <Box sx={styles.boxCardDefault}>
         {boxTituloCards("Informações")}
@@ -1172,8 +1227,7 @@ const PaginaGeral = (params) => {
             </Avatar>
             <Typography sx={styles.textPerfilNome}>
               {usuario?.nome}
-              {(usuario?.autorizacao === "adm001" ||
-                usuario?.autorizacao === "adm002") && (
+              {isAdm && (
                 <Chip label="Admin" variant="outlined" sx={styles.chipName} />
               )}
             </Typography>
@@ -1355,6 +1409,14 @@ const PaginaGeral = (params) => {
         usuarioLogado={usuario}
         openModalDisponibilidade={openModalDisponibilidade}
         setOpenModalDisponibilidade={setOpenModalDisponibilidade}
+      />
+
+      <ModalConfirmarCandidatura
+        usuarioLogado={usuario}
+        openModalConfirmarCandidatar={openModalConfirmarCandidatar}
+        setOpenModalConfirmarCandidatar={setOpenModalConfirmarCandidatar}
+        infoEscalarMembro={infoEscalarMembro}
+        handleBuscarProximaEscala={handleBuscarProximaEscala}
       />
 
       <Snackbar

@@ -5,24 +5,34 @@ import {
   Search,
 } from "@mui/icons-material";
 import {
+  Alert,
   Avatar,
   Backdrop,
   Box,
   Button,
   Chip,
+  CircularProgress,
   Fade,
   IconButton,
   Modal,
+  Snackbar,
   TextField,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ChurchOutlinedIcon from "@mui/icons-material/ChurchOutlined";
 import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
 import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
 import SellOutlinedIcon from "@mui/icons-material/SellOutlined";
+import api from "../../../../../api";
 
 const styles = {
+  configBox: {
+    width: "100%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   boxModal: {
     backgroundColor: "#000000",
     border: "1px solid #F3A913",
@@ -257,33 +267,169 @@ const styles = {
     margin: "10px 0px",
     mr: "20px",
   },
+  boxAreaCircularProgress: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+    height: "100%",
+  },
 };
 
 const ModalEscalarMembro = (params) => {
-  const { openModalEscalarMembro, setOpenModalEscalarMembro } = params;
+  const {
+    openModalEscalarMembro,
+    setOpenModalEscalarMembro,
+    infoEscalarMembro,
+    usuarioLogado,
+    handleBuscarEscalaMensal,
+    editarEscala,
+    escalaMensal,
+    setEscalaMensal,
+  } = params;
   const [OpenModalConfirmarEscolha, setOpenModalConfirmarEscolha] =
     useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarSeverity, setSnackbarSeverity] = useState("");
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [usuariosDisponiveis, setUsuariosDisponiveis] = useState([]);
+  const [
+    loadingTabelaUsuariosDisponiveis,
+    setLoadingTabelaUsuariosDisponiveis,
+  ] = useState(true);
+  const [loadingApiEscalarMembro, setLoadingApiEscalarMembro] = useState(false);
+  const [positionUsuarioSelecionado, setPositionUsuarioSelecionado] =
+    useState(0);
 
-  const [membros, setMembros] = useState([
-    {
-      membro: "João Vinícius Soares",
-      disponivel: true,
-      possuiTag: true,
-    },
-    {
-      membro: "Samuel Cardoso Félix",
-      disponivel: true,
-      possuiTag: true,
-    },
-    {
-      membro: "Hatus Yodes Santos",
-      disponivel: true,
-      possuiTag: false,
-    },
-    { membro: "Gabriela Santos Eugênio", disponivel: true, possuiTag: false },
-    { membro: "Renata Xavier Silva", disponivel: false, possuiTag: true },
-    { membro: "Samuel Silva Xavier", disponivel: false, possuiTag: false },
-  ]);
+  //UseEffect's
+  useEffect(() => {
+    if (openModalEscalarMembro) {
+      handleBuscarUsuariosDisponiveis();
+    }
+  }, [openModalEscalarMembro]);
+
+  //API's
+
+  const handleBuscarUsuariosDisponiveis = async () => {
+    try {
+      setLoadingTabelaUsuariosDisponiveis(true);
+
+      // Definir os parâmetros a serem enviados na requisição
+      let params = {
+        equipeId: usuarioLogado?.equipeId,
+        escalaDataId: infoEscalarMembro?.escalaDataId,
+        tagId: infoEscalarMembro?.tagId,
+      };
+
+      // Se estiver no modo de edição, adicionar parâmetros adicionais
+      if (editarEscala[infoEscalarMembro?.escalaDataId]) {
+        params = {
+          ...params,
+          modoEdit: true,
+          escaladosModoEdit: infoEscalarMembro?.escalados,
+        };
+      }
+
+      // Fazer a requisição com os parâmetros definidos
+      const response = await api.post(
+        "/buscarUsuariosDisponiveisEscalaData",
+        params
+      );
+
+      if (response?.status === 200) {
+        setUsuariosDisponiveis(response?.data);
+        setLoadingTabelaUsuariosDisponiveis(false);
+      } else {
+        setSnackbar("error", "Erro ao conectar com o servidor");
+        console.error("erro ao executar ação", response?.status);
+      }
+    } catch (error) {
+      setSnackbar("error", "Erro ao conectar com o servidor");
+      console.error("erro ao buscar usuários disponíveis para escala: ", error);
+    }
+  };
+
+  const handleAtualizarEscalaData = async (usuarioId, nome, tagId) => {
+    try {
+      setLoadingApiEscalarMembro(true);
+
+      let escaladosUpdate = infoEscalarMembro?.escalados?.map((escalado) => {
+        if (escalado.tagId === tagId) {
+          return {
+            ...escalado,
+            membroId: usuarioId,
+            membroNome: nome,
+          };
+        } else {
+          return escalado;
+        }
+      });
+
+      const response = await api.post("/updateEscalaData", {
+        equipeId: usuarioLogado?.equipeId,
+        escalaDataId: infoEscalarMembro?.escalaDataId,
+        escalados: escaladosUpdate,
+      });
+
+      if (response?.status === 200) {
+        handleBuscarEscalaMensal();
+        setOpenModalConfirmarEscolha(false);
+        setOpenModalEscalarMembro(false);
+        setLoadingApiEscalarMembro(false);
+        setSnackbar("success", "Usuário escalado com sucesso");
+      } else {
+        setSnackbar("error", "Erro ao conectar com o servidor");
+        console.error("erro ao executar ação", response?.status);
+      }
+    } catch (error) {
+      setSnackbar("error", "Erro ao conectar com o servidor");
+      console.error("erro ao buscar usuários disponíveis para escala: ", error);
+    }
+  };
+
+  function handleEscalarMembroModoEdit(usuarioId, nome, tagId) {
+    const indexEscala = escalaMensal?.findIndex(
+      (escala) => escala.escalaDataId === infoEscalarMembro?.escalaDataId
+    );
+
+    if (indexEscala !== -1) {
+      const indexEscalado = escalaMensal[indexEscala]?.escalados?.findIndex(
+        (escalado) => escalado.tagId === tagId
+      );
+
+      if (indexEscalado !== -1) {
+        const novosEscalados = [...escalaMensal[indexEscala]?.escalados];
+        novosEscalados[indexEscalado] = {
+          ...novosEscalados[indexEscalado],
+          membroId: usuarioId,
+          membroNome: nome,
+        };
+
+        const novaEscalaMensal = [...escalaMensal];
+        novaEscalaMensal[indexEscala] = {
+          ...novaEscalaMensal[indexEscala],
+          escalados: novosEscalados,
+        };
+
+        setEscalaMensal(novaEscalaMensal);
+        setOpenModalConfirmarEscolha(false);
+        setOpenModalEscalarMembro(false);
+      }
+    }
+  }
+
+  const setSnackbar = (severity, message) => {
+    setSnackbarSeverity(severity);
+    setSnackbarMessage(message);
+    setSnackbarOpen(true);
+  };
+
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbarOpen(false);
+  };
 
   const boxTituloCards = (titulo) => {
     return (
@@ -326,18 +472,18 @@ const ModalEscalarMembro = (params) => {
               <Box sx={styles.boxInfoProgramacao}>
                 <Typography sx={styles.dataText}>
                   <ChurchOutlinedIcon sx={styles.dataIcon} />
-                  Culto Celebração - ZS16
+                  {infoEscalarMembro?.culto}
                 </Typography>
                 <Typography sx={styles.dataText}>
                   <Box sx={styles.boxDoubleIcon}>
                     <CalendarMonthOutlinedIcon sx={styles.dataIcon} />
                     <AccessTimeOutlinedIcon sx={styles.dataIconInsid} />
                   </Box>
-                  Domingo - 16:00
+                  {`${infoEscalarMembro?.data} - ${infoEscalarMembro?.dia} - ${infoEscalarMembro?.horario}`}
                 </Typography>
                 <Typography sx={styles.dataText}>
                   <SellOutlinedIcon sx={styles.dataIcon} />
-                  Câmera Central
+                  {infoEscalarMembro?.tagNome}
                 </Typography>
                 <TextField
                   focused
@@ -350,46 +496,101 @@ const ModalEscalarMembro = (params) => {
                 />
               </Box>
               <Box sx={styles.boxOpcoesPerfil}>
-                {membros?.map(({ membro, disponivel, possuiTag }, index) => (
-                  <Button
-                    onClick={() => {
-                      if (!disponivel || !possuiTag) {
-                        setOpenModalConfirmarEscolha(true);
-                      } else {
-                        setOpenModalEscalarMembro(false);
-                      }
-                    }}
-                    sx={styles.botaoCardPerfil}
-                  >
-                    <Avatar sx={styles.avatarMembro}>
-                      <Person sx={{ fontSize: "24px" }} />
-                    </Avatar>
-                    <Box sx={styles.boxInfoPerfilCard}>
-                      <Typography sx={styles.textNamePerfil}>
-                        {membro}
-                      </Typography>
-                      <Box sx={styles.boxChipPerfil}>
-                        {disponivel ? (
-                          <Chip label="Disponível" sx={styles.chipPerfil} />
-                        ) : (
-                          <Chip
-                            label="Indisponível"
-                            sx={{ ...styles.chipPerfil, background: "#D32F2F" }}
-                          />
-                        )}
-                        {possuiTag ? (
-                          <Chip label="Câmera Central" sx={styles.chipPerfil} />
-                        ) : (
-                          <Chip
-                            label="Câmera Central"
-                            sx={{ ...styles.chipPerfil, background: "#D32F2F" }}
-                          />
-                        )}
-                      </Box>
+                <>
+                  {loadingTabelaUsuariosDisponiveis && (
+                    <Box sx={styles.boxAreaCircularProgress}>
+                      <CircularProgress />
                     </Box>
-                    <KeyboardArrowRightOutlined sx={styles.iconCardPerfil} />
-                  </Button>
-                ))}
+                  )}
+
+                  {!loadingTabelaUsuariosDisponiveis && (
+                    <>
+                      {usuariosDisponiveis?.map(
+                        (
+                          { usuarioId, nome, possuiTag, possuiDisponibilidade },
+                          index
+                        ) => (
+                          <Button
+                            disabled={loadingApiEscalarMembro}
+                            onClick={() => {
+                              if (!possuiDisponibilidade || !possuiTag) {
+                                setPositionUsuarioSelecionado(index);
+                                setOpenModalConfirmarEscolha(true);
+                              } else {
+                                if (
+                                  editarEscala[infoEscalarMembro?.escalaDataId]
+                                ) {
+                                  handleEscalarMembroModoEdit(
+                                    usuarioId,
+                                    nome,
+                                    infoEscalarMembro?.tagId
+                                  );
+                                } else {
+                                  handleAtualizarEscalaData(
+                                    usuarioId,
+                                    nome,
+                                    infoEscalarMembro?.tagId
+                                  );
+                                }
+                              }
+                            }}
+                            sx={styles.botaoCardPerfil}
+                          >
+                            <Avatar sx={styles.avatarMembro}>
+                              <Person sx={{ fontSize: "24px" }} />
+                            </Avatar>
+                            <Box sx={styles.boxInfoPerfilCard}>
+                              <Typography sx={styles.textNamePerfil}>
+                                {nome}
+                              </Typography>
+                              <Box sx={styles.boxChipPerfil}>
+                                {possuiDisponibilidade ? (
+                                  <Chip
+                                    label="Disponível"
+                                    sx={styles.chipPerfil}
+                                  />
+                                ) : (
+                                  <Chip
+                                    label="Indisponível"
+                                    sx={{
+                                      ...styles.chipPerfil,
+                                      background: "#D32F2F",
+                                    }}
+                                  />
+                                )}
+                                {possuiTag ? (
+                                  <Chip
+                                    label={infoEscalarMembro?.tagNome}
+                                    sx={styles.chipPerfil}
+                                  />
+                                ) : (
+                                  <Chip
+                                    label={infoEscalarMembro?.tagNome}
+                                    sx={{
+                                      ...styles.chipPerfil,
+                                      background: "#D32F2F",
+                                    }}
+                                  />
+                                )}
+                              </Box>
+                            </Box>
+                            <KeyboardArrowRightOutlined
+                              sx={styles.iconCardPerfil}
+                            />
+                          </Button>
+                        )
+                      )}
+
+                      {usuariosDisponiveis?.length === 0 && (
+                        <Box sx={{ ...styles.configBox, height: "100%" }}>
+                          <Typography sx={styles.textTitulo}>
+                            Nenhum membro disponível
+                          </Typography>
+                        </Box>
+                      )}
+                    </>
+                  )}
+                </>
               </Box>
             </Box>
           </Box>
@@ -438,8 +639,21 @@ const ModalEscalarMembro = (params) => {
                 </Button>
                 <Button
                   onClick={() => {
-                    setOpenModalConfirmarEscolha(false);
-                    setOpenModalEscalarMembro(false);
+                    if (editarEscala[infoEscalarMembro?.escalaDataId]) {
+                      handleEscalarMembroModoEdit(
+                        usuariosDisponiveis[positionUsuarioSelecionado]
+                          ?.usuarioId,
+                        usuariosDisponiveis[positionUsuarioSelecionado]?.nome,
+                        infoEscalarMembro?.tagId
+                      );
+                    } else {
+                      handleAtualizarEscalaData(
+                        usuariosDisponiveis[positionUsuarioSelecionado]
+                          ?.usuarioId,
+                        usuariosDisponiveis[positionUsuarioSelecionado]?.nome,
+                        infoEscalarMembro?.tagId
+                      );
+                    }
                   }}
                   sx={styles.botaoDefault}
                 >
@@ -451,6 +665,25 @@ const ModalEscalarMembro = (params) => {
           </Box>
         </Fade>
       </Modal>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={handleSnackbarClose}
+        style={{
+          bottom: "20px",
+          left: "50%",
+          transform: "translateX(-50%)",
+        }}
+      >
+        <Alert
+          elevation={6}
+          variant="filled"
+          onClose={handleSnackbarClose}
+          severity={snackbarSeverity}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </>
   );
 };

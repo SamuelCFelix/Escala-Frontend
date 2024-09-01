@@ -2,6 +2,7 @@ import {
   Box,
   Button,
   CircularProgress,
+  IconButton,
   Snackbar,
   TextField,
   Typography,
@@ -16,6 +17,7 @@ import { useAuth } from "../../components/popUpCadastro/authContext";
 import api from "../../api";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
+import { VisibilityOffOutlined, VisibilityOutlined } from "@mui/icons-material";
 
 const styles = {
   container: {
@@ -237,6 +239,7 @@ const Login = () => {
 
   const [errorEmail, setErrorEmail] = useState(false);
   const [errorPassword, setErrorPassword] = useState(false);
+  const [typePassword, setTypePassword] = useState("password");
 
   const Alert = forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -404,7 +407,7 @@ const Login = () => {
               id="senhaLogin"
               label="Senha"
               variant="outlined"
-              type="password"
+              type={typePassword}
               onChange={(event) => {
                 setPassword(event.target.value);
                 setErrorPassword(false);
@@ -413,7 +416,24 @@ const Login = () => {
               sx={styles.inputLogin}
               onBlur={handleBlurPassword}
               InputProps={{
-                endAdornment: <LockOutlinedIcon sx={{ color: "#F3A913" }} />,
+                endAdornment: (
+                  <>
+                    <IconButton
+                      sx={{ mr: "-8px" }}
+                      onClick={() => {
+                        setTypePassword(
+                          typePassword === "password" ? "text" : "password"
+                        );
+                      }}
+                    >
+                      {typePassword === "password" ? (
+                        <VisibilityOutlined sx={{ color: "#F3A913" }} />
+                      ) : (
+                        <VisibilityOffOutlined sx={{ color: "#F3A913" }} />
+                      )}
+                    </IconButton>
+                  </>
+                ),
               }}
             />
           </Box>
