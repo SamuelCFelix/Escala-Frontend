@@ -657,6 +657,7 @@ const PaginaGeral = (params) => {
   const [loadingApiEscalarMembro, setLoadingApiEscalarMembro] = useState(false);
   const [openModalConfirmarCandidatar, setOpenModalConfirmarCandidatar] =
     useState(false);
+  const [fotosUsuarios, setFotosUsuarios] = useState([]);
 
   //UseEffect's
 
@@ -691,8 +692,9 @@ const PaginaGeral = (params) => {
       });
 
       if (response?.status === 200) {
-        setProximaEscala(response?.data);
-        setCopyProximaEscala(response?.data);
+        setProximaEscala(response?.data?.proximaProgramacao);
+        setCopyProximaEscala(response?.data?.proximaProgramacao);
+        setFotosUsuarios(response?.data?.fotosUsuarios);
         setLoadingTabelaProximaEscala(false);
       } else {
         setSnackbar("error", "Erro ao conectar com o servidor");
@@ -715,36 +717,35 @@ const PaginaGeral = (params) => {
       });
 
       if (response?.status === 200) {
+        setCopyProximaEscala(proximaEscala);
         setEditarEscala(false);
-        setLoadingApiEscalarMembro(false);
-        handleBuscarProximaEscala();
+        setSnackbar("success", "Escala salva com sucesso");
+
+        const userInCurrentScale = proximaEscala?.escalados?.some(
+          (escalados) =>
+            escalados.membroId === usuario?.usuarioHostId ||
+            escalados.membroId === usuario?.usuarioDefaultId
+        );
+
+        const userInPreviousScale = copyProximaEscala?.escalados?.some(
+          (escalados) =>
+            escalados.membroId === usuario?.usuarioHostId ||
+            escalados.membroId === usuario?.usuarioDefaultId
+        );
+
         if (
-          proximaEscala?.escalados?.some(
-            (escalados) =>
-              escalados.membroId === usuario?.usuarioHostId ||
-              escalados.membroId === usuario?.usuarioDefaultId
-          ) ||
-          (copyProximaEscala?.escalados?.some(
-            (escalados) =>
-              escalados.membroId === usuario?.usuarioHostId ||
-              escalados.membroId === usuario?.usuarioDefaultId
-          ) &&
-            !proximaEscala?.escalados?.some(
-              (escalados) =>
-                escalados.membroId === usuario?.usuarioHostId ||
-                escalados.membroId === usuario?.usuarioDefaultId
-            ))
+          userInCurrentScale ||
+          (userInPreviousScale && !userInCurrentScale)
         ) {
           handleBuscarEscalacoesUsuario();
         }
-        setSnackbar("success", "Escala salva com sucesso");
       } else {
         setSnackbar("error", "Erro ao conectar com o servidor");
-        console.error("erro ao executar ação", response?.status);
+        console.error("Erro ao executar ação", response?.status);
       }
     } catch (error) {
       setSnackbar("error", "Erro ao conectar com o servidor");
-      console.error("erro salvar alterações da escala: ", error);
+      console.error("Erro ao salvar alterações da escala: ", error);
     } finally {
       setLoadingApiEscalarMembro(false);
     }
@@ -922,6 +923,11 @@ const PaginaGeral = (params) => {
                       ) => (
                         <Box key={index} sx={styles.areaPerfilEscalado}>
                           <Avatar
+                            src={
+                              fotosUsuarios?.find(
+                                (infoUser) => infoUser.membroId === membroId
+                              )?.membroFoto || undefined
+                            }
                             sx={{
                               ...styles.avatarIcon,
                               background:
@@ -931,13 +937,18 @@ const PaginaGeral = (params) => {
                             }}
                           >
                             {membroId !== "sem membro" ? (
-                              <Person sx={{ fontSize: "24px" }} />
+                              fotosUsuarios?.find(
+                                (infoUser) => infoUser.membroId === membroId
+                              )?.membroFoto ? null : (
+                                <>{membroNome?.charAt(0)?.toUpperCase()}</>
+                              )
                             ) : (
                               <ReportProblemOutlined
                                 sx={{ fontSize: "24px", color: "#F3A913" }}
                               />
-                            )}{" "}
+                            )}
                           </Avatar>
+
                           <Box sx={styles.boxInfoPerfilProximoCulto}>
                             <Typography
                               sx={{
@@ -1222,8 +1233,11 @@ const PaginaGeral = (params) => {
         {boxTituloCards("Informações")}
         <Box sx={styles.areaConteudoCard}>
           <Box sx={styles.boxAreaInformacoesPerfil}>
-            <Avatar sx={styles.avatarIcon}>
-              <Person sx={{ fontSize: "24px" }} />
+            <Avatar
+              sx={styles.avatarIcon}
+              src={usuario?.foto ? usuario?.foto : undefined}
+            >
+              {!usuario?.foto && usuario?.nome?.charAt(0)?.toUpperCase()}
             </Avatar>
             <Typography sx={styles.textPerfilNome}>
               {usuario?.nome}
@@ -1396,6 +1410,9 @@ const PaginaGeral = (params) => {
         handleBuscarEscalacoesUsuario={handleBuscarEscalacoesUsuario}
         editarEscala={editarEscala}
         setProximaEscala={setProximaEscala}
+        setFotosUsuarios={setFotosUsuarios}
+        fotosUsuarios={fotosUsuarios}
+        setCopyProximaEscala={setCopyProximaEscala}
       />
       <ModalCriarAviso
         openModalCriarAviso={openModalCriarAviso}

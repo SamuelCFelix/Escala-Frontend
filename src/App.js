@@ -62,8 +62,14 @@ function App() {
             />
 
             <Route path="/" element={<LayoutBar />}>
-              <Route path="home" element={<Home />} />
+              <Route path="home/geral" element={<Home defaultTab="Geral" />} />
+              <Route
+                path="home/equipe"
+                element={<Home defaultTab="Equipe" />}
+              />
             </Route>
+
+            <Route path="/home" element={<Navigate to="/home/geral" />} />
           </Routes>
         </Router>
       </ThemeProvider>

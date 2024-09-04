@@ -720,8 +720,16 @@ const ModalPerfilMembro = (params) => {
               </IconButton>
               <Box sx={styles.areaConteudoCard}>
                 <Box sx={styles.boxAreaInformacoesPerfil}>
-                  <Avatar sx={styles.avatarIcon}>
-                    <Person sx={{ fontSize: "24px" }} />
+                  <Avatar
+                    src={usuarioPerfil?.foto || undefined}
+                    sx={styles.avatarIcon}
+                  >
+                    {usuarioPerfil?.foto ? null : (
+                      <>
+                        {!usuarioPerfil?.foto &&
+                          usuarioPerfil?.nome?.charAt(0)?.toUpperCase()}
+                      </>
+                    )}
                   </Avatar>
                   <Typography sx={styles.textPerfilNome}>
                     {usuarioPerfil?.nome}

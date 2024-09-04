@@ -103,8 +103,11 @@ const LayoutBar = () => {
               {""}
             </Typography>
             <IconButton onClick={handleClickOpenMenu}>
-              <Avatar sx={{ background: "#F3A913" }}>
-                {user?.nome?.charAt(0)?.toUpperCase()}
+              <Avatar
+                sx={{ background: "#F3A913" }}
+                src={user?.foto ? user?.foto : undefined}
+              >
+                {!user?.foto && user?.nome?.charAt(0)?.toUpperCase()}
               </Avatar>
             </IconButton>
           </Toolbar>

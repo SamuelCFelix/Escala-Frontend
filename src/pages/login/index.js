@@ -30,6 +30,7 @@ const styles = {
     backgroundPosition: "center",
     width: "100vw",
     height: "100vh",
+    position: "relative",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -49,6 +50,7 @@ const styles = {
               `,
     borderRadius: "10px",
     color: "#ffff",
+    backdropFilter: "blur(10px)",
   },
   conteudoLogin: {
     minWidth: 300,
@@ -207,14 +209,15 @@ const styles = {
       boxShadow: "none",
     },
   },
-  boxRodape: {
-    width: "100vw",
-    height: "4vw",
-    position: "fixed",
+  boxLogoRodape: {
+    position: "absolute",
     bottom: 0,
     display: "flex",
-    alignItems: "center",
+    width: "100%",
+    height: "64px",
+    overflow: "hidden",
     justifyContent: "center",
+    alignItems: "center",
   },
   boxAreaCircularProgress: {
     display: "flex",
@@ -497,11 +500,16 @@ const Login = () => {
         </Alert>
       </Snackbar>
 
-      <Box sx={styles.boxRodape}>
+      <Box sx={styles.boxLogoRodape}>
         <img
           src={LogoRodape}
-          style={{ width: "200px", marginBottom: "10px", marginLeft: "-10px" }}
           alt="LogoRodape"
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "contain",
+            transform: "scale(2.4)",
+          }}
         />
       </Box>
       <Snackbar

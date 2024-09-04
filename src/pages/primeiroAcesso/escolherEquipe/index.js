@@ -192,6 +192,20 @@ const styles = {
     width: "100%",
     height: "2.5%",
   },
+  boxModalAreaInfoEquipe: {
+    display: "flex",
+    width: "80%",
+    height: "84px",
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "column",
+  },
+  estiloAvatar: {
+    backgroundColor: "#F3A913",
+    width: "50px",
+    height: "50px",
+    mr: "6px",
+  },
 };
 
 const EscolherEquipe = () => {
@@ -364,33 +378,18 @@ const EscolherEquipe = () => {
                           <Box sx={{ ...styles.baseTituloModalAvisos }} />
                         </Box>
                       </Box>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          width: "80%",
-                          height: "84px",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          flexDirection: "column",
-                        }}
-                      >
+                      <Box sx={styles.boxModalAreaInfoEquipe}>
                         <Avatar
-                          sx={{
-                            backgroundColor: "#F3A913",
-                            width: "50px",
-                            height: "50px",
-                            mr: "6px",
-                          }}
+                          src={equipe?.usuarioHost?.foto || undefined}
+                          sx={styles.estiloAvatar}
                         >
-                          {equipe?.usuarioHost?.nome &&
-                            equipe.usuarioHost.nome
-                              .split(" ")
-                              .map((word, index, array) =>
-                                index === 0 || index === array.length - 1
-                                  ? word[0]
-                                  : null
-                              )
-                              .join("")}
+                          {equipe?.usuarioHost?.foto ? null : (
+                            <>
+                              {equipe?.usuarioHost?.nome
+                                ?.charAt(0)
+                                ?.toUpperCase()}
+                            </>
+                          )}
                         </Avatar>
 
                         <Box

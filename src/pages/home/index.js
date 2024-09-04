@@ -1,18 +1,9 @@
-import {
-  Alert,
-  Box,
-  Snackbar,
-  Tab,
-  Tabs,
-  Typography,
-  tabsClasses,
-} from "@mui/material";
-import "../../../src/style.css";
-import BackgroundImage from "../../img/fotoProducaoSamuel.jpeg";
+import { Alert, Box, Snackbar, Tab, Tabs, tabsClasses } from "@mui/material";
 import { useEffect, useState } from "react";
-import Rodape from "../../components/rodape";
+import { useNavigate, useLocation } from "react-router-dom";
 import PaginaGeral from "./paginaGeral";
 import PaginaEquipe from "./PaginaEquipe";
+import Rodape from "../../components/rodape";
 import api from "../../api";
 
 const styles = {
@@ -73,11 +64,20 @@ const styles = {
   },
 };
 
-const Home = () => {
+const Home = ({ defaultTab }) => {
   const autenticatedToken = localStorage?.getItem("token");
   const storedData = localStorage?.getItem("login");
 
-  const [valueTab, setValueTab] = useState("Geral");
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const getCurrentTab = () => {
+    if (location.pathname.includes("/geral")) return "Geral";
+    if (location.pathname.includes("/equipe")) return "Equipe";
+    return defaultTab || "Geral";
+  };
+
+  const [valueTab, setValueTab] = useState(getCurrentTab());
   const [user, setUser] = useState([]);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState("");
@@ -139,6 +139,11 @@ const Home = () => {
 
   const handleChangeTabs = (event, newValue) => {
     setValueTab(newValue);
+    if (newValue === "Geral") {
+      navigate("/home/geral");
+    } else if (newValue === "Equipe") {
+      navigate("/home/equipe");
+    }
   };
 
   const setSnackbar = (severity, message) => {
@@ -203,4 +208,5 @@ const Home = () => {
     </>
   );
 };
+
 export default Home;

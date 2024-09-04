@@ -286,6 +286,9 @@ const ModalEscalarMembro = (params) => {
     editarEscala,
     escalaMensal,
     setEscalaMensal,
+    setFotosUsuarios,
+    fotosUsuarios,
+    setCopyEscalaMensal,
   } = params;
   const [OpenModalConfirmarEscolha, setOpenModalConfirmarEscolha] =
     useState(false);
@@ -349,7 +352,7 @@ const ModalEscalarMembro = (params) => {
     }
   };
 
-  const handleAtualizarEscalaData = async (usuarioId, nome, tagId) => {
+  const handleAtualizarEscalaData = async (usuarioId, nome, foto, tagId) => {
     try {
       setLoadingApiEscalarMembro(true);
 
@@ -372,9 +375,20 @@ const ModalEscalarMembro = (params) => {
       });
 
       if (response?.status === 200) {
-        handleBuscarEscalaMensal();
-        setOpenModalConfirmarEscolha(false);
-        setOpenModalEscalarMembro(false);
+        /* handleBuscarEscalaMensal();
+           setOpenModalConfirmarEscolha(false);
+           setOpenModalEscalarMembro(false);
+        */
+
+        let salvarCopyEscalaMensal = true;
+
+        handleEscalarMembroModoEdit(
+          usuarioId,
+          nome,
+          foto,
+          tagId,
+          salvarCopyEscalaMensal
+        );
         setLoadingApiEscalarMembro(false);
         setSnackbar("success", "Usuário escalado com sucesso");
       } else {
@@ -387,7 +401,13 @@ const ModalEscalarMembro = (params) => {
     }
   };
 
-  function handleEscalarMembroModoEdit(usuarioId, nome, tagId) {
+  function handleEscalarMembroModoEdit(
+    usuarioId,
+    nome,
+    foto,
+    tagId,
+    salvarCopyEscalaMensal
+  ) {
     const indexEscala = escalaMensal?.findIndex(
       (escala) => escala.escalaDataId === infoEscalarMembro?.escalaDataId
     );
@@ -411,7 +431,23 @@ const ModalEscalarMembro = (params) => {
           escalados: novosEscalados,
         };
 
+        // Verifica se a lista de fotos já contém o membroId, e se não, adiciona-o
+        if (
+          !fotosUsuarios?.some(
+            (fotoUsuario) => fotoUsuario.membroId === usuarioId
+          )
+        ) {
+          setFotosUsuarios((prevState) => [
+            ...prevState,
+            { membroId: usuarioId, membroFoto: foto },
+          ]);
+        }
+
         setEscalaMensal(novaEscalaMensal);
+
+        if (salvarCopyEscalaMensal) {
+          setCopyEscalaMensal(novaEscalaMensal);
+        }
         setOpenModalConfirmarEscolha(false);
         setOpenModalEscalarMembro(false);
       }
@@ -507,7 +543,13 @@ const ModalEscalarMembro = (params) => {
                     <>
                       {usuariosDisponiveis?.map(
                         (
-                          { usuarioId, nome, possuiTag, possuiDisponibilidade },
+                          {
+                            usuarioId,
+                            nome,
+                            foto,
+                            possuiTag,
+                            possuiDisponibilidade,
+                          },
                           index
                         ) => (
                           <Button
@@ -523,12 +565,14 @@ const ModalEscalarMembro = (params) => {
                                   handleEscalarMembroModoEdit(
                                     usuarioId,
                                     nome,
+                                    foto,
                                     infoEscalarMembro?.tagId
                                   );
                                 } else {
                                   handleAtualizarEscalaData(
                                     usuarioId,
                                     nome,
+                                    foto,
                                     infoEscalarMembro?.tagId
                                   );
                                 }
@@ -536,8 +580,13 @@ const ModalEscalarMembro = (params) => {
                             }}
                             sx={styles.botaoCardPerfil}
                           >
-                            <Avatar sx={styles.avatarMembro}>
-                              <Person sx={{ fontSize: "24px" }} />
+                            <Avatar
+                              src={foto || undefined}
+                              sx={styles.avatarMembro}
+                            >
+                              {foto ? null : (
+                                <>{nome?.charAt(0)?.toUpperCase()}</>
+                              )}
                             </Avatar>
                             <Box sx={styles.boxInfoPerfilCard}>
                               <Typography sx={styles.textNamePerfil}>
@@ -644,6 +693,7 @@ const ModalEscalarMembro = (params) => {
                         usuariosDisponiveis[positionUsuarioSelecionado]
                           ?.usuarioId,
                         usuariosDisponiveis[positionUsuarioSelecionado]?.nome,
+                        usuariosDisponiveis[positionUsuarioSelecionado]?.foto,
                         infoEscalarMembro?.tagId
                       );
                     } else {
@@ -651,6 +701,7 @@ const ModalEscalarMembro = (params) => {
                         usuariosDisponiveis[positionUsuarioSelecionado]
                           ?.usuarioId,
                         usuariosDisponiveis[positionUsuarioSelecionado]?.nome,
+                        usuariosDisponiveis[positionUsuarioSelecionado]?.foto,
                         infoEscalarMembro?.tagId
                       );
                     }

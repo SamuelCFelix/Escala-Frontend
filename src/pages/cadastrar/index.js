@@ -1,8 +1,11 @@
 import {
   Alert,
+  Avatar,
   Box,
   Button,
   Checkbox,
+  FormControlLabel,
+  IconButton,
   Stack,
   TextField,
   Typography,
@@ -15,6 +18,8 @@ import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
 import { useAuth } from "../../components/popUpCadastro/authContext";
 import api from "../../api";
+import { DeleteOutline, Person } from "@mui/icons-material";
+import AddAPhotoOutlinedIcon from "@mui/icons-material/AddAPhotoOutlined";
 
 const styles = {
   container: {
@@ -25,44 +30,69 @@ const styles = {
     backgroundSize: "cover",
     backgroundRepeat: "no-repeat",
     backgroundPosition: "center",
+    position: "relative",
     width: "100vw",
     height: "100vh",
     display: "flex",
+    flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
   },
   boxCadastro: {
     display: "flex",
-    minWidth: 725,
-    minHeight: 314,
-    background: "rgba(2, 2, 2, 0.7)",
-    //background: "blue",
+    width: "540px",
+    height: "auto",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    background: "rgba(15, 15, 15, 0.7)",
     boxShadow: `
                 0px 4px 4px 0px rgba(0, 0, 0, 0.25),
                 0px 4px 4px 0px rgba(0, 0, 0, 0.25)
               `,
     borderRadius: "10px",
-    color: "#ffff",
+    backdropFilter: "blur(10px)",
   },
-  conteudoCadastro: {
-    minWidth: "95%",
-    padding: "20px 18px 14px 18px",
-  },
-  boxAlinhar: {
+  boxAreaColunaHorizontal: {
     display: "flex",
-    alignItems: "center",
+    width: "100%",
+    height: "60px",
+    mb: "10px",
     justifyContent: "center",
+    alignItems: "center",
   },
-  tituloCadastro: {
+  textTitulo: {
+    color: "#ffffff",
+    textAlign: "center",
+    fontSize: "36px",
+    lineHeight: "16px",
+    letterSpacing: "1.25px",
     fontFamily: "Libre Baskerville",
-    fontSize: "2.5rem",
-    width: "200px",
+  },
+  avatarMembro: {
+    width: "80px",
+    height: "80px",
+    background: "#F3A913",
+  },
+  boxAreaColunasInput: {
+    display: "flex",
+    width: "100%",
+    height: "240px",
+    alignItems: "center",
+    justifyContent: "space-around",
+  },
+  boxColunaInput: {
+    display: "flex",
+    flexDirection: "column",
+    width: "auto",
+    height: "100%",
+    alignItems: "center",
+    justifyContent: "space-around",
   },
   inputCadastro: {
     background: "rgba(86, 86, 86, 0.8)",
-    borderRadius: "10px",
-    width: "300px",
-    marginBottom: "12%",
+    borderRadius: "5px",
+    width: "240px",
     "& .MuiInputLabel-root": {
       color: "#fff",
       fontFamily: "Libre Baskerville",
@@ -89,7 +119,7 @@ const styles = {
       color: "#fff",
     },
     "& .MuiOutlinedInput-notchedOutline": {
-      borderRadius: "10px",
+      borderRadius: "5px",
     },
     "&.MuiFormControl-root-MuiTextField-root .MuiInputLabel-root": {
       color: "#d32f2f !important",
@@ -109,31 +139,31 @@ const styles = {
         borderColor: "#d32f2f",
       },
   },
-  botaoCriarConta: {
-    color: "#ffffff",
-    width: 210,
-    height: 40,
-    borderRadius: "10px",
+  botaoDefault: {
     display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    margin: "auto",
-    marginTop: "3%",
+    width: "auto",
+    height: "30px",
+    padding: "0px 20px",
+    borderRadius: "5px",
     fontFamily: "Roboto, sans-serif",
-    fontSize: "14px",
+    fontSize: "12px",
+    lineHeight: "36px",
+    letterSpacing: "1.25px",
+    color: "#ffffff",
     background: "#F3A913",
     "&:hover": {
       background: "#FEBC36",
     },
-    position: "relative",
-    zIndex: "2",
+    "&:disabled": {
+      color: "#ffffff",
+      background: "rgba(243, 169, 19, 0.6)",
+    },
+    zIndex: 999,
   },
   botaoJaTenhoConta: {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    mt: "4%",
-    ml: "40%",
     height: "5px",
     width: "140px",
     color: "#fff",
@@ -170,16 +200,30 @@ const styles = {
       boxShadow: "none",
     },
     position: "relative",
-    zIndex: "2",
+    zIndex: 999,
   },
-  boxRodape: {
-    width: "100vw",
-    height: "4vw",
-    position: "fixed",
+  boxLogoRodape: {
+    position: "absolute",
     bottom: 0,
     display: "flex",
-    alignItems: "center",
+    width: "100%",
+    height: "64px",
+    overflow: "hidden",
     justifyContent: "center",
+    alignItems: "center",
+  },
+  iconButtonAddFoto: {
+    position: "absolute",
+    bottom: 10,
+    right: "45.5%",
+    transform: "translate(50%, 50%)",
+    fontSize: "16px",
+    background: "#e77f00",
+    "&:hover": {
+      background: "#f88800ff",
+    },
+    borderRadius: "50%",
+    zIndex: 99,
   },
 };
 
@@ -190,6 +234,8 @@ const Cadastrar = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState("");
   const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [fotoUsuario, setFotoUsuario] = useState(null);
+  const [fotoUsuarioDB, setFotoUsuarioDB] = useState(null);
   const [nome, setNome] = useState("");
   const [cpf, setCpf] = useState("");
   const [dataNascimento, setDataNascimento] = useState("");
@@ -223,38 +269,38 @@ const Cadastrar = () => {
   //Botão de Criar Cadastro
   const handleCriarCadastro = async (event) => {
     if (
-      nome === "" ||
-      cpf === "" ||
-      dataNascimento === "" ||
-      email === "" ||
-      password === "" ||
-      confirmPassword === "" ||
+      !nome ||
+      !cpf ||
+      !dataNascimento ||
+      !email ||
+      !password ||
+      !confirmPassword ||
       confirmPassword !== password ||
-      checked === false ||
-      errorNome === true ||
-      errorCpf === true ||
-      errorDataNascimento === true ||
-      errorEmail === true ||
-      errorPassword === true ||
-      errorConfirmPassword === true ||
-      errorConfirmPassword2 === true
+      !checked ||
+      errorNome ||
+      errorCpf ||
+      errorDataNascimento ||
+      errorEmail ||
+      errorPassword ||
+      errorConfirmPassword ||
+      errorConfirmPassword2
     ) {
-      if (nome === "") {
+      if (!nome) {
         setErrorNome(true);
       }
-      if (cpf === "") {
+      if (!cpf) {
         setErrorCpf(true);
       }
-      if (dataNascimento === "") {
+      if (!dataNascimento) {
         setErrorDataNascimento(true);
       }
-      if (email === "") {
+      if (!email) {
         setErrorEmail(true);
       }
-      if (password === "") {
+      if (!password) {
         setErrorPassword(true);
       }
-      if (confirmPassword === "") {
+      if (!confirmPassword) {
         setErrorConfirmPassword(true);
       }
       if (confirmPassword !== password) {
@@ -275,6 +321,7 @@ const Cadastrar = () => {
 
         const response = await api.post("/createPerfil", {
           nome: capitalizeFirstLetters(nome),
+          foto: fotoUsuarioDB,
           cpf: cpf,
           dataNascimento: dataNascimento,
           email: email,
@@ -460,223 +507,325 @@ const Cadastrar = () => {
     }
   };
 
+  const handleFileChange = async (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      // Carrega a imagem em um objeto Image
+      const img = new Image();
+      img.src = URL.createObjectURL(file);
+
+      img.onload = () => {
+        // Converte a imagem original para base64 para exibição
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64String = reader.result;
+          setFotoUsuario(base64String); // Exibição da imagem original com qualidade total
+        };
+        reader.readAsDataURL(file);
+
+        // Cria um canvas para redimensionar a imagem
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+
+        // Define o tamanho do canvas (redimensionado)
+        const maxDimension = 100; // Tamanho máximo ajustado
+        const scale = Math.min(
+          maxDimension / img.width,
+          maxDimension / img.height
+        );
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
+
+        // Desenha a imagem redimensionada no canvas
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        // Converte o canvas para base64 com qualidade reduzida
+        const base64StringReduced = canvas.toDataURL("image/jpeg", 0.9); // Qualidade ajustada para 0.9
+
+        // Define a foto para salvar no banco de dados
+
+        setFotoUsuarioDB(base64StringReduced); // Salvar versão reduzida
+      };
+    }
+  };
+
   return (
-    <Box sx={styles.container}>
-      <Box sx={styles.boxCadastro}>
-        <Box sx={styles.conteudoCadastro}>
-          <Box sx={styles.boxAlinhar}>
-            <Typography variant="h3" sx={styles.tituloCadastro}>
-              Cadastre-se
-            </Typography>
+    <>
+      <Box sx={styles.container}>
+        <Box sx={styles.boxCadastro}>
+          <Box sx={styles.boxAreaColunaHorizontal}>
+            <Typography sx={styles.textTitulo}>Criar Perfil</Typography>
           </Box>
           <Box
-            component="form"
+            position={"relative"}
             sx={{
-              "& > :not(style)": { ml: "22px", mt: "36px", width: "80ch" },
+              ...styles.boxAreaColunaHorizontal,
+              mb: "20px",
             }}
-            noValidate
-            autoComplete="off"
-            direction={"row"}
           >
-            <Stack direction={"row"} height={"336px"}>
-              {/*COLUNA 1 - INPUT CADASTRAR*/}
-              <Box width={"95%"}>
-                <TextField
-                  error={errorNome}
-                  id="nomeCompleto"
-                  label="Nome completo"
-                  value={nome}
-                  variant="outlined"
-                  inputProps={{
-                    inputMode: "text",
-                    pattern: "[A-Za-zÀ-ú ]*",
-                    maxLength: 50,
-                  }}
-                  onChange={(event) => {
-                    handleInputNome(event);
-                    setErrorNome(false);
-                  }}
-                  onKeyDown={handleKeyDown}
-                  sx={styles.inputCadastro}
-                  onBlur={handleBlurNome}
-                />
-                <TextField
-                  error={errorCpf}
-                  id="cpf"
-                  label="CPF"
-                  value={cpf}
-                  placeholder="___.___.___-__"
-                  variant="outlined"
-                  inputProps={{
-                    inputMode: "numeric",
-                    pattern: "[0-9]*",
-                    maxLength: 14,
-                  }}
-                  onChange={(event) => {
-                    handleInputCPF(event);
-                    setErrorCpf(false);
-                  }}
-                  onKeyDown={handleKeyDown}
-                  sx={styles.inputCadastro}
-                  onBlur={handleBlurCPF}
-                />
-                <TextField
-                  error={errorDataNascimento}
-                  id="dataDeNascimento"
-                  label="Data de nascimento"
-                  value={dataNascimento}
-                  placeholder="__/__/____"
-                  variant="outlined"
-                  inputProps={{
-                    inputMode: "numeric",
-                    pattern: "[0-9]*",
-                    maxLength: 10,
-                  }}
-                  onChange={(event) => {
-                    handleInputDataNascimento(event);
-                    setErrorDataNascimento(false);
-                  }}
-                  onKeyDown={handleKeyDown}
-                  sx={styles.inputCadastro}
-                  onBlur={handleBlurDataNascimento}
-                />
-              </Box>
+            <Avatar
+              sx={styles.avatarMembro}
+              src={fotoUsuario ? fotoUsuario : undefined}
+            >
+              {!fotoUsuario && <Person sx={{ fontSize: "32px" }} />}
+            </Avatar>
 
-              {/*COLUNA 2 - INPUT CADASTRAR */}
-              <Box width={"93%"} ml={"7%"}>
-                <TextField
-                  error={errorEmail}
-                  id="email"
-                  label="Email"
-                  variant="outlined"
-                  type="Email"
-                  onChange={(event) => {
-                    setEmail(event.target.value);
-                    setErrorEmail(false);
+            <IconButton
+              onClick={() => {
+                if (fotoUsuario) {
+                  setFotoUsuario(null);
+                  setFotoUsuarioDB(null);
+                } else {
+                  document.getElementById("upload-photo-input").click();
+                }
+              }}
+              sx={styles.iconButtonAddFoto}
+            >
+              {fotoUsuario ? (
+                <DeleteOutline
+                  sx={{
+                    fontSize: "16px",
+                    color: "#ffffff",
                   }}
-                  onKeyDown={handleKeyDown}
-                  sx={styles.inputCadastro}
-                  onBlur={handleBlurEmail}
                 />
-                <TextField
-                  error={errorPassword}
-                  id="senha"
-                  label="Senha"
-                  value={password}
-                  variant="outlined"
-                  type="password"
-                  onChange={(event) => {
-                    setPassword(event.target.value);
-                    setErrorPassword(false);
-                    setErrorConfirmPassword2(false);
+              ) : (
+                <AddAPhotoOutlinedIcon
+                  sx={{
+                    fontSize: "16px",
+                    color: "#ffffff",
                   }}
-                  onKeyDown={handleKeyDown}
-                  sx={styles.inputCadastro}
-                  onBlur={handleBlurPassword}
                 />
-                <TextField
-                  error={errorConfirmPassword}
-                  id="confirmarSenha"
-                  label="Confirmar senha"
-                  value={confirmPassword}
-                  variant="outlined"
-                  type="password"
-                  onChange={(event) => {
-                    setConfirmPassword(event.target.value);
-                    setErrorConfirmPassword(false);
-                    setErrorConfirmPassword2(false);
-                  }}
-                  onKeyDown={handleKeyDown}
-                  sx={styles.inputCadastro}
-                  onBlur={handleBlurConfirmPassword}
-                />
-                {errorConfirmPassword2 && (
-                  <Typography
-                    height="10px"
-                    mt={"-32px"}
-                    mb={"22px"}
-                    variant="body2"
-                    color="error"
-                  >
-                    Senhas diferentes
-                  </Typography>
-                )}
-                <Box display="flex" alignItems="center">
-                  <Checkbox
-                    checked={checked}
-                    onChange={handleChangeCheck}
-                    inputProps={{ "aria-label": "controlled" }}
-                    sx={{
-                      color: errorChecked ? "red" : "#fff", // Altera a cor para vermelho quando estiver com erro
-                      "&.Mui-checked": {
-                        color: "#F3A913",
-                      },
-                    }}
-                  />
-                  <Typography
-                    color={errorChecked ? "red" : "#fff"}
-                    variant="body1"
-                    component="div"
-                  >
-                    Eu li e concordo com o{" "}
-                    <a href="#" style={{ color: "#00A7CC" }}>
-                      termo de uso e políticas de privacidade
-                    </a>
-                    .
-                  </Typography>
-                </Box>
-              </Box>
-            </Stack>
+              )}
+            </IconButton>
+            <input
+              id="upload-photo-input"
+              type="file"
+              accept="image/jpeg, image/png"
+              hidden
+              onChange={handleFileChange}
+            />
           </Box>
 
-          <Button
-            variant="contained"
-            onClick={(event) => handleCriarCadastro(event)}
-            sx={styles.botaoCriarConta}
-          >
-            CRIAR CONTA
-          </Button>
-          <Button
-            component={Link}
-            to="/login"
-            sx={styles.botaoJaTenhoConta}
-            onClick={() => {
-              hidePopup();
+          <Box sx={styles.boxAreaColunasInput}>
+            <Box sx={styles.boxColunaInput}>
+              <TextField
+                error={errorNome}
+                id="nomeCompleto"
+                label="Nome completo"
+                value={nome}
+                variant="outlined"
+                inputProps={{
+                  inputMode: "text",
+                  pattern: "[A-Za-zÀ-ú ]*",
+                  maxLength: 50,
+                }}
+                onChange={(event) => {
+                  handleInputNome(event);
+                  setErrorNome(false);
+                }}
+                onKeyDown={handleKeyDown}
+                sx={styles.inputCadastro}
+                onBlur={handleBlurNome}
+              />
+              <TextField
+                error={errorCpf}
+                id="cpf"
+                label="CPF"
+                value={cpf}
+                placeholder="___.___.___-__"
+                variant="outlined"
+                inputProps={{
+                  inputMode: "numeric",
+                  pattern: "[0-9]*",
+                  maxLength: 14,
+                }}
+                onChange={(event) => {
+                  handleInputCPF(event);
+                  setErrorCpf(false);
+                }}
+                onKeyDown={handleKeyDown}
+                sx={styles.inputCadastro}
+                onBlur={handleBlurCPF}
+              />
+              <TextField
+                error={errorDataNascimento}
+                id="dataDeNascimento"
+                label="Data de nascimento"
+                value={dataNascimento}
+                placeholder="__/__/____"
+                variant="outlined"
+                inputProps={{
+                  inputMode: "numeric",
+                  pattern: "[0-9]*",
+                  maxLength: 10,
+                }}
+                onChange={(event) => {
+                  handleInputDataNascimento(event);
+                  setErrorDataNascimento(false);
+                }}
+                onKeyDown={handleKeyDown}
+                sx={styles.inputCadastro}
+                onBlur={handleBlurDataNascimento}
+              />
+            </Box>
+            <Box sx={styles.boxColunaInput}>
+              <TextField
+                error={errorEmail}
+                id="email"
+                label="Email"
+                variant="outlined"
+                type="Email"
+                onChange={(event) => {
+                  setEmail(event.target.value);
+                  setErrorEmail(false);
+                }}
+                onKeyDown={handleKeyDown}
+                sx={styles.inputCadastro}
+                onBlur={handleBlurEmail}
+                placeholder="email@adpaz-zs.com.br"
+              />
+              <TextField
+                error={errorPassword}
+                id="senha"
+                label="Senha"
+                value={password}
+                variant="outlined"
+                type="password"
+                onChange={(event) => {
+                  setPassword(event.target.value);
+                  setErrorPassword(false);
+                  setErrorConfirmPassword2(false);
+                }}
+                onKeyDown={handleKeyDown}
+                sx={styles.inputCadastro}
+                onBlur={handleBlurPassword}
+              />
+              <TextField
+                error={errorConfirmPassword}
+                id="confirmarSenha"
+                label="Confirmar senha"
+                value={confirmPassword}
+                variant="outlined"
+                type="password"
+                onChange={(event) => {
+                  setConfirmPassword(event.target.value);
+                  setErrorConfirmPassword(false);
+                  setErrorConfirmPassword2(false);
+                }}
+                onKeyDown={handleKeyDown}
+                sx={styles.inputCadastro}
+                onBlur={handleBlurConfirmPassword}
+              />
+              {errorConfirmPassword2 && (
+                <Typography
+                  height="10px"
+                  mt={"-32px"}
+                  mb={"22px"}
+                  variant="body2"
+                  color="error"
+                >
+                  Senhas diferentes
+                </Typography>
+              )}
+            </Box>
+          </Box>
+          <Box
+            sx={{
+              ...styles.boxAreaColunaHorizontal,
+              justifyContent: "flex-start",
+              ml: "30px",
+              mt: "-14px",
             }}
           >
-            Já tenho uma conta
-          </Button>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={checked}
+                  onChange={handleChangeCheck}
+                  inputProps={{ "aria-label": "controlled" }}
+                  sx={{
+                    color: errorChecked ? "red" : "#fff",
+                    "&.Mui-checked": {
+                      color: "#F3A913",
+                    },
+                  }}
+                />
+              }
+              label={
+                <Typography
+                  color={errorChecked ? "red" : "#fff"}
+                  variant="body1"
+                  component="div"
+                >
+                  Eu li e concordo com os{" "}
+                  <a href="#" style={{ color: "#00A7CC" }}>
+                    termos de uso e políticas de privacidade
+                  </a>
+                  .
+                </Typography>
+              }
+            />
+          </Box>
+          <Box
+            sx={{
+              ...styles.boxAreaColunaHorizontal,
+              flexDirection: "column",
+              gap: "16px",
+            }}
+          >
+            <Button
+              variant="contained"
+              onClick={(event) => handleCriarCadastro(event)}
+              sx={styles.botaoDefault}
+            >
+              CRIAR CONTA
+            </Button>
+            <Button
+              component={Link}
+              to="/login"
+              sx={styles.botaoJaTenhoConta}
+              onClick={() => {
+                hidePopup();
+              }}
+            >
+              Já tenho uma conta
+            </Button>
+          </Box>
         </Box>
-      </Box>
+        <Box sx={styles.boxLogoRodape}>
+          <img
+            src={LogoRodape}
+            alt="LogoRodape"
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "contain",
+              transform: "scale(2.4)",
+            }}
+          />
+        </Box>
 
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={3000}
-        onClose={handleSnackbarClose}
-        style={{
-          bottom: "20px",
-          left: "50%",
-          transform: "translateX(-50%)",
-        }}
-      >
-        <Alert
-          elevation={6}
-          variant="filled"
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={3000}
           onClose={handleSnackbarClose}
-          severity={snackbarSeverity}
+          style={{
+            bottom: "20px",
+            left: "50%",
+            transform: "translateX(-50%)",
+          }}
         >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
-
-      <Box sx={styles.boxRodape}>
-        <img
-          src={LogoRodape}
-          style={{ width: "200px", marginBottom: "10px", marginLeft: "-10px" }}
-          alt="LogoRodape"
-        />
+          <Alert
+            elevation={6}
+            variant="filled"
+            onClose={handleSnackbarClose}
+            severity={snackbarSeverity}
+          >
+            {snackbarMessage}
+          </Alert>
+        </Snackbar>
       </Box>
-    </Box>
+    </>
   );
 };
 

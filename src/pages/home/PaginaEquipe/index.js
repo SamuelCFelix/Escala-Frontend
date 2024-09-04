@@ -993,6 +993,7 @@ const PaginaEquipe = (params) => {
   const [openModalConfirmarCandidatar, setOpenModalConfirmarCandidatar] =
     useState(false);
   const [tagsUsuario, setTagsUsuario] = useState([]);
+  const [fotosUsuarios, setFotosUsuarios] = useState([]);
 
   //UseEffect's
 
@@ -1047,8 +1048,9 @@ const PaginaEquipe = (params) => {
       });
 
       if (response?.status === 200) {
-        setCopyEscalaMensal(response?.data);
-        setEscalaMensal(response?.data);
+        setCopyEscalaMensal(response?.data?.escalaMensal);
+        setEscalaMensal(response?.data?.escalaMensal);
+        setFotosUsuarios(response?.data?.fotosUsuarios);
         setLoadingTabelaEscalaMensal(false);
       } else {
         setSnackbar("error", "Erro ao conectar com o servidor");
@@ -1074,9 +1076,15 @@ const PaginaEquipe = (params) => {
       });
 
       if (response?.status === 200) {
+        setCopyEscalaMensal((prevState) => {
+          const newCopyEscalaMensal = [...prevState];
+          newCopyEscalaMensal[indexEscala] = {
+            ...newCopyEscalaMensal[indexEscala],
+            escalados: escalaMensal[indexEscala]?.escalados,
+          };
+          return newCopyEscalaMensal;
+        });
         handleEditarEscala(escalaDataId, false);
-        setLoadingApiEscalarMembro(false);
-        handleBuscarEscalaMensal();
         setSnackbar("success", "Escala salva com sucesso");
       } else {
         setSnackbar("error", "Erro ao conectar com o servidor");
@@ -1204,16 +1212,23 @@ const PaginaEquipe = (params) => {
     const membrosEquipe = [];
     let usuarioHost = [];
 
+    // Filtra e organiza o usuário host
     usuarioHost = membros.filter((membro) => membro.autorizacao === "adm001");
 
+    // Filtra e organiza os administradores
     administradoresEquipe.push(
-      ...membros.filter((membro) => membro.autorizacao === "adm002")
+      ...membros
+        .filter((membro) => membro.autorizacao === "adm002")
+        .sort((a, b) => a.nome.localeCompare(b.nome))
     );
 
+    // Filtra e organiza os membros
     membrosEquipe.push(
-      ...membros.filter(
-        (membro) => membro.autorizacao === "" || membro.autorizacao === null
-      )
+      ...membros
+        .filter(
+          (membro) => membro.autorizacao === "" || membro.autorizacao === null
+        )
+        .sort((a, b) => a.nome.localeCompare(b.nome))
     );
 
     setUsuarioHostMinhaEquipe([...usuarioHost]);
@@ -1382,6 +1397,11 @@ const PaginaEquipe = (params) => {
                         ) => (
                           <Box key={index} sx={styles.boxPerfis}>
                             <Avatar
+                              src={
+                                fotosUsuarios?.find(
+                                  (infoUser) => infoUser.membroId === membroId
+                                )?.membroFoto || undefined
+                              }
                               sx={{
                                 ...styles.avatarMembro,
                                 background:
@@ -1391,12 +1411,16 @@ const PaginaEquipe = (params) => {
                               }}
                             >
                               {membroId !== "sem membro" ? (
-                                <Person sx={{ fontSize: "18px" }} />
+                                fotosUsuarios?.find(
+                                  (infoUser) => infoUser.membroId === membroId
+                                )?.membroFoto ? null : (
+                                  <>{membroNome?.charAt(0)?.toUpperCase()}</>
+                                )
                               ) : (
                                 <ReportProblemOutlined
                                   sx={{ fontSize: "18px", color: "#F3A913" }}
                                 />
-                              )}{" "}
+                              )}
                             </Avatar>
                             <Box sx={styles.boxInfoPerfil}>
                               <Typography
@@ -1709,16 +1733,22 @@ const PaginaEquipe = (params) => {
             {!loadingTabelaSolicitacoesEntrada && (
               <>
                 {solicitacoesEntrada?.map(
-                  ({ usuarioDefaultId, nome, email, createAt }, index) => (
+                  (
+                    { usuarioDefaultId, nome, foto, email, createAt },
+                    index
+                  ) => (
                     <Box key={index} sx={styles.boxCardSolicitacao}>
                       <Box sx={styles.boxAreaInfoSolicatao}>
                         <Avatar
+                          src={foto || undefined}
                           sx={{
                             ...styles.avatarMembroList,
                             margin: "0px 0px -22px 6px",
                           }}
                         >
-                          <Person />
+                          {foto ? null : (
+                            <>{!foto && nome?.charAt(0)?.toUpperCase()}</>
+                          )}
                         </Avatar>
                         <Box sx={styles.boxDataSolicitacao}>
                           <Box
@@ -1883,11 +1913,20 @@ const PaginaEquipe = (params) => {
                               <Divider sx={styles.dividerList} />
                             </Box>
                             {usuarioHostEquipe?.map(
-                              ({ nome, email, tags }, index) => (
+                              ({ nome, foto, email, tags }, index) => (
                                 <Box key={index} sx={styles.boxCardMembroList}>
-                                  <Avatar sx={styles.avatarMembroList}>
-                                    <Person />
+                                  <Avatar
+                                    src={foto || undefined}
+                                    sx={styles.avatarMembroList}
+                                  >
+                                    {foto ? null : (
+                                      <>
+                                        {!foto &&
+                                          nome?.charAt(0)?.toUpperCase()}
+                                      </>
+                                    )}
                                   </Avatar>
+
                                   <Box sx={styles.boxAreaInfoMembroList}>
                                     <Box
                                       sx={styles.boxAreaTextAndChipMembroLista}
@@ -1951,10 +1990,18 @@ const PaginaEquipe = (params) => {
                               )
                             )}
                             {administradoresEquipe?.map(
-                              ({ nome, email, tags }, index) => (
+                              ({ nome, foto, email, tags }, index) => (
                                 <Box key={index} sx={styles.boxCardMembroList}>
-                                  <Avatar sx={styles.avatarMembroList}>
-                                    <Person />
+                                  <Avatar
+                                    src={foto || undefined}
+                                    sx={styles.avatarMembroList}
+                                  >
+                                    {foto ? null : (
+                                      <>
+                                        {!foto &&
+                                          nome?.charAt(0)?.toUpperCase()}
+                                      </>
+                                    )}
                                   </Avatar>
                                   <Box sx={styles.boxAreaInfoMembroList}>
                                     <Box
@@ -2024,10 +2071,18 @@ const PaginaEquipe = (params) => {
                               <Divider sx={styles.dividerList} />
                             </Box>
                             {membrosMinhaEquipe?.map(
-                              ({ nome, email, tags }, index) => (
+                              ({ nome, foto, email, tags }, index) => (
                                 <Box key={index} sx={styles.boxCardMembroList}>
-                                  <Avatar sx={styles.avatarMembroList}>
-                                    <Person />
+                                  <Avatar
+                                    src={foto || undefined}
+                                    sx={styles.avatarMembroList}
+                                  >
+                                    {foto ? null : (
+                                      <>
+                                        {!foto &&
+                                          nome?.charAt(0)?.toUpperCase()}
+                                      </>
+                                    )}
                                   </Avatar>
                                   <Box sx={styles.boxAreaInfoMembroList}>
                                     <Box
@@ -2140,6 +2195,9 @@ const PaginaEquipe = (params) => {
         editarEscala={editarEscala}
         escalaMensal={escalaMensal}
         setEscalaMensal={setEscalaMensal}
+        setFotosUsuarios={setFotosUsuarios}
+        fotosUsuarios={fotosUsuarios}
+        setCopyEscalaMensal={setCopyEscalaMensal}
       />
 
       <ModalPerfilMembro

@@ -286,6 +286,9 @@ const ModalEscalarMembro = (params) => {
     editarEscala,
     setProximaEscala,
     handleBuscarEscalacoesUsuario,
+    setFotosUsuarios,
+    fotosUsuarios,
+    setCopyProximaEscala,
   } = params;
   const [OpenModalConfirmarEscolha, setOpenModalConfirmarEscolha] =
     useState(false);
@@ -349,7 +352,7 @@ const ModalEscalarMembro = (params) => {
     }
   };
 
-  const handleAtualizarEscalaData = async (usuarioId, nome, tagId) => {
+  const handleAtualizarEscalaData = async (usuarioId, nome, foto, tagId) => {
     try {
       setLoadingApiEscalarMembro(true);
 
@@ -372,7 +375,10 @@ const ModalEscalarMembro = (params) => {
       });
 
       if (response?.status === 200) {
-        handleBuscarProximaEscala();
+        /* handleBuscarProximaEscala();
+        setOpenModalConfirmarEscolha(false);
+        setOpenModalEscalarMembro(false); */
+        handleEscalarMembroModoEdit(usuarioId, nome, foto, tagId);
         if (
           escaladosUpdate?.some(
             (escalados) =>
@@ -382,8 +388,13 @@ const ModalEscalarMembro = (params) => {
         ) {
           handleBuscarEscalacoesUsuario();
         }
-        setOpenModalConfirmarEscolha(false);
-        setOpenModalEscalarMembro(false);
+
+        // Atualiza a copy da próxima escala com a lista de escalados atualizada
+        setCopyProximaEscala((prevState) => ({
+          ...prevState,
+          escalados: escaladosUpdate,
+        }));
+
         setLoadingApiEscalarMembro(false);
         setSnackbar("success", "Usuário escalado com sucesso");
       } else {
@@ -396,7 +407,7 @@ const ModalEscalarMembro = (params) => {
     }
   };
 
-  function handleEscalarMembroModoEdit(usuarioId, nome, tagId) {
+  function handleEscalarMembroModoEdit(usuarioId, nome, foto, tagId) {
     let escaladosUpdate = infoEscalarMembro?.escalados?.map((escalado) => {
       if (escalado.tagId === tagId) {
         return {
@@ -409,6 +420,17 @@ const ModalEscalarMembro = (params) => {
       }
     });
 
+    // Verifica se a lista de fotos já contém o membroId, e se não, adiciona-o
+    if (
+      !fotosUsuarios?.some((fotoUsuario) => fotoUsuario.membroId === usuarioId)
+    ) {
+      setFotosUsuarios((prevState) => [
+        ...prevState,
+        { membroId: usuarioId, membroFoto: foto },
+      ]);
+    }
+
+    // Atualiza a próxima escala com a lista de escalados atualizada
     setProximaEscala((prevState) => ({
       ...prevState,
       escalados: escaladosUpdate,
@@ -506,7 +528,13 @@ const ModalEscalarMembro = (params) => {
                     <>
                       {usuariosDisponiveis?.map(
                         (
-                          { usuarioId, nome, possuiTag, possuiDisponibilidade },
+                          {
+                            usuarioId,
+                            nome,
+                            foto,
+                            possuiTag,
+                            possuiDisponibilidade,
+                          },
                           index
                         ) => (
                           <Button
@@ -520,12 +548,14 @@ const ModalEscalarMembro = (params) => {
                                   handleEscalarMembroModoEdit(
                                     usuarioId,
                                     nome,
+                                    foto,
                                     infoEscalarMembro?.tagId
                                   );
                                 } else {
                                   handleAtualizarEscalaData(
                                     usuarioId,
                                     nome,
+                                    foto,
                                     infoEscalarMembro?.tagId
                                   );
                                 }
@@ -533,8 +563,13 @@ const ModalEscalarMembro = (params) => {
                             }}
                             sx={styles.botaoCardPerfil}
                           >
-                            <Avatar sx={styles.avatarMembro}>
-                              <Person sx={{ fontSize: "24px" }} />
+                            <Avatar
+                              src={foto || undefined}
+                              sx={styles.avatarMembro}
+                            >
+                              {foto ? null : (
+                                <>{nome?.charAt(0)?.toUpperCase()}</>
+                              )}
                             </Avatar>
                             <Box sx={styles.boxInfoPerfilCard}>
                               <Typography sx={styles.textNamePerfil}>
@@ -641,6 +676,7 @@ const ModalEscalarMembro = (params) => {
                         usuariosDisponiveis[positionUsuarioSelecionado]
                           ?.usuarioId,
                         usuariosDisponiveis[positionUsuarioSelecionado]?.nome,
+                        usuariosDisponiveis[positionUsuarioSelecionado]?.foto,
                         infoEscalarMembro?.tagId
                       );
                     } else {
@@ -648,6 +684,7 @@ const ModalEscalarMembro = (params) => {
                         usuariosDisponiveis[positionUsuarioSelecionado]
                           ?.usuarioId,
                         usuariosDisponiveis[positionUsuarioSelecionado]?.nome,
+                        usuariosDisponiveis[positionUsuarioSelecionado]?.foto,
                         infoEscalarMembro?.tagId
                       );
                     }
