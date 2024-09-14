@@ -655,7 +655,7 @@ const PaginaGeral = (params) => {
     useState(true);
   const [infoEscalarMembro, setInfoEscalarMembro] = useState([]);
   const [loadingApiEscalarMembro, setLoadingApiEscalarMembro] = useState(false);
-  const [openModalConfirmarCandidatar, setOpenModalConfirmarCandidatar] =
+  const [openModalConfirmarCandidatura, setOpenModalConfirmarCandidatura] =
     useState(false);
   const [fotosUsuarios, setFotosUsuarios] = useState([]);
 
@@ -882,7 +882,7 @@ const PaginaGeral = (params) => {
 
           {!loadingTabelaProximaEscala && (
             <>
-              {proximaEscala !== null ? (
+              {proximaEscala ? (
                 <>
                   <Box sx={styles.boxInfoProximoCulto}>
                     <Typography
@@ -1045,7 +1045,8 @@ const PaginaGeral = (params) => {
                               ) &&
                                 tagsUsuario?.some(
                                   (userTags) => userTags.id === tagId
-                                ) && (
+                                ) &&
+                                usuario?.ativo && (
                                   <IconButton
                                     sx={styles.IconButtonHover}
                                     onClick={() => {
@@ -1063,7 +1064,7 @@ const PaginaGeral = (params) => {
                                         escalados: proximaEscala?.escalados,
                                       });
 
-                                      setOpenModalConfirmarCandidatar(true);
+                                      setOpenModalConfirmarCandidatura(true);
                                     }}
                                   >
                                     <PersonAddAlt1Outlined
@@ -1090,7 +1091,7 @@ const PaginaGeral = (params) => {
               ) : (
                 <Box sx={{ ...styles.configBox, height: "100%" }}>
                   <Typography sx={styles.textTitulo}>
-                    Sem programação
+                    Sem próxima programação
                   </Typography>
                 </Box>
               )}
@@ -1243,6 +1244,16 @@ const PaginaGeral = (params) => {
               {usuario?.nome}
               {isAdm && (
                 <Chip label="Admin" variant="outlined" sx={styles.chipName} />
+              )}
+              {!usuario?.ativo && (
+                <Chip
+                  label="Inativo"
+                  variant="outlined"
+                  sx={{
+                    ...styles.chipName,
+                    borderColor: "#D32F2F",
+                  }}
+                />
               )}
             </Typography>
 
@@ -1430,10 +1441,14 @@ const PaginaGeral = (params) => {
 
       <ModalConfirmarCandidatura
         usuarioLogado={usuario}
-        openModalConfirmarCandidatar={openModalConfirmarCandidatar}
-        setOpenModalConfirmarCandidatar={setOpenModalConfirmarCandidatar}
+        openModalConfirmarCandidatura={openModalConfirmarCandidatura}
+        setOpenModalConfirmarCandidatura={setOpenModalConfirmarCandidatura}
         infoEscalarMembro={infoEscalarMembro}
-        handleBuscarProximaEscala={handleBuscarProximaEscala}
+        handleBuscarEscalacoesUsuario={handleBuscarEscalacoesUsuario}
+        setCopyProximaEscala={setCopyProximaEscala}
+        setFotosUsuarios={setFotosUsuarios}
+        fotosUsuarios={fotosUsuarios}
+        setProximaEscala={setProximaEscala}
       />
 
       <Snackbar

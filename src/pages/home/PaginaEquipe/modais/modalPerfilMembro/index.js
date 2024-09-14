@@ -469,6 +469,8 @@ const ModalPerfilMembro = (params) => {
     setOpenModalPerfilMembro,
     tagsEquipe,
     handleBuscarMembrosMinhaEquipe,
+    handleBuscarEscalaMensal,
+    setValueTabInformacoesEscala,
   } = params;
 
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -618,11 +620,14 @@ const ModalPerfilMembro = (params) => {
   const handleExpulsarMembroEquipe = async () => {
     try {
       const response = await api.put("/expulsarMembroEquipe", {
+        equipeId: usuarioLogado?.equipeId,
         usuarioId: usuarioPerfil?.usuarioDefaultId,
       });
 
       if (response?.status === 200) {
+        setValueTabInformacoesEscala(1);
         handleBuscarMembrosMinhaEquipe();
+        handleBuscarEscalaMensal();
         handleCloseModal();
       } else {
         setSnackbar("error", "Erro ao conectar com o servidor");
@@ -739,6 +744,16 @@ const ModalPerfilMembro = (params) => {
                         label="Admin"
                         variant="outlined"
                         sx={styles.chipName}
+                      />
+                    )}
+                    {!usuarioPerfil?.ativo && (
+                      <Chip
+                        label="Inativo"
+                        variant="outlined"
+                        sx={{
+                          ...styles.chipName,
+                          borderColor: "#D32F2F",
+                        }}
                       />
                     )}
                     {usuarioPerfil?.autorizacao === "adm001" && (
@@ -1109,9 +1124,9 @@ const ModalPerfilMembro = (params) => {
                   Você realmente deseja desativar esse membro da sua equipe?
                 </Typography>
                 <Typography sx={styles.textModal}>
-                  Ao confirmar, ele será removido de todas as suas escalações,
-                  não será inserido na criação de escalas futuras e não poderá
-                  mais se candidatar
+                  Ao confirmar, o usuário não será incluído na geração das
+                  escalas e não poderá mais ser escalado nem se candidatar às
+                  escalas de sua equipe
                 </Typography>
               </Box>
               <Box sx={styles.boxBotaoModalDelete}>

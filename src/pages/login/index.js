@@ -1,4 +1,5 @@
 import {
+  Alert,
   Box,
   Button,
   CircularProgress,
@@ -8,14 +9,11 @@ import {
   Typography,
 } from "@mui/material";
 import BackgroundImage from "../../img/fotoProducaoSamuel.jpeg";
-import BackgroundImage2 from "../../img/zs-samuel.jpg";
-import { forwardRef, useState } from "react";
+import { forwardRef, useEffect, useState } from "react";
 import LogoRodape from "../../img/logoZS.png";
 import { Link, useNavigate } from "react-router-dom";
-import MuiAlert from "@mui/material/Alert";
 import { useAuth } from "../../components/popUpCadastro/authContext";
 import api from "../../api";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import { VisibilityOffOutlined, VisibilityOutlined } from "@mui/icons-material";
 
@@ -244,10 +242,6 @@ const Login = () => {
   const [errorPassword, setErrorPassword] = useState(false);
   const [typePassword, setTypePassword] = useState("password");
 
-  const Alert = forwardRef(function Alert(props, ref) {
-    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-  });
-
   const handleOpenPopUpSuccess = () => {
     setShowPopup(true);
   };
@@ -259,44 +253,16 @@ const Login = () => {
     hidePopup();
   };
 
-  const [openPopUpError, setOpenPopUpError] = useState(false);
-  const handleOpenPopUpError = () => {
-    setOpenPopUpError(true);
-  };
-  const handleClosePopUpError = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setOpenPopUpError(false);
-  };
-
-  const setSnackbar = (severity, message) => {
-    setSnackbarSeverity(severity);
-    setSnackbarMessage(message);
-    setSnackbarOpen(true);
-  };
-  const handleSnackbarClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setSnackbarOpen(false);
-  };
-
   //Botão de Login
   const handleLogin = async (event) => {
-    if (
-      email === "" ||
-      errorEmail === true ||
-      password === "" ||
-      errorPassword === true
-    ) {
-      if (email === "") {
+    if (!email || errorEmail || !password || errorPassword) {
+      if (!email) {
         setErrorEmail(true);
       }
-      if (password === "") {
+      if (!password) {
         setErrorPassword(true);
       }
-      handleOpenPopUpError();
+      setSnackbar("error", "Login ou Senha incorreta");
     } else {
       try {
         setLoadingLogin(true);
@@ -304,7 +270,7 @@ const Login = () => {
           email: email,
           senha: password,
         });
-        if (response.status === 200 && response.data) {
+        if (response.status === 200) {
           const data = response.data;
 
           localStorage.setItem("token", JSON.stringify(data.token));
@@ -329,7 +295,13 @@ const Login = () => {
           }
         }
       } catch (error) {
-        setSnackbar("error", "Login ou senha incorreta");
+        // Verifica se o erro é de credenciais inválidas (401)
+        if (error.response && error.response.status === 401) {
+          setSnackbar("error", "Login ou Senha incorreta");
+        } else {
+          setSnackbar("error", "Erro ao conectar com o servidor");
+          console.error("erro com a conexão com o servidor", error);
+        }
       } finally {
         setLoadingLogin(false);
       }
@@ -372,6 +344,18 @@ const Login = () => {
     }
   };
 
+  const setSnackbar = (severity, message) => {
+    setSnackbarSeverity(severity);
+    setSnackbarMessage(message);
+    setSnackbarOpen(true);
+  };
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbarOpen(false);
+  };
+
   return (
     <Box sx={styles.container}>
       <Box sx={styles.boxLogin}>
@@ -404,6 +388,7 @@ const Login = () => {
               InputProps={{
                 endAdornment: <EmailOutlinedIcon sx={{ color: "#F3A913" }} />,
               }}
+              placeholder="email@adpaz-zs.com.br"
             />
             <TextField
               error={errorPassword}
@@ -478,25 +463,6 @@ const Login = () => {
       >
         <Alert onClose={handleClosePopUpSuccess} severity="success">
           Perfil criado com sucesso!
-        </Alert>
-      </Snackbar>
-
-      <Snackbar
-        open={openPopUpError}
-        autoHideDuration={3000}
-        onClose={handleClosePopUpError}
-        style={{
-          bottom: "20px",
-          left: "50%",
-          transform: "translateX(-50%)",
-        }}
-      >
-        <Alert
-          onClose={handleClosePopUpError}
-          severity="error"
-          sx={{ width: "100%" }}
-        >
-          Email e/ou senha incorreta
         </Alert>
       </Snackbar>
 

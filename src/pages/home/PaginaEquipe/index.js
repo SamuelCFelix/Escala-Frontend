@@ -61,6 +61,8 @@ import ModalPerfilMembro from "./modais/modalPerfilMembro";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import ModalConfirmarCandidatura from "./modais/modalConfirmarCandidatura";
+import ModalConfirmarGerarEscala from "./modais/modalConfirmarGerarEscala";
+import ModalConfirmarExcluirEscalaData from "./modais/modalConfirmarExcluirEscalaData";
 
 const styles = {
   configBox: {
@@ -229,6 +231,19 @@ const styles = {
     justifyContent: "flex-start",
     gap: "8px",
     marginBottom: "14px",
+  },
+  boxCardEscalaMensalEfeitoDesativado: {
+    "::after": {
+      content: '""',
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: "rgba(0, 0, 0, 0.4)", // Efeito de bloqueio
+      zIndex: 10,
+    },
+    pointerEvents: "none", // Bloqueia interação
   },
   boxInfoEscalaMensal: {
     position: "relative",
@@ -983,17 +998,36 @@ const PaginaEquipe = (params) => {
 
   const [editarEscala, setEditarEscala] = useState({});
   const [openModalEscalarMembro, setOpenModalEscalarMembro] = useState(false);
-  const [valueTabInformacoes, setValueTabInformacoes] = useState("membros");
+  const [valueTabInformacoesEquipe, setValueTabInformacoesEquipe] =
+    useState("membros");
+  const [valueTabInformacoesEscala, setValueTabInformacoesEscala] = useState(1);
   const [escalaMensal, setEscalaMensal] = useState([]);
   const [copyEscalaMensal, setCopyEscalaMensal] = useState([]);
+  const [fotosUsuarios, setFotosUsuarios] = useState([]);
+  const [proximaEscalaMensal, setProximaEscalaMensal] = useState([]);
+  const [copyProximaEscalaMensal, setCopyProximaEscalaMensal] = useState([]);
+  const [fotosUsuariosProximaEscala, setFotosUsuariosProximaEscala] = useState(
+    []
+  );
   const [loadingTabelaEscalaMensal, setLoadingTabelaEscalaMensal] =
     useState(true);
   const [loadingApiEscalarMembro, setLoadingApiEscalarMembro] = useState(false);
   const [infoEscalarMembro, setInfoEscalarMembro] = useState([]);
-  const [openModalConfirmarCandidatar, setOpenModalConfirmarCandidatar] =
+  const [openModalConfirmarCandidatura, setOpenModalConfirmarCandidatura] =
     useState(false);
   const [tagsUsuario, setTagsUsuario] = useState([]);
-  const [fotosUsuarios, setFotosUsuarios] = useState([]);
+  const [openModalConfirmarGerarEscala, setOpenModalConfirmarGerarEscala] =
+    useState(false);
+  const [
+    openModalConfirmarExcluirEscalaData,
+    setOpenModalConfirmarExcluirEscalaData,
+  ] = useState(false);
+  const [infoDeletarEscalaData, setInfoDeletarEscalaData] = useState([]);
+
+  // Obter o mês atual e o próximo mês
+  const today = new Date();
+  const currentMonthIndex = today.getMonth();
+  const nextMonthIndex = (currentMonthIndex + 1) % 12; // Para ciclos de meses
 
   //UseEffect's
 
@@ -1003,6 +1037,10 @@ const PaginaEquipe = (params) => {
     handleBuscarMembrosMinhaEquipe();
     handleBuscarTagsEquipe();
     handleBuscarEscalaMensal();
+
+    if (isNextMonthInThreeDays()) {
+      handleBuscarProximaEscalaMensal();
+    }
   }, []);
 
   useEffect(() => {
@@ -1062,6 +1100,55 @@ const PaginaEquipe = (params) => {
     }
   };
 
+  const handleBuscarProximaEscalaMensal = async () => {
+    try {
+      setLoadingTabelaEscalaMensal(true);
+      const response = await api.post("/buscarProximaEscalaMensal", {
+        equipeId: usuario?.equipeId,
+      });
+
+      if (response?.status === 200) {
+        setCopyProximaEscalaMensal(response?.data?.proximaEscalaMensal);
+        setProximaEscalaMensal(response?.data?.proximaEscalaMensal);
+        setFotosUsuariosProximaEscala(response?.data?.fotosUsuarios);
+        setLoadingTabelaEscalaMensal(false);
+      } else {
+        setSnackbar("error", "Erro ao conectar com o servidor");
+        console.error("erro ao executar ação", response?.status);
+      }
+    } catch (error) {
+      setSnackbar("error", "Erro ao conectar com o servidor");
+      console.error("erro ao buscar próxima escala mensal da equipe: ", error);
+    }
+  };
+
+  const handleGerarNovaEscalaMensal = async () => {
+    try {
+      setLoadingTabelaEscalaMensal(true);
+      const response = await api.post("/gerarEscalaMensal", {
+        equipeId: usuario?.equipeId,
+        tipo: valueTabInformacoesEscala,
+      });
+
+      if (response?.status === 200) {
+        if (valueTabInformacoesEscala === 1) {
+          handleBuscarEscalaMensal();
+        } else if (valueTabInformacoesEscala === 2) {
+          handleBuscarProximaEscalaMensal();
+        }
+        setOpenModalConfirmarGerarEscala(false);
+        setLoadingTabelaEscalaMensal(false);
+        setSnackbar("success", "Escala gerada com sucesso");
+      } else {
+        setSnackbar("error", "Erro ao conectar com o servidor");
+        console.error("erro ao executar ação", response?.status);
+      }
+    } catch (error) {
+      setSnackbar("error", "Erro ao conectar com o servidor");
+      console.error("erro ao gerar nova escala mensal da equipe: ", error);
+    }
+  };
+
   const handleAtualizarEscala = async (escalaDataId) => {
     try {
       setLoadingApiEscalarMembro(true);
@@ -1083,6 +1170,42 @@ const PaginaEquipe = (params) => {
             escalados: escalaMensal[indexEscala]?.escalados,
           };
           return newCopyEscalaMensal;
+        });
+        handleEditarEscala(escalaDataId, false);
+        setSnackbar("success", "Escala salva com sucesso");
+      } else {
+        setSnackbar("error", "Erro ao conectar com o servidor");
+        console.error("erro ao executar ação", response?.status);
+      }
+    } catch (error) {
+      setSnackbar("error", "Erro ao conectar com o servidor");
+      console.error("erro salvar alterações da escala: ", error);
+    } finally {
+      setLoadingApiEscalarMembro(false);
+    }
+  };
+
+  const handleAtualizarProximaEscala = async (escalaDataId) => {
+    try {
+      setLoadingApiEscalarMembro(true);
+      let indexEscala = proximaEscalaMensal?.findIndex(
+        (escala) => escala.escalaDataId === escalaDataId
+      );
+
+      const response = await api.post("/updateProximaEscalaData", {
+        equipeId: usuario?.equipeId,
+        escalaDataId: escalaDataId,
+        escalados: proximaEscalaMensal[indexEscala]?.escalados,
+      });
+
+      if (response?.status === 200) {
+        setCopyProximaEscalaMensal((prevState) => {
+          const newCopyProximaEscalaMensal = [...prevState];
+          newCopyProximaEscalaMensal[indexEscala] = {
+            ...newCopyProximaEscalaMensal[indexEscala],
+            escalados: proximaEscalaMensal[indexEscala]?.escalados,
+          };
+          return newCopyProximaEscalaMensal;
         });
         handleEditarEscala(escalaDataId, false);
         setSnackbar("success", "Escala salva com sucesso");
@@ -1142,7 +1265,7 @@ const PaginaEquipe = (params) => {
 
   const handleRecusarSolicitacao = async (usuarioDefaultId) => {
     try {
-      const response = await api.delete("/recusarMembroEquipe", {
+      const response = await api.put("/recusarMembroEquipe", {
         usuarioId: usuarioDefaultId,
         equipeId: usuario?.equipeId,
       });
@@ -1258,6 +1381,19 @@ const PaginaEquipe = (params) => {
     }));
   };
 
+  const handleResetEditarEscala = () => {
+    setEditarEscala((prevAnchorEls) => {
+      const novosValores = {};
+
+      // Definir todos os valores como false
+      Object.keys(prevAnchorEls).forEach((id) => {
+        novosValores[id] = false;
+      });
+
+      return novosValores;
+    });
+  };
+
   function handleRemoveUsuarioEscala(escalaDataId, membroId) {
     const indexEscala = escalaMensal?.findIndex(
       (escala) => escala.escalaDataId === escalaDataId
@@ -1286,6 +1422,96 @@ const PaginaEquipe = (params) => {
       }
     }
   }
+
+  function handleRemoveUsuarioProximaEscala(escalaDataId, membroId) {
+    const indexEscala = proximaEscalaMensal?.findIndex(
+      (escala) => escala.escalaDataId === escalaDataId
+    );
+
+    if (indexEscala !== -1) {
+      const indexEscalado = proximaEscalaMensal[
+        indexEscala
+      ]?.escalados?.findIndex((escalado) => escalado.membroId === membroId);
+
+      if (indexEscalado !== -1) {
+        const novosEscalados = [...proximaEscalaMensal[indexEscala]?.escalados];
+        novosEscalados[indexEscalado] = {
+          ...novosEscalados[indexEscalado],
+          membroId: "sem membro",
+          membroNome: "sem membro",
+        };
+
+        const novaProximaEscalaMensal = [...proximaEscalaMensal];
+        novaProximaEscalaMensal[indexEscala] = {
+          ...novaProximaEscalaMensal[indexEscala],
+          escalados: novosEscalados,
+        };
+
+        setProximaEscalaMensal(novaProximaEscalaMensal);
+      }
+    }
+  }
+
+  const handleChangeTabsInformacoesEquipe = (event, newValue) => {
+    setValueTabInformacoesEquipe(newValue);
+  };
+
+  const handleChangeTabsInformacoesEscala = (event, newValue) => {
+    setValueTabInformacoesEscala(newValue);
+  };
+
+  function getMonthName(monthIndex) {
+    const months = [
+      "Janeiro",
+      "Fevereiro",
+      "Março",
+      "Abril",
+      "Maio",
+      "Junho",
+      "Julho",
+      "Agosto",
+      "Setembro",
+      "Outubro",
+      "Novembro",
+      "Dezembro",
+    ];
+    return months[monthIndex];
+  }
+
+  // Função para verificar se faltam menos de 3 dias para o próximo mês
+  const isNextMonthInThreeDays = () => {
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const currentMonth = today.getMonth();
+
+    // Primeiro dia do próximo mês
+    const nextMonthFirstDay = new Date(currentYear, currentMonth + 1, 1);
+
+    // Diferença em milissegundos entre hoje e o primeiro dia do próximo mês
+    const diffTime = nextMonthFirstDay - today;
+
+    // Converter milissegundos para dias
+    const diffDays = diffTime / (1000 * 60 * 60 * 24);
+
+    // Retorna true se faltam 3 dias ou menos
+    return diffDays <= 3;
+  };
+
+  const isProgramacaoFinalizada = (data, horario) => {
+    // Dividir o horário em horas e minutos
+    const [horas, minutos] = horario.split(":").map(Number);
+
+    // Dividir a data no formato DD/MM/YYYY
+    const [dia, mes, ano] = data.split("/").map(Number); // Assumindo formato "DD/MM/YYYY"
+
+    // Criar a data e adicionar as horas e minutos corretos
+    const dataProgramacao = new Date(ano, mes - 1, dia, horas + 1, minutos); // Meses começam em 0 no objeto Date
+
+    const agora = new Date(); // Data e hora atuais
+
+    // Retorna true se a programação já passou
+    return dataProgramacao < agora;
+  };
 
   const setSnackbar = (severity, message) => {
     setSnackbarSeverity(severity);
@@ -1322,15 +1548,53 @@ const PaginaEquipe = (params) => {
     );
   };
 
-  const handleChangeTabsInformacoes = (event, newValue) => {
-    setValueTabInformacoes(newValue);
-  };
-
   return (
     <Box sx={styles.container}>
       {/* Tabela ESCALA DO MÊS */}
       <Box sx={styles.boxCardDefault}>
         {boxTituloCards("Escala do mês")}
+
+        <Box sx={{ ...styles.boxTabs, mb: "10px" }}>
+          <Tabs
+            value={valueTabInformacoesEscala}
+            onChange={handleChangeTabsInformacoesEscala}
+            variant="scrollable"
+            scrollButtons
+            allowScrollButtonsMobile
+            sx={styles.estiloTabs}
+          >
+            <Tab
+              onClick={() => {
+                if (valueTabInformacoesEscala !== 1) {
+                  handleBuscarEscalaMensal();
+                  handleResetEditarEscala();
+                }
+              }}
+              label={getMonthName(currentMonthIndex)}
+              value={1}
+              sx={{ color: "#ffffff" }}
+            />
+
+            <Tab
+              disabled={!isNextMonthInThreeDays()}
+              onClick={() => {
+                if (valueTabInformacoesEscala !== 2) {
+                  handleBuscarProximaEscalaMensal();
+                  handleResetEditarEscala();
+                }
+              }}
+              label={getMonthName(nextMonthIndex)}
+              value={2}
+              sx={{
+                color: "#ffffff",
+                "&.MuiButtonBase-root.MuiTab-root.Mui-disabled": {
+                  color: "#BDBDBD",
+                },
+              }}
+            />
+          </Tabs>
+        </Box>
+
         <Box sx={{ ...styles.areaConteudoCard, overflowY: "auto" }}>
           {loadingTabelaEscalaMensal && (
             <Box sx={styles.boxAreaCircularProgress}>
@@ -1340,7 +1604,10 @@ const PaginaEquipe = (params) => {
 
           {!loadingTabelaEscalaMensal && (
             <>
-              {escalaMensal?.map(
+              {(valueTabInformacoesEscala === 1
+                ? escalaMensal
+                : proximaEscalaMensal
+              )?.map(
                 ({
                   programacaoId,
                   escalaDataId,
@@ -1351,7 +1618,13 @@ const PaginaEquipe = (params) => {
                   escalados,
                   index,
                 }) => (
-                  <Box sx={styles.boxCardEscalaMensal}>
+                  <Box
+                    sx={{
+                      ...styles.boxCardEscalaMensal,
+                      ...(isProgramacaoFinalizada(data, horario) &&
+                        styles.boxCardEscalaMensalEfeitoDesativado),
+                    }}
+                  >
                     <Box sx={styles.boxInfoEscalaMensal}>
                       <Typography sx={styles.textTituloInfoEscala}>
                         <CalendarMonthOutlined
@@ -1470,10 +1743,19 @@ const PaginaEquipe = (params) => {
                               membroId !== "sem membro" && (
                                 <IconButton
                                   onClick={() => {
-                                    handleRemoveUsuarioEscala(
-                                      escalaDataId,
-                                      membroId
-                                    );
+                                    if (valueTabInformacoesEscala === 1) {
+                                      handleRemoveUsuarioEscala(
+                                        escalaDataId,
+                                        membroId
+                                      );
+                                    } else if (
+                                      valueTabInformacoesEscala === 2
+                                    ) {
+                                      handleRemoveUsuarioProximaEscala(
+                                        escalaDataId,
+                                        membroId
+                                      );
+                                    }
                                   }}
                                   sx={{
                                     "&.MuiButtonBase-root.MuiIconButton-root:hover ":
@@ -1492,6 +1774,7 @@ const PaginaEquipe = (params) => {
                                 </IconButton>
                               )}
                             {membroId === "sem membro" &&
+                              !isProgramacaoFinalizada(data, horario) &&
                               ((isAdm && (
                                 <IconButton
                                   sx={styles.IconButtonHover}
@@ -1523,7 +1806,8 @@ const PaginaEquipe = (params) => {
                                 ) &&
                                   tagsUsuario?.some(
                                     (userTags) => userTags.id === tagId
-                                  ) && (
+                                  ) &&
+                                  usuario?.ativo && (
                                     <IconButton
                                       sx={styles.IconButtonHover}
                                       onClick={() => {
@@ -1539,7 +1823,7 @@ const PaginaEquipe = (params) => {
                                           escalados,
                                         });
 
-                                        setOpenModalConfirmarCandidatar(true);
+                                        setOpenModalConfirmarCandidatura(true);
                                       }}
                                     >
                                       <PersonAddAlt1Outlined
@@ -1580,7 +1864,13 @@ const PaginaEquipe = (params) => {
                                   height: "22px",
                                 }}
                                 onClick={() => {
-                                  setEscalaMensal(copyEscalaMensal);
+                                  if (valueTabInformacoesEscala === 1) {
+                                    setEscalaMensal(copyEscalaMensal);
+                                  } else if (valueTabInformacoesEscala === 2) {
+                                    setProximaEscalaMensal(
+                                      copyProximaEscalaMensal
+                                    );
+                                  }
                                   handleEditarEscala(escalaDataId, false);
                                 }}
                               >
@@ -1597,7 +1887,11 @@ const PaginaEquipe = (params) => {
                                   height: "22px",
                                 }}
                                 onClick={() => {
-                                  handleAtualizarEscala(escalaDataId);
+                                  if (valueTabInformacoesEscala === 1) {
+                                    handleAtualizarEscala(escalaDataId);
+                                  } else if (valueTabInformacoesEscala === 2) {
+                                    handleAtualizarProximaEscala(escalaDataId);
+                                  }
                                 }}
                               >
                                 <SaveOutlined sx={{ fontSize: "16px" }} />
@@ -1608,7 +1902,7 @@ const PaginaEquipe = (params) => {
                         </>
                       )}
 
-                      {isAdm && (
+                      {isAdm && !isProgramacaoFinalizada(data, horario) && (
                         <>
                           <Box sx={styles.boxButtonConfigEscala}>
                             <IconButton
@@ -1674,6 +1968,13 @@ const PaginaEquipe = (params) => {
                                     },
                                   }}
                                   onClick={() => {
+                                    setInfoDeletarEscalaData({
+                                      escalaDataId,
+                                    });
+
+                                    setOpenModalConfirmarExcluirEscalaData(
+                                      true
+                                    );
                                     handleCloseMenuEscala(escalaDataId);
                                   }}
                                 >
@@ -1708,9 +2009,12 @@ const PaginaEquipe = (params) => {
           <Divider sx={styles.divider} />
           {isAdm && (
             <Button
+              disabled={loadingTabelaEscalaMensal}
               variant="contained"
               sx={{ ...styles.botaoDefault, mb: "8px", gap: "4px" }}
-              onClick={() => {}}
+              onClick={() => {
+                setOpenModalConfirmarGerarEscala(true);
+              }}
             >
               <RestartAltOutlinedIcon sx={{ fontSize: "18px" }} />
               Gerar escala novamente
@@ -1721,7 +2025,9 @@ const PaginaEquipe = (params) => {
 
       {/* Tabela SOLICITAÇÕES DE ENTRADA */}
       {isAdm && (
-        <Box sx={styles.boxCardDefault}>
+        /* solicitacoesEntrada?.length > 0 && */ <Box
+          sx={styles.boxCardDefault}
+        >
           {boxTituloCards("Solicitações de entrada")}
           <Box sx={{ ...styles.areaConteudoCard, overflowY: "auto" }}>
             {loadingTabelaSolicitacoesEntrada && (
@@ -1855,8 +2161,8 @@ const PaginaEquipe = (params) => {
           <Box sx={styles.boxAreaMinhaEquipe}>
             <Box sx={styles.boxTabs}>
               <Tabs
-                value={valueTabInformacoes}
-                onChange={handleChangeTabsInformacoes}
+                value={valueTabInformacoesEquipe}
+                onChange={handleChangeTabsInformacoesEquipe}
                 variant="scrollable"
                 scrollButtons
                 allowScrollButtonsMobile
@@ -1880,7 +2186,7 @@ const PaginaEquipe = (params) => {
               </Tabs>
             </Box>
             <Box sx={styles.boxAreaConteudoTabsMinhaEquipe}>
-              {valueTabInformacoes === "membros" && (
+              {valueTabInformacoesEquipe === "membros" && (
                 <>
                   {loadingTabelaMinhaEquipeMembros && (
                     <Box sx={styles.boxAreaCircularProgress}>
@@ -1913,7 +2219,7 @@ const PaginaEquipe = (params) => {
                               <Divider sx={styles.dividerList} />
                             </Box>
                             {usuarioHostEquipe?.map(
-                              ({ nome, foto, email, tags }, index) => (
+                              ({ nome, ativo, foto, email, tags }, index) => (
                                 <Box key={index} sx={styles.boxCardMembroList}>
                                   <Avatar
                                     src={foto || undefined}
@@ -1941,6 +2247,16 @@ const PaginaEquipe = (params) => {
                                         variant="outlined"
                                         sx={styles.chipName}
                                       />
+                                      {!ativo && (
+                                        <Chip
+                                          label="Inativo"
+                                          variant="outlined"
+                                          sx={{
+                                            ...styles.chipName,
+                                            borderColor: "#D32F2F",
+                                          }}
+                                        />
+                                      )}
                                       {tags?.length === 0 && (
                                         <Chip
                                           label="Nenhuma TAG"
@@ -1990,7 +2306,7 @@ const PaginaEquipe = (params) => {
                               )
                             )}
                             {administradoresEquipe?.map(
-                              ({ nome, foto, email, tags }, index) => (
+                              ({ nome, ativo, foto, email, tags }, index) => (
                                 <Box key={index} sx={styles.boxCardMembroList}>
                                   <Avatar
                                     src={foto || undefined}
@@ -2017,6 +2333,16 @@ const PaginaEquipe = (params) => {
                                         variant="outlined"
                                         sx={styles.chipName}
                                       />
+                                      {!ativo && (
+                                        <Chip
+                                          label="Inativo"
+                                          variant="outlined"
+                                          sx={{
+                                            ...styles.chipName,
+                                            borderColor: "#D32F2F",
+                                          }}
+                                        />
+                                      )}
                                       {tags?.length === 0 && (
                                         <Chip
                                           label="Nenhuma TAG"
@@ -2071,7 +2397,7 @@ const PaginaEquipe = (params) => {
                               <Divider sx={styles.dividerList} />
                             </Box>
                             {membrosMinhaEquipe?.map(
-                              ({ nome, foto, email, tags }, index) => (
+                              ({ nome, ativo, foto, email, tags }, index) => (
                                 <Box key={index} sx={styles.boxCardMembroList}>
                                   <Avatar
                                     src={foto || undefined}
@@ -2093,6 +2419,16 @@ const PaginaEquipe = (params) => {
                                       >
                                         {nome}
                                       </Typography>
+                                      {!ativo && (
+                                        <Chip
+                                          label="Inativo"
+                                          variant="outlined"
+                                          sx={{
+                                            ...styles.chipName,
+                                            borderColor: "#D32F2F",
+                                          }}
+                                        />
+                                      )}
                                       {tags?.length === 0 && (
                                         <Chip
                                           label="Nenhuma TAG"
@@ -2142,13 +2478,13 @@ const PaginaEquipe = (params) => {
                   )}
                 </>
               )}
-              {valueTabInformacoes === "programacoes" && (
+              {valueTabInformacoesEquipe === "programacoes" && (
                 <Box sx={{ ...styles.configBox, height: "100%" }}>
                   <Typography sx={styles.textTitulo}>Em Breve</Typography>
                 </Box>
               )}
 
-              {/* {valueTabInformacoes === "tags" && (
+              {/* {valueTabInformacoesEquipe === "tags" && (
                 <Box sx={styles.boxAreaTagsMinhaEquipe}>
                   {tagsMinhaEquipe?.map(({ id, nome }, index) => (
                     <Chip
@@ -2161,7 +2497,7 @@ const PaginaEquipe = (params) => {
                 </Box>
               )} */}
 
-              {valueTabInformacoes === "tags" && (
+              {valueTabInformacoesEquipe === "tags" && (
                 <Box sx={{ ...styles.configBox, height: "100%" }}>
                   <Typography sx={styles.textTitulo}>Em Breve</Typography>
                 </Box>
@@ -2198,6 +2534,12 @@ const PaginaEquipe = (params) => {
         setFotosUsuarios={setFotosUsuarios}
         fotosUsuarios={fotosUsuarios}
         setCopyEscalaMensal={setCopyEscalaMensal}
+        proximaEscalaMensal={proximaEscalaMensal}
+        setProximaEscalaMensal={setProximaEscalaMensal}
+        setFotosUsuariosProximaEscala={setFotosUsuariosProximaEscala}
+        fotosUsuariosProximaEscala={fotosUsuariosProximaEscala}
+        setCopyProximaEscalaMensal={setCopyProximaEscalaMensal}
+        valueTabInformacoesEscala={valueTabInformacoesEscala}
       />
 
       <ModalPerfilMembro
@@ -2207,14 +2549,49 @@ const PaginaEquipe = (params) => {
         setOpenModalPerfilMembro={setOpenModalPerfilMembro}
         tagsEquipe={tagsEquipe}
         handleBuscarMembrosMinhaEquipe={handleBuscarMembrosMinhaEquipe}
+        handleBuscarEscalaMensal={handleBuscarEscalaMensal}
+        setValueTabInformacoesEscala={setValueTabInformacoesEscala}
       />
 
       <ModalConfirmarCandidatura
         usuarioLogado={usuario}
-        openModalConfirmarCandidatar={openModalConfirmarCandidatar}
-        setOpenModalConfirmarCandidatar={setOpenModalConfirmarCandidatar}
+        openModalConfirmarCandidatura={openModalConfirmarCandidatura}
+        setOpenModalConfirmarCandidatura={setOpenModalConfirmarCandidatura}
         infoEscalarMembro={infoEscalarMembro}
-        handleBuscarEscalaMensal={handleBuscarEscalaMensal}
+        escalaMensal={escalaMensal}
+        setEscalaMensal={setEscalaMensal}
+        setFotosUsuarios={setFotosUsuarios}
+        fotosUsuarios={fotosUsuarios}
+        setCopyEscalaMensal={setCopyEscalaMensal}
+        proximaEscalaMensal={proximaEscalaMensal}
+        setProximaEscalaMensal={setProximaEscalaMensal}
+        setFotosUsuariosProximaEscala={setFotosUsuariosProximaEscala}
+        fotosUsuariosProximaEscala={fotosUsuariosProximaEscala}
+        setCopyProximaEscalaMensal={setCopyProximaEscalaMensal}
+        valueTabInformacoesEscala={valueTabInformacoesEscala}
+      />
+
+      <ModalConfirmarExcluirEscalaData
+        usuarioLogado={usuario}
+        openModalConfirmarExcluirEscalaData={
+          openModalConfirmarExcluirEscalaData
+        }
+        setOpenModalConfirmarExcluirEscalaData={
+          setOpenModalConfirmarExcluirEscalaData
+        }
+        infoDeletarEscalaData={infoDeletarEscalaData}
+        escalaMensal={escalaMensal}
+        setEscalaMensal={setEscalaMensal}
+        proximaEscalaMensal={proximaEscalaMensal}
+        setProximaEscalaMensal={setProximaEscalaMensal}
+        valueTabInformacoesEscala={valueTabInformacoesEscala}
+      />
+
+      <ModalConfirmarGerarEscala
+        openModalConfirmarGerarEscala={openModalConfirmarGerarEscala}
+        setOpenModalConfirmarGerarEscala={setOpenModalConfirmarGerarEscala}
+        loadingTabelaEscalaMensal={loadingTabelaEscalaMensal}
+        handleGerarNovaEscalaMensal={handleGerarNovaEscalaMensal}
       />
 
       <Snackbar

@@ -72,6 +72,7 @@ const SalaDeEspera = () => {
       !userData?.usuarioDefaultId ||
       !(userData?.equipeId === "solicitacao enviada")
     ) {
+      localStorage.clear();
       window.location.href = "/login";
     }
   }, []);

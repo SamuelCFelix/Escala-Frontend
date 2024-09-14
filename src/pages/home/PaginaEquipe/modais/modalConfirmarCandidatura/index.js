@@ -116,11 +116,21 @@ const styles = {
 
 const ModalConfirmarCandidatura = (params) => {
   const {
-    openModalConfirmarCandidatar,
-    setOpenModalConfirmarCandidatar,
+    openModalConfirmarCandidatura,
+    setOpenModalConfirmarCandidatura,
     infoEscalarMembro,
     usuarioLogado,
-    handleBuscarEscalaMensal,
+    escalaMensal,
+    setEscalaMensal,
+    setFotosUsuarios,
+    fotosUsuarios,
+    setCopyEscalaMensal,
+    valueTabInformacoesEscala,
+    proximaEscalaMensal,
+    setProximaEscalaMensal,
+    setFotosUsuariosProximaEscala,
+    fotosUsuariosProximaEscala,
+    setCopyProximaEscalaMensal,
   } = params;
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState("");
@@ -130,7 +140,7 @@ const ModalConfirmarCandidatura = (params) => {
 
   //API's
 
-  const handleAtualizarEscalaData = async (usuarioId, nome, tagId) => {
+  const handleAtualizarEscalaData = async (usuarioId, nome, foto, tagId) => {
     try {
       setLoadingApiEscalarMembro(true);
 
@@ -146,26 +156,158 @@ const ModalConfirmarCandidatura = (params) => {
         }
       });
 
-      const response = await api.post("/updateEscalaData", {
-        equipeId: usuarioLogado?.equipeId,
-        escalaDataId: infoEscalarMembro?.escalaDataId,
-        escalados: escaladosUpdate,
-      });
+      let response = [];
+
+      if (valueTabInformacoesEscala == 1) {
+        response = await api.post("/updateEscalaData", {
+          equipeId: usuarioLogado?.equipeId,
+          escalaDataId: infoEscalarMembro?.escalaDataId,
+          escalados: escaladosUpdate,
+        });
+      } else if (valueTabInformacoesEscala == 2) {
+        response = await api.post("/updateProximaEscalaData", {
+          equipeId: usuarioLogado?.equipeId,
+          escalaDataId: infoEscalarMembro?.escalaDataId,
+          escalados: escaladosUpdate,
+        });
+      }
 
       if (response?.status === 200) {
-        handleBuscarEscalaMensal();
-        setOpenModalConfirmarCandidatar(false);
+        let salvarCopyEscalaMensal = true;
+
+        if (valueTabInformacoesEscala == 1) {
+          handleEscalarMembroModoEdit(
+            usuarioId,
+            nome,
+            foto,
+            tagId,
+            salvarCopyEscalaMensal
+          );
+        } else if (valueTabInformacoesEscala == 2) {
+          handleEscalarMembroModoEditProximaEscala(
+            usuarioId,
+            nome,
+            foto,
+            tagId,
+            salvarCopyEscalaMensal
+          );
+        }
         setLoadingApiEscalarMembro(false);
-        setSnackbar("success", "Candidatura feita com sucesso");
+        setSnackbar("success", "Usuário escalado com sucesso");
       } else {
         setSnackbar("error", "Erro ao conectar com o servidor");
         console.error("erro ao executar ação", response?.status);
       }
     } catch (error) {
       setSnackbar("error", "Erro ao conectar com o servidor");
-      console.error("erro ao tentar se candidatar para escala: ", error);
+      console.error("erro ao buscar usuários disponíveis para escala: ", error);
     }
   };
+
+  function handleEscalarMembroModoEdit(
+    usuarioId,
+    nome,
+    foto,
+    tagId,
+    salvarCopyEscalaMensal
+  ) {
+    const indexEscala = escalaMensal?.findIndex(
+      (escala) => escala.escalaDataId === infoEscalarMembro?.escalaDataId
+    );
+
+    if (indexEscala !== -1) {
+      const indexEscalado = escalaMensal[indexEscala]?.escalados?.findIndex(
+        (escalado) => escalado.tagId === tagId
+      );
+
+      if (indexEscalado !== -1) {
+        const novosEscalados = [...escalaMensal[indexEscala]?.escalados];
+        novosEscalados[indexEscalado] = {
+          ...novosEscalados[indexEscalado],
+          membroId: usuarioId,
+          membroNome: nome,
+        };
+
+        const novaEscalaMensal = [...escalaMensal];
+        novaEscalaMensal[indexEscala] = {
+          ...novaEscalaMensal[indexEscala],
+          escalados: novosEscalados,
+        };
+
+        // Verifica se a lista de fotos já contém o membroId, e se não, adiciona-o
+        if (
+          !fotosUsuarios?.some(
+            (fotoUsuario) => fotoUsuario.membroId === usuarioId
+          )
+        ) {
+          setFotosUsuarios((prevState) => [
+            ...prevState,
+            { membroId: usuarioId, membroFoto: foto },
+          ]);
+        }
+
+        setEscalaMensal(novaEscalaMensal);
+
+        if (salvarCopyEscalaMensal) {
+          setCopyEscalaMensal(novaEscalaMensal);
+        }
+
+        setOpenModalConfirmarCandidatura(false);
+      }
+    }
+  }
+
+  function handleEscalarMembroModoEditProximaEscala(
+    usuarioId,
+    nome,
+    foto,
+    tagId,
+    salvarCopyEscalaMensal
+  ) {
+    const indexEscala = proximaEscalaMensal?.findIndex(
+      (escala) => escala.escalaDataId === infoEscalarMembro?.escalaDataId
+    );
+
+    if (indexEscala !== -1) {
+      const indexEscalado = proximaEscalaMensal[
+        indexEscala
+      ]?.escalados?.findIndex((escalado) => escalado.tagId === tagId);
+
+      if (indexEscalado !== -1) {
+        const novosEscalados = [...proximaEscalaMensal[indexEscala]?.escalados];
+        novosEscalados[indexEscalado] = {
+          ...novosEscalados[indexEscalado],
+          membroId: usuarioId,
+          membroNome: nome,
+        };
+
+        const novaEscalaMensal = [...proximaEscalaMensal];
+        novaEscalaMensal[indexEscala] = {
+          ...novaEscalaMensal[indexEscala],
+          escalados: novosEscalados,
+        };
+
+        // Verifica se a lista de fotos já contém o membroId, e se não, adiciona-o
+        if (
+          !fotosUsuariosProximaEscala?.some(
+            (fotoUsuario) => fotoUsuario.membroId === usuarioId
+          )
+        ) {
+          setFotosUsuariosProximaEscala((prevState) => [
+            ...prevState,
+            { membroId: usuarioId, membroFoto: foto },
+          ]);
+        }
+
+        setProximaEscalaMensal(novaEscalaMensal);
+
+        if (salvarCopyEscalaMensal) {
+          setCopyProximaEscalaMensal(novaEscalaMensal);
+        }
+        setOpenModalConfirmarCandidatura(false);
+      }
+    }
+  }
 
   const setSnackbar = (severity, message) => {
     setSnackbarSeverity(severity);
@@ -194,9 +336,9 @@ const ModalConfirmarCandidatura = (params) => {
   return (
     <>
       <Modal
-        open={openModalConfirmarCandidatar}
+        open={openModalConfirmarCandidatura}
         onClose={() => {
-          setOpenModalConfirmarCandidatar(false);
+          setOpenModalConfirmarCandidatura(false);
         }}
         closeAfterTransition
         slots={{ backdrop: Backdrop }}
@@ -206,7 +348,7 @@ const ModalConfirmarCandidatura = (params) => {
           },
         }}
       >
-        <Fade in={openModalConfirmarCandidatar}>
+        <Fade in={openModalConfirmarCandidatura}>
           <Box sx={styles.boxModal}>
             <Box sx={styles.boxConteudoModal}>
               {boxTituloCards("Preencher programação")}
@@ -217,7 +359,7 @@ const ModalConfirmarCandidatura = (params) => {
               <Box sx={styles.boxBotoesModal}>
                 <Button
                   onClick={() => {
-                    setOpenModalConfirmarCandidatar(false);
+                    setOpenModalConfirmarCandidatura(false);
                   }}
                   sx={styles.botaoDefaultModal}
                 >
@@ -230,6 +372,7 @@ const ModalConfirmarCandidatura = (params) => {
                     handleAtualizarEscalaData(
                       usuarioLogado?.usuarioDefaultId,
                       usuarioLogado?.nome,
+                      usuarioLogado?.foto,
                       infoEscalarMembro?.tagId
                     );
                   }}

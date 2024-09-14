@@ -5,6 +5,7 @@ import {
   Button,
   Card,
   Fade,
+  IconButton,
   Modal,
   Typography,
 } from "@mui/material";
@@ -16,6 +17,7 @@ import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import api from "../../../api";
+import { Close } from "@mui/icons-material";
 
 const styles = {
   container: {
@@ -224,6 +226,7 @@ const EscolherEquipe = () => {
     } else if (userData?.equipeId === "solicitacao enviada") {
       window.location.href = "/primeiroAcesso/escolherequipe/saladeespera";
     } else {
+      localStorage.clear();
       window.location.href = "/login";
     }
   }, []);
@@ -361,6 +364,14 @@ const EscolherEquipe = () => {
                       "&:focus-visible": { outline: "none" },
                     }}
                   >
+                    <IconButton
+                      onClick={() => {
+                        handleCloseModal(equipe.id);
+                      }}
+                      sx={{ position: "absolute", top: 4, right: 0 }}
+                    >
+                      <Close sx={{ fontSize: "26px", color: "#ffffff" }} />
+                    </IconButton>
                     <Box sx={styles.boxConteudoModalAvisos}>
                       <Box sx={styles.boxAreaTituloModalAvisos}>
                         <Box sx={styles.boxTituloModalAvisos}>

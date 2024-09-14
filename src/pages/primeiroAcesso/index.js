@@ -312,6 +312,7 @@ const PrimerioAcesso = () => {
       setUsuarioPerfilId(userData.usuarioPerfilId);
       setLoadingPage(true);
     } else {
+      localStorage?.clear();
       window.location.href = "/login";
     }
   }, []);

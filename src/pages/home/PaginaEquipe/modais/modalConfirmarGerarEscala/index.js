@@ -116,106 +116,16 @@ const styles = {
 
 const ModalConfirmarCandidatura = (params) => {
   const {
-    openModalConfirmarCandidatura,
-    setOpenModalConfirmarCandidatura,
-    infoEscalarMembro,
-    usuarioLogado,
-    handleBuscarEscalacoesUsuario,
-    setCopyProximaEscala,
-    setFotosUsuarios,
-    fotosUsuarios,
-    setProximaEscala,
+    openModalConfirmarGerarEscala,
+    setOpenModalConfirmarGerarEscala,
+    handleGerarNovaEscalaMensal,
+    loadingTabelaEscalaMensal,
   } = params;
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState("");
   const [snackbarMessage, setSnackbarMessage] = useState("");
 
-  const [loadingApiEscalarMembro, setLoadingApiEscalarMembro] = useState(false);
-
   //API's
-
-  const handleAtualizarEscalaData = async (usuarioId, nome, foto, tagId) => {
-    try {
-      setLoadingApiEscalarMembro(true);
-
-      let escaladosUpdate = infoEscalarMembro?.escalados?.map((escalado) => {
-        if (escalado.tagId === tagId) {
-          return {
-            ...escalado,
-            membroId: usuarioId,
-            membroNome: nome,
-          };
-        } else {
-          return escalado;
-        }
-      });
-
-      const response = await api.post("/updateEscalaData", {
-        equipeId: usuarioLogado?.equipeId,
-        escalaDataId: infoEscalarMembro?.escalaDataId,
-        escalados: escaladosUpdate,
-      });
-
-      if (response?.status === 200) {
-        handleEscalarMembroModoEdit(usuarioId, nome, foto, tagId);
-        if (
-          escaladosUpdate?.some(
-            (escalados) =>
-              escalados.membroId === usuarioLogado?.usuarioHostId ||
-              escalados.membroId === usuarioLogado?.usuarioDefaultId
-          )
-        ) {
-          handleBuscarEscalacoesUsuario();
-        }
-
-        // Atualiza a copy da próxima escala com a lista de escalados atualizada
-        setCopyProximaEscala((prevState) => ({
-          ...prevState,
-          escalados: escaladosUpdate,
-        }));
-
-        setLoadingApiEscalarMembro(false);
-        setSnackbar("success", "Usuário escalado com sucesso");
-      } else {
-        setSnackbar("error", "Erro ao conectar com o servidor");
-        console.error("erro ao executar ação", response?.status);
-      }
-    } catch (error) {
-      setSnackbar("error", "Erro ao conectar com o servidor");
-      console.error("erro ao buscar usuários disponíveis para escala: ", error);
-    }
-  };
-
-  function handleEscalarMembroModoEdit(usuarioId, nome, foto, tagId) {
-    let escaladosUpdate = infoEscalarMembro?.escalados?.map((escalado) => {
-      if (escalado.tagId === tagId) {
-        return {
-          ...escalado,
-          membroId: usuarioId,
-          membroNome: nome,
-        };
-      } else {
-        return escalado;
-      }
-    });
-
-    // Verifica se a lista de fotos já contém o membroId, e se não, adiciona-o
-    if (
-      !fotosUsuarios?.some((fotoUsuario) => fotoUsuario.membroId === usuarioId)
-    ) {
-      setFotosUsuarios((prevState) => [
-        ...prevState,
-        { membroId: usuarioId, membroFoto: foto },
-      ]);
-    }
-
-    // Atualiza a próxima escala com a lista de escalados atualizada
-    setProximaEscala((prevState) => ({
-      ...prevState,
-      escalados: escaladosUpdate,
-    }));
-    setOpenModalConfirmarCandidatura(false);
-  }
 
   const setSnackbar = (severity, message) => {
     setSnackbarSeverity(severity);
@@ -244,9 +154,9 @@ const ModalConfirmarCandidatura = (params) => {
   return (
     <>
       <Modal
-        open={openModalConfirmarCandidatura}
+        open={openModalConfirmarGerarEscala}
         onClose={() => {
-          setOpenModalConfirmarCandidatura(false);
+          setOpenModalConfirmarGerarEscala(false);
         }}
         closeAfterTransition
         slots={{ backdrop: Backdrop }}
@@ -256,18 +166,20 @@ const ModalConfirmarCandidatura = (params) => {
           },
         }}
       >
-        <Fade in={openModalConfirmarCandidatura}>
+        <Fade in={openModalConfirmarGerarEscala}>
           <Box sx={styles.boxModal}>
             <Box sx={styles.boxConteudoModal}>
-              {boxTituloCards("Preencher programação")}
+              {boxTituloCards("Gerar uma nova escala")}
               <Typography sx={styles.dataTextModal}>
-                Ao confirmar, você estará assumindo o compromisso de
-                comparecimento e será escalado para esse dia
+                Você realmente deseja gerar uma nova escala?
+              </Typography>
+              <Typography sx={styles.dataTextModal}>
+                Ao confirmar, a escala atual será substituída
               </Typography>
               <Box sx={styles.boxBotoesModal}>
                 <Button
                   onClick={() => {
-                    setOpenModalConfirmarCandidatura(false);
+                    setOpenModalConfirmarGerarEscala(false);
                   }}
                   sx={styles.botaoDefaultModal}
                 >
@@ -275,14 +187,9 @@ const ModalConfirmarCandidatura = (params) => {
                   Cancelar
                 </Button>
                 <Button
-                  disabled={loadingApiEscalarMembro}
+                  disabled={loadingTabelaEscalaMensal}
                   onClick={() => {
-                    handleAtualizarEscalaData(
-                      usuarioLogado?.usuarioDefaultId,
-                      usuarioLogado?.nome,
-                      usuarioLogado?.foto,
-                      infoEscalarMembro?.tagId
-                    );
+                    handleGerarNovaEscalaMensal();
                   }}
                   sx={styles.botaoDefaultModal}
                 >

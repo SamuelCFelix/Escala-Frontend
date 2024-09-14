@@ -53,6 +53,7 @@ const LayoutBar = () => {
 
   useEffect(() => {
     if (!autenticated) {
+      localStorage.clear();
       window.location.href = "/login";
     }
   }, [autenticated]);

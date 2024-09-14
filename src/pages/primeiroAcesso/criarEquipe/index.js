@@ -1753,6 +1753,7 @@ const CriarEquipe = () => {
                 if (activeStep !== 0) {
                   handlenVoltarStep();
                 } else {
+                  localStorage?.clear();
                   window.location.href = "/login";
                 }
               }}

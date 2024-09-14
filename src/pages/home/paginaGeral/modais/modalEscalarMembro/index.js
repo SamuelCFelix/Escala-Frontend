@@ -322,6 +322,7 @@ const ModalEscalarMembro = (params) => {
         equipeId: usuarioLogado?.equipeId,
         escalaDataId: infoEscalarMembro?.escalaDataId,
         tagId: infoEscalarMembro?.tagId,
+        tipo: 1,
       };
 
       // Se estiver no modo de edição, adicionar parâmetros adicionais
@@ -330,6 +331,7 @@ const ModalEscalarMembro = (params) => {
           ...params,
           modoEdit: true,
           escaladosModoEdit: infoEscalarMembro?.escalados,
+          tipo: 1,
         };
       }
 

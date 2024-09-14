@@ -1121,9 +1121,10 @@ const ModalDisponibilidade = (params) => {
                   As escalas são geradas automaticamente
                 </Typography>
                 <Typography sx={styles.textModal}>
-                  às <span style={{ color: "#F3A913" }}>23:30</span> do{" "}
-                  <span style={{ color: "#F3A913" }}>último dia</span> de cada{" "}
-                  <span style={{ color: "#F3A913" }}>mês</span>.
+                  {/* às <span style={{ color: "#F3A913" }}>23:30</span> do{" "}
+                  <span style={{ color: "#F3A913" }}>último dia</span>  */}
+                  <span style={{ color: "#F3A913" }}>3 dias</span> antes do
+                  próximo <span style={{ color: "#F3A913" }}>mês</span>.
                 </Typography>
                 <Typography sx={styles.textModal}>
                   As informações de disponibilidade serão mantidas para os meses

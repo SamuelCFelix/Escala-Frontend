@@ -282,13 +282,18 @@ const ModalEscalarMembro = (params) => {
     setOpenModalEscalarMembro,
     infoEscalarMembro,
     usuarioLogado,
-    handleBuscarEscalaMensal,
     editarEscala,
     escalaMensal,
     setEscalaMensal,
     setFotosUsuarios,
     fotosUsuarios,
     setCopyEscalaMensal,
+    valueTabInformacoesEscala,
+    proximaEscalaMensal,
+    setProximaEscalaMensal,
+    setFotosUsuariosProximaEscala,
+    fotosUsuariosProximaEscala,
+    setCopyProximaEscalaMensal,
   } = params;
   const [OpenModalConfirmarEscolha, setOpenModalConfirmarEscolha] =
     useState(false);
@@ -322,6 +327,7 @@ const ModalEscalarMembro = (params) => {
         equipeId: usuarioLogado?.equipeId,
         escalaDataId: infoEscalarMembro?.escalaDataId,
         tagId: infoEscalarMembro?.tagId,
+        tipo: valueTabInformacoesEscala,
       };
 
       // Se estiver no modo de edição, adicionar parâmetros adicionais
@@ -330,6 +336,7 @@ const ModalEscalarMembro = (params) => {
           ...params,
           modoEdit: true,
           escaladosModoEdit: infoEscalarMembro?.escalados,
+          tipo: valueTabInformacoesEscala,
         };
       }
 
@@ -368,27 +375,42 @@ const ModalEscalarMembro = (params) => {
         }
       });
 
-      const response = await api.post("/updateEscalaData", {
-        equipeId: usuarioLogado?.equipeId,
-        escalaDataId: infoEscalarMembro?.escalaDataId,
-        escalados: escaladosUpdate,
-      });
+      let response = [];
+
+      if (valueTabInformacoesEscala == 1) {
+        response = await api.post("/updateEscalaData", {
+          equipeId: usuarioLogado?.equipeId,
+          escalaDataId: infoEscalarMembro?.escalaDataId,
+          escalados: escaladosUpdate,
+        });
+      } else if (valueTabInformacoesEscala == 2) {
+        response = await api.post("/updateProximaEscalaData", {
+          equipeId: usuarioLogado?.equipeId,
+          escalaDataId: infoEscalarMembro?.escalaDataId,
+          escalados: escaladosUpdate,
+        });
+      }
 
       if (response?.status === 200) {
-        /* handleBuscarEscalaMensal();
-           setOpenModalConfirmarEscolha(false);
-           setOpenModalEscalarMembro(false);
-        */
-
         let salvarCopyEscalaMensal = true;
 
-        handleEscalarMembroModoEdit(
-          usuarioId,
-          nome,
-          foto,
-          tagId,
-          salvarCopyEscalaMensal
-        );
+        if (valueTabInformacoesEscala == 1) {
+          handleEscalarMembroModoEdit(
+            usuarioId,
+            nome,
+            foto,
+            tagId,
+            salvarCopyEscalaMensal
+          );
+        } else if (valueTabInformacoesEscala == 2) {
+          handleEscalarMembroModoEditProximaEscala(
+            usuarioId,
+            nome,
+            foto,
+            tagId,
+            salvarCopyEscalaMensal
+          );
+        }
         setLoadingApiEscalarMembro(false);
         setSnackbar("success", "Usuário escalado com sucesso");
       } else {
@@ -447,6 +469,59 @@ const ModalEscalarMembro = (params) => {
 
         if (salvarCopyEscalaMensal) {
           setCopyEscalaMensal(novaEscalaMensal);
+        }
+        setOpenModalConfirmarEscolha(false);
+        setOpenModalEscalarMembro(false);
+      }
+    }
+  }
+
+  function handleEscalarMembroModoEditProximaEscala(
+    usuarioId,
+    nome,
+    foto,
+    tagId,
+    salvarCopyEscalaMensal
+  ) {
+    const indexEscala = proximaEscalaMensal?.findIndex(
+      (escala) => escala.escalaDataId === infoEscalarMembro?.escalaDataId
+    );
+
+    if (indexEscala !== -1) {
+      const indexEscalado = proximaEscalaMensal[
+        indexEscala
+      ]?.escalados?.findIndex((escalado) => escalado.tagId === tagId);
+
+      if (indexEscalado !== -1) {
+        const novosEscalados = [...proximaEscalaMensal[indexEscala]?.escalados];
+        novosEscalados[indexEscalado] = {
+          ...novosEscalados[indexEscalado],
+          membroId: usuarioId,
+          membroNome: nome,
+        };
+
+        const novaEscalaMensal = [...proximaEscalaMensal];
+        novaEscalaMensal[indexEscala] = {
+          ...novaEscalaMensal[indexEscala],
+          escalados: novosEscalados,
+        };
+
+        // Verifica se a lista de fotos já contém o membroId, e se não, adiciona-o
+        if (
+          !fotosUsuariosProximaEscala?.some(
+            (fotoUsuario) => fotoUsuario.membroId === usuarioId
+          )
+        ) {
+          setFotosUsuariosProximaEscala((prevState) => [
+            ...prevState,
+            { membroId: usuarioId, membroFoto: foto },
+          ]);
+        }
+
+        setProximaEscalaMensal(novaEscalaMensal);
+
+        if (salvarCopyEscalaMensal) {
+          setCopyProximaEscalaMensal(novaEscalaMensal);
         }
         setOpenModalConfirmarEscolha(false);
         setOpenModalEscalarMembro(false);
@@ -562,12 +637,21 @@ const ModalEscalarMembro = (params) => {
                                 if (
                                   editarEscala[infoEscalarMembro?.escalaDataId]
                                 ) {
-                                  handleEscalarMembroModoEdit(
-                                    usuarioId,
-                                    nome,
-                                    foto,
-                                    infoEscalarMembro?.tagId
-                                  );
+                                  if (valueTabInformacoesEscala == 1) {
+                                    handleEscalarMembroModoEdit(
+                                      usuarioId,
+                                      nome,
+                                      foto,
+                                      infoEscalarMembro?.tagId
+                                    );
+                                  } else if (valueTabInformacoesEscala == 2) {
+                                    handleEscalarMembroModoEditProximaEscala(
+                                      usuarioId,
+                                      nome,
+                                      foto,
+                                      infoEscalarMembro?.tagId
+                                    );
+                                  }
                                 } else {
                                   handleAtualizarEscalaData(
                                     usuarioId,
@@ -689,13 +773,23 @@ const ModalEscalarMembro = (params) => {
                 <Button
                   onClick={() => {
                     if (editarEscala[infoEscalarMembro?.escalaDataId]) {
-                      handleEscalarMembroModoEdit(
-                        usuariosDisponiveis[positionUsuarioSelecionado]
-                          ?.usuarioId,
-                        usuariosDisponiveis[positionUsuarioSelecionado]?.nome,
-                        usuariosDisponiveis[positionUsuarioSelecionado]?.foto,
-                        infoEscalarMembro?.tagId
-                      );
+                      if (valueTabInformacoesEscala == 1) {
+                        handleEscalarMembroModoEdit(
+                          usuariosDisponiveis[positionUsuarioSelecionado]
+                            ?.usuarioId,
+                          usuariosDisponiveis[positionUsuarioSelecionado]?.nome,
+                          usuariosDisponiveis[positionUsuarioSelecionado]?.foto,
+                          infoEscalarMembro?.tagId
+                        );
+                      } else if (valueTabInformacoesEscala == 2) {
+                        handleEscalarMembroModoEditProximaEscala(
+                          usuariosDisponiveis[positionUsuarioSelecionado]
+                            ?.usuarioId,
+                          usuariosDisponiveis[positionUsuarioSelecionado]?.nome,
+                          usuariosDisponiveis[positionUsuarioSelecionado]?.foto,
+                          infoEscalarMembro?.tagId
+                        );
+                      }
                     } else {
                       handleAtualizarEscalaData(
                         usuariosDisponiveis[positionUsuarioSelecionado]
