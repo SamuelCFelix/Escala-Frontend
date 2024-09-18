@@ -5,6 +5,7 @@ import {
   Button,
   ButtonBase,
   Fade,
+  IconButton,
   Modal,
   Slide,
   Snackbar,
@@ -22,6 +23,7 @@ import imagemServo2 from "../../img/zs-servo.JPG";
 import { Fragment, useEffect, useState } from "react";
 import api from "../../api";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import { Close } from "@mui/icons-material";
 
 const styles = {
   container: {
@@ -378,6 +380,13 @@ const PrimerioAcesso = () => {
     setValuePassword("");
   };
 
+  //APERTAR ENTER
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      handleApiPasswordAutorization();
+    }
+  };
+
   return (
     <Box sx={styles.container}>
       <Box sx={styles.boxTitulo}>
@@ -537,6 +546,14 @@ const PrimerioAcesso = () => {
       >
         <Fade in={openModalAutorizacao}>
           <Box sx={styles.boxModalAvisos}>
+            <IconButton
+              onClick={() => {
+                handleCloseModal();
+              }}
+              sx={{ position: "absolute", top: 4, right: 0 }}
+            >
+              <Close sx={{ fontSize: "26px", color: "#ffffff" }} />
+            </IconButton>
             <Box sx={styles.boxConteudoModalAvisos}>
               <Box sx={styles.boxAreaTituloModalAvisos}>
                 <Box sx={styles.boxTituloModalAvisos}>
@@ -578,6 +595,7 @@ const PrimerioAcesso = () => {
               >
                 <TextField
                   value={valuePassword}
+                  onKeyDown={handleKeyDown}
                   onChange={(event) => {
                     setValuePassword(event.target.value);
                   }}

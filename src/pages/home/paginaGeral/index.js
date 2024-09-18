@@ -1142,6 +1142,7 @@ const PaginaGeral = (params) => {
                 </Box>
               ) : (
                 <Button
+                  disabled={loadingTabelaProximaEscala || !proximaEscala}
                   variant="contained"
                   sx={{ ...styles.botaoDefault, mb: "8px", gap: "4px" }}
                   onClick={() => setEditarEscala(true)}
