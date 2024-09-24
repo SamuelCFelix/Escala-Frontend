@@ -25,14 +25,13 @@ const styles = {
     padding: 0,
     fontFamily: "Roboto",
     background: "#000000",
-    width: "100vw",
-    height: "100vh",
+    width: "100dvw",
+    height: "100dvh",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "flex-start",
-    overflowY: "auto",
-    overflowX: "hidden",
+    overflow: "auto",
   },
   boxTitulo: {
     width: "384px",
@@ -64,16 +63,16 @@ const styles = {
   baseTitulo: {
     background: "#F3A913",
     width: "60%",
-    height: "3.8%",
+    height: "2px",
   },
   boxCenter: {
     width: "100dvw",
     height: "auto",
     display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "flex-start",
-    gap: "145px",
+    flexWrap: "wrap",
+    alignItems: "flex-start",
+    justifyContent: "center",
+    gap: "20px",
   },
   textoDefault: {
     fontSize: "14px",
@@ -81,33 +80,17 @@ const styles = {
     lineHeight: "24px",
     letterSpacing: "0.17px",
   },
-  botaoDefault: {
-    display: "flex",
-    width: "140px",
-    height: "30px",
-    padding: "0px 40px",
-    borderRadius: "10px",
-    fontFamily: "Roboto, sans-serif",
-    fontSize: "12px",
-    lineHeight: "36px",
-    letterSpacing: "1.25px",
-    color: "#ffffff",
-    background: "#F3A913",
-    "&:hover": {
-      background: "#FEBC36",
-    },
-  },
   boxAreaCardEquipe: {
     display: "flex",
     position: "relative",
     width: "90dvw",
+    height: "122px",
     maxWidth: "400px",
     cursor: "pointer",
   },
   boxEquipe: {
     background: "#000000",
     width: "400px",
-    minHeight: "120px",
     height: "120px",
     display: "flex",
     flexDirection: "column",
@@ -161,8 +144,8 @@ const styles = {
     left: "50%",
     transform: "translate(-50%, -50%)",
     width: "350px",
-    minHeight: "295px",
-    maxHeight: "395px",
+    height: "340px",
+    maxHeight: "90dvh",
     boxShadow: 24,
   },
   boxConteudoModalAvisos: {
@@ -172,6 +155,7 @@ const styles = {
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "flex-start",
+    overflow: "auto",
   },
   boxAreaTituloModalAvisos: {
     width: "100%",
@@ -218,10 +202,39 @@ const styles = {
     height: "50px",
     mr: "6px",
   },
+  boxInfo: {
+    width: "90dvw",
+    maxWidth: "420px",
+    height: "auto",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "column",
+    borderRadius: "10px",
+    border: "1px solid #F3A913",
+    gap: "12px",
+    padding: "14px 0px",
+  },
+  botaoDefault: {
+    display: "flex",
+    width: "auto",
+    height: "30px",
+    padding: "0px 40px",
+    borderRadius: "5px",
+    fontFamily: "Roboto, sans-serif",
+    fontSize: "12px",
+    lineHeight: "36px",
+    letterSpacing: "1.25px",
+    color: "#ffffff",
+    background: "#F3A913",
+    "&:hover": {
+      background: "#FEBC36",
+    },
+  },
 };
 
 const EscolherEquipe = () => {
-  const [loadingPage, setLoadingPage] = useState(false);
+  const [loadingPage, setLoadingPage] = useState(true);
   const [openModalEquipe, setOpenModalEquipe] = useState({});
   const [usuarioDefaultId, setUsuarioDefaultId] = useState("");
   const [arrayEquipes, setArrayEquipes] = useState([]);
@@ -232,7 +245,6 @@ const EscolherEquipe = () => {
     const userData = JSON.parse(storedData);
     if (userData?.usuarioDefaultId && userData?.equipeId === "sem equipe") {
       setUsuarioDefaultId(userData.usuarioDefaultId);
-      setLoadingPage(true);
     } else if (userData?.equipeId === "solicitacao enviada") {
       window.location.href = "/primeiroAcesso/escolherequipe/saladeespera";
     } else {
@@ -254,6 +266,8 @@ const EscolherEquipe = () => {
       }
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoadingPage(false);
     }
   }
 
@@ -286,101 +300,47 @@ const EscolherEquipe = () => {
         <Typography sx={styles.titulo}>Escolha sua equipe</Typography>
         <Box sx={styles.baseTitulo} />
       </Box>
-      <Box sx={styles.boxCenter}>
-        {arrayEquipes?.map((equipe, index) => {
-          return (
-            <>
-              <Box key={equipe.id} sx={styles.boxAreaCardEquipe}>
-                <motion.div
-                  className="motionDiv"
-                  initial={{ opacity: 0 }}
-                  animate={{
-                    opacity: 1,
-                    transition: { delay: 0.5 + 0.2 * index, ease: "easeInOut" },
-                  }}
-                  whileHover={{ scale: 1.04 }}
-                >
-                  <Card
-                    sx={styles.boxEquipe}
-                    onClick={() => {
-                      setOpenModalEquipe((prevState) => ({
-                        ...prevState,
-                        [equipe.id]: true,
-                      }));
-                    }}
-                  >
-                    <Box sx={styles.blurBackground} />
-                    <Box sx={styles.etiqueta} />
-                    <Box sx={styles.boxTituloCard}>
-                      <ControlCameraIcon
-                        sx={{ color: "#F3A913", fontSize: "18px", mb: "-10px" }}
-                      />
-                      <Typography
-                        sx={{
-                          ...styles.titulo,
-                          maxWidth: "270px",
-                          textOverflow: "ellipsis",
-                          overflow: "hidden",
-                          whiteSpace: "nowrap",
+      {!loadingPage && (
+        <>
+          <Box sx={styles.boxCenter}>
+            {arrayEquipes?.map((equipe, index) => {
+              return (
+                <>
+                  <Box key={equipe.id} sx={styles.boxAreaCardEquipe}>
+                    <motion.div
+                      className="motionDiv"
+                      initial={{ opacity: 0 }}
+                      animate={{
+                        opacity: 1,
+                        transition: {
+                          delay: 0.5 + 0.2 * index,
+                          ease: "easeInOut",
+                        },
+                      }}
+                      whileHover={{ scale: 1.04 }}
+                    >
+                      <Card
+                        sx={styles.boxEquipe}
+                        onClick={() => {
+                          setOpenModalEquipe((prevState) => ({
+                            ...prevState,
+                            [equipe.id]: true,
+                          }));
                         }}
                       >
-                        {equipe?.nome}
-                      </Typography>
-                      <Box sx={{ ...styles.baseTitulo, width: "85%" }} />
-                    </Box>
-                    <Box sx={styles.boxBaseEquipe}>
-                      <Box sx={{ ...styles.boxRodapeEquipe, ml: "10px" }}>
-                        <CalendarMonthOutlinedIcon sx={{ color: "#F3A913" }} />
-                        <Typography sx={styles.textoDefault}>
-                          Programações: {equipe?.Programacao?.length}
-                        </Typography>
-                      </Box>
-                      <Box sx={{ ...styles.boxRodapeEquipe, mr: "16px" }}>
-                        <GroupsOutlinedIcon sx={{ color: "#F3A913" }} />
-                        <Typography sx={styles.textoDefault}>
-                          Membros: {equipe?.UsuarioDefault?.length + 1}
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </Card>
-                </motion.div>
-              </Box>
-
-              <Modal
-                key={equipe.id + index}
-                open={openModalEquipe[equipe.id]}
-                onClose={() => {
-                  handleCloseModal(equipe.id);
-                }}
-                closeAfterTransition
-                slots={{ backdrop: Backdrop }}
-                slotProps={{
-                  backdrop: {
-                    timeout: 500,
-                  },
-                }}
-              >
-                <Fade in={openModalEquipe[equipe.id]}>
-                  <Box
-                    sx={{
-                      ...styles.boxModalAvisos,
-                      "&:focus-visible": { outline: "none" },
-                    }}
-                  >
-                    <IconButton
-                      onClick={() => {
-                        handleCloseModal(equipe.id);
-                      }}
-                      sx={{ position: "absolute", top: 4, right: 0 }}
-                    >
-                      <Close sx={{ fontSize: "26px", color: "#ffffff" }} />
-                    </IconButton>
-                    <Box sx={styles.boxConteudoModalAvisos}>
-                      <Box sx={styles.boxAreaTituloModalAvisos}>
-                        <Box sx={styles.boxTituloModalAvisos}>
+                        <Box sx={styles.blurBackground} />
+                        <Box sx={styles.etiqueta} />
+                        <Box sx={styles.boxTituloCard}>
+                          <ControlCameraIcon
+                            sx={{
+                              color: "#F3A913",
+                              fontSize: "18px",
+                              mb: "-10px",
+                            }}
+                          />
                           <Typography
                             sx={{
-                              ...styles.tituloModalAvisos,
+                              ...styles.titulo,
                               maxWidth: "270px",
                               textOverflow: "ellipsis",
                               overflow: "hidden",
@@ -389,119 +349,215 @@ const EscolherEquipe = () => {
                           >
                             {equipe?.nome}
                           </Typography>
-                          <Box sx={{ ...styles.baseTituloModalAvisos }} />
+                          <Box sx={{ ...styles.baseTitulo, width: "85%" }} />
                         </Box>
-                      </Box>
-                      <Box sx={styles.boxModalAreaInfoEquipe}>
-                        <Avatar
-                          src={equipe?.usuarioHost?.foto || undefined}
-                          sx={styles.estiloAvatar}
-                        >
-                          {equipe?.usuarioHost?.foto ? null : (
-                            <>
-                              {equipe?.usuarioHost?.nome
-                                ?.charAt(0)
-                                ?.toUpperCase()}
-                            </>
-                          )}
-                        </Avatar>
-
-                        <Box
-                          sx={{
-                            ...styles.boxRodapeEquipe,
-                            mr: "16px",
-                            mt: "4px",
-                          }}
-                        >
-                          <FlagOutlinedIcon sx={{ color: "#F3A913" }} />
-                          <Typography
-                            sx={{
-                              ...styles.textoDefault,
-                              maxWidth: "270px",
-                              textOverflow: "ellipsis",
-                              whiteSpace: "nowrap",
-                              overflow: "hidden",
-                            }}
-                          >
-                            {equipe?.usuarioHost?.nome}
-                          </Typography>
+                        <Box sx={styles.boxBaseEquipe}>
+                          <Box sx={{ ...styles.boxRodapeEquipe, ml: "10px" }}>
+                            <CalendarMonthOutlinedIcon
+                              sx={{ color: "#F3A913" }}
+                            />
+                            <Typography sx={styles.textoDefault}>
+                              Programações: {equipe?.Programacao?.length}
+                            </Typography>
+                          </Box>
+                          <Box sx={{ ...styles.boxRodapeEquipe, mr: "16px" }}>
+                            <GroupsOutlinedIcon sx={{ color: "#F3A913" }} />
+                            <Typography sx={styles.textoDefault}>
+                              Membros: {equipe?.UsuarioDefault?.length + 1}
+                            </Typography>
+                          </Box>
                         </Box>
-                      </Box>
-
-                      <Box sx={{ ...styles.boxBaseEquipe, width: "90%" }}>
-                        <Box sx={{ ...styles.boxRodapeEquipe }}>
-                          <CalendarMonthOutlinedIcon
-                            sx={{ color: "#F3A913" }}
-                          />
-                          <Typography sx={styles.textoDefault}>
-                            Programações: {equipe?.Programacao?.length}
-                          </Typography>
-                        </Box>
-                        <Box sx={{ ...styles.boxRodapeEquipe, mr: "16px" }}>
-                          <GroupsOutlinedIcon sx={{ color: "#F3A913" }} />
-                          <Typography sx={styles.textoDefault}>
-                            Servindo: {equipe?.UsuarioDefault?.length + 1}
-                          </Typography>
-                        </Box>
-                      </Box>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          width: "90%",
-                          maxHeight: "150px",
-                          mb: "4px",
-                          justifyContent: "flex-start",
-                          alignItems: "center",
-                          flexDirection: "column",
-                        }}
-                      >
-                        <Box sx={{ ...styles.boxRodapeEquipe, mr: "20px" }}>
-                          <DescriptionOutlinedIcon sx={{ color: "#F3A913" }} />
-                          <Typography
-                            sx={{
-                              ...styles.textoDefault,
-                              textTransform: "uppercase",
-                            }}
-                          >
-                            Descrição
-                          </Typography>
-                        </Box>
-                        <Typography
-                          sx={{
-                            ...styles.textoDefault,
-                            textAlign: "center",
-                            fontSize: "13px",
-                          }}
-                        >
-                          {equipe?.descricao}
-                        </Typography>
-                      </Box>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          height: "40px",
-                          mb: "10px",
-                        }}
-                      >
-                        <Button
-                          sx={{ ...styles.botaoDefault, width: "100%" }}
-                          onClick={() => {
-                            handleApiEnviarSolicitacao(equipe.id);
-                          }}
-                        >
-                          Enviar solicitação
-                        </Button>
-                      </Box>
-                    </Box>
+                      </Card>
+                    </motion.div>
                   </Box>
-                </Fade>
-              </Modal>
-            </>
-          );
-        })}
-      </Box>
+
+                  <Modal
+                    key={equipe.id + index}
+                    open={openModalEquipe[equipe.id]}
+                    onClose={() => {
+                      handleCloseModal(equipe.id);
+                    }}
+                    closeAfterTransition
+                    slots={{ backdrop: Backdrop }}
+                    slotProps={{
+                      backdrop: {
+                        timeout: 500,
+                      },
+                    }}
+                  >
+                    <Fade in={openModalEquipe[equipe.id]}>
+                      <Box
+                        sx={{
+                          ...styles.boxModalAvisos,
+                          "&:focus-visible": { outline: "none" },
+                        }}
+                      >
+                        <IconButton
+                          onClick={() => {
+                            handleCloseModal(equipe.id);
+                          }}
+                          sx={{ position: "absolute", top: 4, right: 0 }}
+                        >
+                          <Close sx={{ fontSize: "26px", color: "#ffffff" }} />
+                        </IconButton>
+                        <Box sx={styles.boxConteudoModalAvisos}>
+                          <Box sx={styles.boxAreaTituloModalAvisos}>
+                            <Box sx={styles.boxTituloModalAvisos}>
+                              <Typography
+                                sx={{
+                                  ...styles.tituloModalAvisos,
+                                  maxWidth: "270px",
+                                  textOverflow: "ellipsis",
+                                  overflow: "hidden",
+                                  whiteSpace: "nowrap",
+                                }}
+                              >
+                                {equipe?.nome}
+                              </Typography>
+                              <Box sx={{ ...styles.baseTituloModalAvisos }} />
+                            </Box>
+                          </Box>
+                          <Box sx={styles.boxModalAreaInfoEquipe}>
+                            <Avatar
+                              src={equipe?.usuarioHost?.foto || undefined}
+                              sx={styles.estiloAvatar}
+                            >
+                              {equipe?.usuarioHost?.foto ? null : (
+                                <>
+                                  {equipe?.usuarioHost?.nome
+                                    ?.charAt(0)
+                                    ?.toUpperCase()}
+                                </>
+                              )}
+                            </Avatar>
+
+                            <Box
+                              sx={{
+                                ...styles.boxRodapeEquipe,
+                                mr: "16px",
+                                mt: "4px",
+                              }}
+                            >
+                              <FlagOutlinedIcon sx={{ color: "#F3A913" }} />
+                              <Typography
+                                sx={{
+                                  ...styles.textoDefault,
+                                  maxWidth: "270px",
+                                  textOverflow: "ellipsis",
+                                  whiteSpace: "nowrap",
+                                  overflow: "hidden",
+                                }}
+                              >
+                                {equipe?.usuarioHost?.nome}
+                              </Typography>
+                            </Box>
+                          </Box>
+
+                          <Box sx={{ ...styles.boxBaseEquipe, width: "90%" }}>
+                            <Box sx={{ ...styles.boxRodapeEquipe }}>
+                              <CalendarMonthOutlinedIcon
+                                sx={{ color: "#F3A913" }}
+                              />
+                              <Typography sx={styles.textoDefault}>
+                                Programações: {equipe?.Programacao?.length}
+                              </Typography>
+                            </Box>
+                            <Box sx={{ ...styles.boxRodapeEquipe, mr: "16px" }}>
+                              <GroupsOutlinedIcon sx={{ color: "#F3A913" }} />
+                              <Typography sx={styles.textoDefault}>
+                                Servindo: {equipe?.UsuarioDefault?.length + 1}
+                              </Typography>
+                            </Box>
+                          </Box>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              width: "90%",
+                              maxHeight: "150px",
+                              mb: "4px",
+                              justifyContent: "flex-start",
+                              alignItems: "center",
+                              flexDirection: "column",
+                            }}
+                          >
+                            <Box sx={{ ...styles.boxRodapeEquipe, mr: "20px" }}>
+                              <DescriptionOutlinedIcon
+                                sx={{ color: "#F3A913" }}
+                              />
+                              <Typography
+                                sx={{
+                                  ...styles.textoDefault,
+                                  textTransform: "uppercase",
+                                }}
+                              >
+                                Descrição
+                              </Typography>
+                            </Box>
+                            <Typography
+                              sx={{
+                                ...styles.textoDefault,
+                                textAlign: "center",
+                                fontSize: "13px",
+                              }}
+                            >
+                              {equipe?.descricao}
+                            </Typography>
+                          </Box>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              height: "40px",
+                              mb: "10px",
+                            }}
+                          >
+                            <Button
+                              sx={{ ...styles.botaoDefault, width: "100%" }}
+                              onClick={() => {
+                                handleApiEnviarSolicitacao(equipe.id);
+                              }}
+                            >
+                              Enviar solicitação
+                            </Button>
+                          </Box>
+                        </Box>
+                      </Box>
+                    </Fade>
+                  </Modal>
+                </>
+              );
+            })}
+            {arrayEquipes?.length === 0 && (
+              <>
+                <Box sx={styles.boxInfo}>
+                  <Typography
+                    sx={{ ...styles.textoDefault, textAlign: "center" }}
+                  >
+                    Nenhuma equipe existente no momento
+                  </Typography>
+                  <Typography
+                    sx={{ ...styles.textoDefault, textAlign: "center" }}
+                  >
+                    Aguarde a criação de equipes para solicitar entrada
+                  </Typography>
+                </Box>
+              </>
+            )}
+          </Box>
+
+          <Button
+            sx={{ ...styles.botaoDefault, mt: "20px" }}
+            onClick={() => {
+              localStorage.clear();
+              window.location.href = "/login";
+            }}
+          >
+            Voltar para a tela inicial
+          </Button>
+          <Box sx={{ width: "100dvw", height: "50px" }} />
+        </>
+      )}
     </Box>
   );
 };

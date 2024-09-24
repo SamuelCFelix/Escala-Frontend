@@ -22,6 +22,7 @@ import api from "../../api";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { Close, Padding } from "@mui/icons-material";
 import useDeviceType from "../../hooks/useDeviceType";
+import { useMediaQuery } from "react-responsive";
 
 const styles = {
   container: {
@@ -29,17 +30,17 @@ const styles = {
     padding: 0,
     fontFamily: "Roboto",
     background: "#000000",
-    width: "100vw",
-    height: "100vh",
+    width: "100dvw",
+    height: "100dvh",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
+    overflow: "auto",
   },
   boxTitulo: {
     width: "384px",
-    height: "70px",
-    marginBottom: "30px",
+    height: "100px",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
@@ -56,7 +57,7 @@ const styles = {
   baseTitulo: {
     background: "#F3A913",
     width: "60%",
-    height: "3.5%",
+    height: "2px",
   },
   boxTituloCards: {
     width: "auto",
@@ -83,12 +84,15 @@ const styles = {
     height: "2px",
   },
   boxCenter: {
-    width: "100dvw",
-    height: "70dvh",
+    width: "98dvw",
+    minHeight: "70dvh",
+    height: "auto",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+    flexWrap: "wrap",
     gap: "20px",
+    mt: "10px",
   },
   boxButton: {
     position: "relative",
@@ -103,10 +107,9 @@ const styles = {
   },
 
   boxCardsButton: {
-    width: "90%",
-    maxWidth: "446px",
-    height: "100%",
-    maxHeight: "487px",
+    width: "446px",
+    maxWidth: "90dvw",
+    height: "487px",
     borderRadius: "10px",
     display: "flex",
     position: "relative",
@@ -280,10 +283,18 @@ const styles = {
     width: "100%",
     height: "3.5%",
   },
+  boxButtonTelaInicial: {
+    width: "100dvw",
+    height: "auto",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
 };
 
 const PrimerioAcesso = () => {
   const { isMobile, isTablet, isDesktop } = useDeviceType();
+
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState("");
   const [snackbarMessage, setSnackbarMessage] = useState("");
@@ -380,7 +391,7 @@ const PrimerioAcesso = () => {
         <Typography sx={styles.titulo}>Escolha o seu perfil</Typography>
         <Box sx={styles.baseTitulo} />
       </Box>
-      <Box sx={{ ...styles.boxCenter, flexDirection: isMobile && "column" }}>
+      <Box sx={styles.boxCenter}>
         <Box sx={styles.boxCardsButton}>
           <motion.div
             className="motionDiv"
@@ -395,8 +406,8 @@ const PrimerioAcesso = () => {
               sx={{
                 ...styles.boxButton,
                 backgroundImage: `url(${imagemPastor})`,
-                backgroundSize: isMobile ? "130%" : "180%",
-                backgroundPosition: isMobile ? "center 0%" : "center 66%",
+                backgroundSize: isMobile ? "190%" : "164%",
+                backgroundPosition: isMobile ? "center 0%" : "center 50%",
                 border: selectLider ? "4px solid #F3A913" : "4px solid #ffffff",
               }}
               onClick={handleSelectLider}
@@ -461,8 +472,8 @@ const PrimerioAcesso = () => {
               sx={{
                 ...styles.boxButton,
                 backgroundImage: `url(${imagemServo})`,
-                backgroundSize: isMobile ? "120%" : "180%",
-                backgroundPosition: isMobile ? "center 53%" : "center 66%",
+                backgroundSize: isMobile ? "210%" : "170%",
+                backgroundPosition: isMobile ? "center 63%" : "center 70%",
                 border: selectServo ? "4px solid #F3A913" : "4px solid #ffffff",
               }}
               onClick={handleSelectServo}
@@ -513,7 +524,20 @@ const PrimerioAcesso = () => {
             )}
           </motion.div>
         </Box>
+        <Box sx={styles.boxButtonTelaInicial}>
+          <Button
+            sx={{ ...styles.botaoDefault, width: "auto" }}
+            onClick={() => {
+              localStorage.clear();
+              window.location.href = "/login";
+            }}
+          >
+            Voltar para a tela inicial
+          </Button>
+        </Box>
+        <Box sx={{ width: "100dvw", height: "12px" }} />
       </Box>
+
       <Modal
         open={openModalAutorizacao}
         onClose={() => {
