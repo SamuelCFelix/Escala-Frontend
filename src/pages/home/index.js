@@ -5,6 +5,7 @@ import PaginaGeral from "./paginaGeral";
 import PaginaEquipe from "./PaginaEquipe";
 import Rodape from "../../components/rodape";
 import api from "../../api";
+import useDeviceType from "../../hooks/useDeviceType";
 
 const styles = {
   configBox: {
@@ -22,11 +23,10 @@ const styles = {
     backgroundRepeat: "no-repeat",
     backgroundPosition: "center",
     width: "100%",
-    minHeight: "100vh",
+    minHeight: "auto",
     display: "flex",
     overflow: "auto",
     position: "relative",
-    overflow: "auto",
   },
   boxHome: {
     width: "100%",
@@ -35,7 +35,6 @@ const styles = {
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
-    mt: "64px",
   },
   estiloTabs: {
     [`& .${tabsClasses?.scrollButtons}`]: {
@@ -53,18 +52,19 @@ const styles = {
     width: "202px",
     paddingLeft: "22px",
   },
-  boxProximoCulto: {
-    background: "#000000",
+  boxTabs: {
     display: "flex",
-    alignItems: "center",
     justifyContent: "center",
-    width: "446px",
-    height: "492px",
-    borderRadius: "10px",
+    alignItems: "center",
+    width: "100%",
+    height: "auto",
+    margin: "12px 0px",
   },
 };
 
 const Home = ({ defaultTab }) => {
+  const { isMobile, isTablet, isDesktop } = useDeviceType();
+
   const autenticatedToken = localStorage?.getItem("token");
   const storedData = localStorage?.getItem("login");
 
@@ -163,27 +163,25 @@ const Home = ({ defaultTab }) => {
     <>
       <Box sx={styles.container}>
         <Box sx={styles.boxHome}>
-          <Box sx={{ ...styles.configBox, margin: "12px 0px" }}>
-            <Box sx={styles.boxTabs}>
-              <Tabs
-                value={valueTab}
-                onChange={handleChangeTabs}
-                variant="scrollable"
-                indicatorColor="#F3A913"
-                sx={styles.estiloTabs}
-              >
-                <Tab label="Geral" value="Geral" sx={{ color: "#ffffff" }} />
-                <Tab label="Equipe" value="Equipe" sx={{ color: "#ffffff" }} />
-              </Tabs>
-            </Box>
+          <Box sx={styles.boxTabs}>
+            <Tabs
+              value={valueTab}
+              onChange={handleChangeTabs}
+              variant="scrollable"
+              indicatorColor="#F3A913"
+              sx={styles.estiloTabs}
+            >
+              <Tab label="Geral" value="Geral" sx={{ color: "#ffffff" }} />
+              <Tab label="Equipe" value="Equipe" sx={{ color: "#ffffff" }} />
+            </Tabs>
           </Box>
+
           {!loadingPage && (
             <Box sx={{ display: "flex", width: "100%" }}>
               {valueTab === "Geral" && <PaginaGeral usuario={user} />}
               {valueTab === "Equipe" && <PaginaEquipe usuario={user} />}
             </Box>
           )}
-          <Rodape />
         </Box>
         <Snackbar
           open={snackbarOpen}

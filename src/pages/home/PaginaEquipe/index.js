@@ -63,6 +63,8 @@ import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined
 import ModalConfirmarCandidatura from "./modais/modalConfirmarCandidatura";
 import ModalConfirmarGerarEscala from "./modais/modalConfirmarGerarEscala";
 import ModalConfirmarExcluirEscalaData from "./modais/modalConfirmarExcluirEscalaData";
+import useDeviceType from "../../../hooks/useDeviceType";
+import { useMediaQuery } from "react-responsive";
 
 const styles = {
   configBox: {
@@ -73,12 +75,14 @@ const styles = {
   },
   container: {
     display: "flex",
+    flexWrap: "wrap",
     width: "100%",
     alignItems: "center",
     justifyContent: "center",
     padding: "0px 20px",
-    gap: "30px",
-    mb: "68px",
+    gap: "20px",
+    overflow: "auto",
+    mb: "14px",
   },
   boxCardDefault: {
     background: "#000000",
@@ -86,7 +90,9 @@ const styles = {
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "flex-start",
-    minWidth: "446px",
+    width: "446px",
+    maxWidth: "90dvw",
+    minHeight: "487px",
     height: "70vh",
     borderRadius: "10px",
   },
@@ -547,8 +553,11 @@ const styles = {
     gap: "4px",
   },
   boxTabs: {
-    width: "auto",
+    display: "flex",
+    width: "100%",
     height: "42px",
+    alignItems: "center",
+    justifyContent: "center",
   },
   estiloTabs: {
     [`& .${tabsClasses?.scrollButtons}`]: {
@@ -975,6 +984,10 @@ const styles = {
 
 const PaginaEquipe = (params) => {
   const { usuario } = params;
+  const { isMobile, isTablet, isDesktop } = useDeviceType();
+  const breakPoint01 = useMediaQuery({ query: "(max-width: 962px)" });
+  const breakPoint02 = useMediaQuery({ query: "(max-width: 1438px)" });
+
   const [isAdm, setIsAdm] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState("");
@@ -2024,9 +2037,14 @@ const PaginaEquipe = (params) => {
       </Box>
 
       {/* Tabela SOLICITAÇÕES DE ENTRADA */}
-      {isAdm && (
-        /* solicitacoesEntrada?.length > 0 && */ <Box
-          sx={styles.boxCardDefault}
+      {isAdm && solicitacoesEntrada?.length > 0 && (
+        <Box
+          sx={{
+            ...styles.boxCardDefault,
+            /* height: "auto",
+            maxHeight: "70vh",
+            minHeight: "0px", */
+          }}
         >
           {boxTituloCards("Solicitações de entrada")}
           <Box sx={{ ...styles.areaConteudoCard, overflowY: "auto" }}>

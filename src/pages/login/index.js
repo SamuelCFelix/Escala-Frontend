@@ -16,6 +16,7 @@ import { useAuth } from "../../components/popUpCadastro/authContext";
 import api from "../../api";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import { VisibilityOffOutlined, VisibilityOutlined } from "@mui/icons-material";
+import useDeviceType from "../../hooks/useDeviceType";
 
 const styles = {
   container: {
@@ -26,8 +27,8 @@ const styles = {
     backgroundSize: "cover",
     backgroundRepeat: "no-repeat",
     backgroundPosition: "center",
-    width: "100vw",
-    height: "100vh",
+    width: "100dvw",
+    height: "100dvh",
     position: "relative",
     display: "flex",
     alignItems: "center",
@@ -36,11 +37,12 @@ const styles = {
   },
   boxLogin: {
     display: "flex",
-    minWidth: 340,
-    minHeight: 390,
-    marginLeft: "auto",
-    /* marginRight: "150px", */
-    marginRight: "50px",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "flex-start",
+    width: "340px",
+    maxWidth: "90dvw",
+    height: "auto",
     background: "rgba(2, 2, 2, 0.7)",
     boxShadow: `
                 0px 4px 4px 0px rgba(0, 0, 0, 0.25),
@@ -49,16 +51,15 @@ const styles = {
     borderRadius: "10px",
     color: "#ffff",
     backdropFilter: "blur(10px)",
-  },
-  conteudoLogin: {
-    minWidth: 300,
-    padding: "30px 20px",
+    gap: "10px",
+    padding: "20px",
+    mb: "10px",
   },
   tituloLogin: {
     fontFamily: "Libre Baskerville",
     fontSize: "2.5rem",
-    width: "100px",
-    marginLeft: "10px",
+    width: "100%",
+    textAlign: "start",
   },
   inputLogin: {
     background: "rgba(86, 86, 86, 0.8)",
@@ -112,7 +113,7 @@ const styles = {
   },
   botaoEqueciSenha: {
     height: "5px",
-    marginTop: "10px",
+    mt: "2px",
     marginLeft: "-4px",
     color: "#fff",
     background: "transparent",
@@ -150,14 +151,13 @@ const styles = {
     },
   },
   botaoEntrar: {
-    width: 210,
-    height: 40,
+    width: "80%",
+    height: "40px",
+    mt: "6px",
     borderRadius: "5px",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    margin: "auto",
-    marginTop: "20px",
     fontFamily: "Roboto, sans-serif",
     fontSize: "14px",
     color: "#ffffff",
@@ -172,7 +172,7 @@ const styles = {
   },
   botaoCadastrar: {
     height: "5px",
-    margin: "30px 0px 0px 60px",
+    mt: "16px",
     color: "#fff",
     background: "transparent",
     fontFamily: "Libre Baskerville",
@@ -224,9 +224,26 @@ const styles = {
     width: "100%",
     height: "100%",
   },
+  boxInputs: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "column",
+    width: "100%",
+    gap: "30px",
+    mt: "20px",
+  },
+  centralizar: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+  },
 };
 
 const Login = () => {
+  const { isMobile, isTablet, isDesktop } = useDeviceType();
+
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState("");
   const [snackbarMessage, setSnackbarMessage] = useState("");
@@ -358,74 +375,72 @@ const Login = () => {
 
   return (
     <Box sx={styles.container}>
-      <Box sx={styles.boxLogin}>
-        <Box sx={styles.conteudoLogin}>
-          <Typography variant="h3" sx={styles.tituloLogin}>
-            Login
-          </Typography>
-          <Box
-            component="form"
-            sx={{
-              "& > :not(style)": { m: "40px 0px 0px  0px", width: "36ch" },
-              width: "300px",
+      <Box
+        sx={{
+          ...styles.boxLogin,
+          ml: !isMobile && "auto",
+          mr: !isMobile && "5%",
+        }}
+      >
+        <Typography variant="h3" sx={styles.tituloLogin}>
+          Login
+        </Typography>
+        <Box sx={styles.boxInputs} autoComplete="off">
+          <TextField
+            error={errorEmail}
+            id="emailLogin"
+            label="Email"
+            variant="outlined"
+            type="email"
+            onChange={(event) => {
+              setEmail(event.target.value);
+              setErrorEmail(false);
             }}
-            noValidate
-            autoComplete="off"
-          >
-            <TextField
-              error={errorEmail}
-              id="emailLogin"
-              label="Email"
-              variant="outlined"
-              type="email"
-              onChange={(event) => {
-                setEmail(event.target.value);
-                setErrorEmail(false);
-              }}
-              onKeyDown={handleKeyDown}
-              sx={styles.inputLogin}
-              onBlur={handleBlurEmail}
-              InputProps={{
-                endAdornment: <EmailOutlinedIcon sx={{ color: "#F3A913" }} />,
-              }}
-              placeholder="email@adpaz-zs.com.br"
-            />
-            <TextField
-              error={errorPassword}
-              id="senhaLogin"
-              label="Senha"
-              variant="outlined"
-              type={typePassword}
-              onChange={(event) => {
-                setPassword(event.target.value);
-                setErrorPassword(false);
-              }}
-              onKeyDown={handleKeyDown}
-              sx={styles.inputLogin}
-              onBlur={handleBlurPassword}
-              InputProps={{
-                endAdornment: (
-                  <>
-                    <IconButton
-                      sx={{ mr: "-8px" }}
-                      onClick={() => {
-                        setTypePassword(
-                          typePassword === "password" ? "text" : "password"
-                        );
-                      }}
-                    >
-                      {typePassword === "password" ? (
-                        <VisibilityOutlined sx={{ color: "#F3A913" }} />
-                      ) : (
-                        <VisibilityOffOutlined sx={{ color: "#F3A913" }} />
-                      )}
-                    </IconButton>
-                  </>
-                ),
-              }}
-            />
-          </Box>
-          <Button sx={styles.botaoEqueciSenha}>Esqueci minha senha</Button>
+            onKeyDown={handleKeyDown}
+            sx={styles.inputLogin}
+            onBlur={handleBlurEmail}
+            InputProps={{
+              endAdornment: <EmailOutlinedIcon sx={{ color: "#F3A913" }} />,
+            }}
+            placeholder="email@adpaz-zs.com.br"
+          />
+          <TextField
+            error={errorPassword}
+            id="senhaLogin"
+            label="Senha"
+            variant="outlined"
+            type={typePassword}
+            onChange={(event) => {
+              setPassword(event.target.value);
+              setErrorPassword(false);
+            }}
+            onKeyDown={handleKeyDown}
+            sx={styles.inputLogin}
+            onBlur={handleBlurPassword}
+            InputProps={{
+              endAdornment: (
+                <>
+                  <IconButton
+                    sx={{ mr: "-8px" }}
+                    onClick={() => {
+                      setTypePassword(
+                        typePassword === "password" ? "text" : "password"
+                      );
+                    }}
+                  >
+                    {typePassword === "password" ? (
+                      <VisibilityOutlined sx={{ color: "#F3A913" }} />
+                    ) : (
+                      <VisibilityOffOutlined sx={{ color: "#F3A913" }} />
+                    )}
+                  </IconButton>
+                </>
+              ),
+            }}
+          />
+        </Box>
+        <Button sx={styles.botaoEqueciSenha}>Esqueci minha senha</Button>
+        <Box sx={styles.centralizar}>
           <Button
             disabled={loadingLogin}
             variant="contained"
@@ -440,6 +455,8 @@ const Login = () => {
               "ENTRAR"
             )}
           </Button>
+        </Box>
+        <Box sx={styles.centralizar}>
           <Button
             onClick={handleOpenPopUpSuccess}
             component={Link}
@@ -466,7 +483,7 @@ const Login = () => {
         </Alert>
       </Snackbar>
 
-      <Box sx={styles.boxLogoRodape}>
+      {/* <Box sx={styles.boxLogoRodape}>
         <img
           src={LogoRodape}
           alt="LogoRodape"
@@ -477,7 +494,7 @@ const Login = () => {
             transform: "scale(2.4)",
           }}
         />
-      </Box>
+      </Box> */}
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={3000}

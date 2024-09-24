@@ -12,18 +12,16 @@ import {
   Stack,
   TextField,
   Typography,
-  styled,
 } from "@mui/material";
 import { motion } from "framer-motion";
 import "../../../src/style.css";
-import imagemLider from "../../img/zs-lider.JPG";
 import imagemPastor from "../../img/zs-pastor.jpg";
 import imagemServo from "../../img/zs-vini.png";
-import imagemServo2 from "../../img/zs-servo.JPG";
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import api from "../../api";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import { Close } from "@mui/icons-material";
+import { Close, Padding } from "@mui/icons-material";
+import useDeviceType from "../../hooks/useDeviceType";
 
 const styles = {
   container: {
@@ -61,15 +59,15 @@ const styles = {
     height: "3.5%",
   },
   boxTituloCards: {
-    width: "25%",
-    height: "10%",
-    marginBottom: "30px",
+    width: "auto",
+    height: "auto",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
+    gap: "6px",
     position: "absolute",
-    top: 0,
+    top: 14,
     zIndex: 10,
   },
   tituloCards: {
@@ -78,22 +76,19 @@ const styles = {
     fontSize: "14px",
     lineHeight: "16px",
     letterSpacing: "1.25px",
-    margin: "8% 0%",
   },
   baseTituloCards: {
     background: "#F3A913",
-    width: "80%",
-    height: "3.8%",
+    width: "130%",
+    height: "2px",
   },
   boxCenter: {
-    width: "768px",
-    height: "487px",
-  },
-  stackopcoes: {
-    width: "100%",
-    height: "100%",
+    width: "100dvw",
+    height: "70dvh",
+    display: "flex",
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "center",
+    gap: "20px",
   },
   boxButton: {
     position: "relative",
@@ -104,21 +99,14 @@ const styles = {
     height: "100%",
     padding: "0px",
     borderRadius: "10px",
-    /* color: "#000000", */
     color: "#F3A913",
   },
 
-  boxLider: {
-    width: "49%",
+  boxCardsButton: {
+    width: "90%",
+    maxWidth: "446px",
     height: "100%",
-    borderRadius: "10px",
-    display: "flex",
-    position: "relative",
-    justifyContent: "center",
-  },
-  boxServo: {
-    width: "49%",
-    height: "100%",
+    maxHeight: "487px",
     borderRadius: "10px",
     display: "flex",
     position: "relative",
@@ -134,7 +122,7 @@ const styles = {
     bottom: 0,
     left: 0,
     width: "100%",
-    height: "90%",
+    height: "86%",
     borderBottomLeftRadius: "10px",
     borderBottomRightRadius: "10px",
   },
@@ -295,7 +283,7 @@ const styles = {
 };
 
 const PrimerioAcesso = () => {
-  const [loadingPage, setLoadingPage] = useState(false);
+  const { isMobile, isTablet, isDesktop } = useDeviceType();
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState("");
   const [snackbarMessage, setSnackbarMessage] = useState("");
@@ -312,7 +300,6 @@ const PrimerioAcesso = () => {
     const userData = JSON.parse(storedData);
     if (userData?.usuarioPerfilId) {
       setUsuarioPerfilId(userData.usuarioPerfilId);
-      setLoadingPage(true);
     } else {
       localStorage?.clear();
       window.location.href = "/login";
@@ -393,143 +380,139 @@ const PrimerioAcesso = () => {
         <Typography sx={styles.titulo}>Escolha o seu perfil</Typography>
         <Box sx={styles.baseTitulo} />
       </Box>
-      <Box sx={styles.boxCenter}>
-        <Stack direction={"row"} sx={styles.stackopcoes}>
-          <Box sx={styles.boxLider}>
-            <motion.div
-              className="motionDiv"
-              initial={{ opacity: 0 }}
-              animate={{
-                opacity: 1,
-                transition: { delay: 0.5, ease: "easeInOut" },
+      <Box sx={{ ...styles.boxCenter, flexDirection: isMobile && "column" }}>
+        <Box sx={styles.boxCardsButton}>
+          <motion.div
+            className="motionDiv"
+            initial={{ opacity: 0 }}
+            animate={{
+              opacity: 1,
+              transition: { delay: 0.5, ease: "easeInOut" },
+            }}
+            whileHover={{ scale: 1.04 }}
+          >
+            <Button
+              sx={{
+                ...styles.boxButton,
+                backgroundImage: `url(${imagemPastor})`,
+                backgroundSize: isMobile ? "130%" : "180%",
+                backgroundPosition: isMobile ? "center 0%" : "center 66%",
+                border: selectLider ? "4px solid #F3A913" : "4px solid #ffffff",
               }}
-              whileHover={{ scale: 1.04 }}
+              onClick={handleSelectLider}
             >
-              <Button
-                sx={{
-                  ...styles.boxButton,
-                  backgroundImage: `url(${imagemPastor})`,
-                  border: selectLider
-                    ? "4px solid #F3A913"
-                    : "4px solid #ffffff",
-                }}
-                onClick={handleSelectLider}
+              <Box sx={styles.boxTituloCards}>
+                <Typography sx={styles.tituloCards}>Líder</Typography>
+                <Box sx={styles.baseTituloCards} />
+              </Box>
+              <motion.div
+                className="motionDiv"
+                initial={{ height: "0px", opacity: 0 }}
+                animate={selectLider ? { height: "100%", opacity: 1 } : ""}
+                transition={{ delay: 0.1, ease: "easeInOut" }}
               >
-                <Box sx={styles.boxTituloCards}>
-                  <Typography sx={styles.tituloCards}>Líder</Typography>
-                  <Box sx={styles.baseTituloCards} />
+                <Box sx={styles.conteudoCards}>
+                  <Typography sx={styles.descricaoCards}>
+                    perfil de liderança:
+                    <br />
+                    <br /> criará uma equipe e será responsável por administrar
+                    as escalas e membros que fazem parte dela
+                  </Typography>
                 </Box>
+              </motion.div>
+            </Button>
+            {selectLider && (
+              <Box sx={styles.boxSelecionar}>
                 <motion.div
                   className="motionDiv"
-                  initial={{ height: "0px", opacity: 0 }}
-                  animate={selectLider ? { height: "100%", opacity: 1 } : ""}
-                  transition={{ delay: 0.1, ease: "easeInOut" }}
+                  initial={{ opacity: 0 }}
+                  animate={selectLider ? { opacity: 1 } : { opacity: 0 }}
+                  transition={
+                    selectLider
+                      ? { delay: 0.3, ease: "easeInOut" }
+                      : { delay: 0, ease: "easeInOut" }
+                  }
                 >
-                  <Box sx={styles.conteudoCards}>
-                    <Typography sx={styles.descricaoCards}>
-                      perfil de liderança:
-                      <br />
-                      <br /> criará uma equipe e será responsável por
-                      administrar as escalas e membros que fazem parte dela
-                    </Typography>
-                  </Box>
-                </motion.div>
-              </Button>
-              {selectLider && (
-                <Box sx={styles.boxSelecionar}>
-                  <motion.div
-                    className="motionDiv"
-                    initial={{ opacity: 0 }}
-                    animate={selectLider ? { opacity: 1 } : { opacity: 0 }}
-                    transition={
-                      selectLider
-                        ? { delay: 0.3, ease: "easeInOut" }
-                        : { delay: 0, ease: "easeInOut" }
-                    }
+                  <Button
+                    disabled={!selectLider}
+                    sx={styles.botaoSelecionar}
+                    onClick={() => {
+                      setOpenModalAutorizacao(true);
+                    }}
                   >
-                    <Button
-                      disabled={!selectLider}
-                      sx={styles.botaoSelecionar}
-                      onClick={() => {
-                        setOpenModalAutorizacao(true);
-                      }}
-                    >
-                      Escolher
-                    </Button>
-                  </motion.div>
-                </Box>
-              )}
-            </motion.div>
-          </Box>
-          <Box sx={styles.boxServo}>
-            <motion.div
-              className="motionDiv"
-              initial={{ opacity: 0 }}
-              animate={{
-                opacity: 1,
-                transition: { delay: 1, ease: "easeInOut" },
+                    Escolher
+                  </Button>
+                </motion.div>
+              </Box>
+            )}
+          </motion.div>
+        </Box>
+        <Box sx={styles.boxCardsButton}>
+          <motion.div
+            className="motionDiv"
+            initial={{ opacity: 0 }}
+            animate={{
+              opacity: 1,
+              transition: { delay: 1, ease: "easeInOut" },
+            }}
+            whileHover={{ scale: 1.04 }}
+          >
+            <Button
+              sx={{
+                ...styles.boxButton,
+                backgroundImage: `url(${imagemServo})`,
+                backgroundSize: isMobile ? "120%" : "180%",
+                backgroundPosition: isMobile ? "center 53%" : "center 66%",
+                border: selectServo ? "4px solid #F3A913" : "4px solid #ffffff",
               }}
-              whileHover={{ scale: 1.04 }}
+              onClick={handleSelectServo}
             >
-              <Button
-                sx={{
-                  ...styles.boxButton,
-                  backgroundImage: `url(${imagemServo})`,
-                  backgroundSize: "200%",
-                  backgroundPosition: "center 74%",
-                  border: selectServo
-                    ? "4px solid #F3A913"
-                    : "4px solid #ffffff",
-                }}
-                onClick={handleSelectServo}
+              <Box sx={styles.boxTituloCards}>
+                <Typography sx={styles.tituloCards}>Membro</Typography>
+                <Box sx={styles.baseTituloCards} />
+              </Box>
+              <motion.div
+                className="motionDiv"
+                initial={{ height: "0px", opacity: 0 }}
+                animate={selectServo ? { height: "100%", opacity: 1 } : ""}
+                transition={{ delay: 0.1, ease: "easeInOut" }}
               >
-                <Box sx={styles.boxTituloCards}>
-                  <Typography sx={styles.tituloCards}>Membro</Typography>
-                  <Box sx={{ ...styles.baseTituloCards, width: "100%" }} />
+                <Box sx={styles.conteudoCards}>
+                  <Typography sx={styles.descricaoCards}>
+                    perfil de membro:
+                    <br />
+                    <br />
+                    entrará em uma equipe e será responsável por informar sua
+                    disponibilidade para criação da escala
+                  </Typography>
                 </Box>
+              </motion.div>
+            </Button>
+            {selectServo && (
+              <Box sx={styles.boxSelecionar}>
                 <motion.div
                   className="motionDiv"
-                  initial={{ height: "0px", opacity: 0 }}
-                  animate={selectServo ? { height: "100%", opacity: 1 } : ""}
-                  transition={{ delay: 0.1, ease: "easeInOut" }}
+                  initial={{ opacity: 0 }}
+                  animate={selectServo ? { opacity: 1 } : { opacity: 0 }}
+                  transition={
+                    selectServo
+                      ? { delay: 0.3, ease: "easeInOut" }
+                      : { delay: 0, ease: "easeInOut" }
+                  }
                 >
-                  <Box sx={styles.conteudoCards}>
-                    <Typography sx={styles.descricaoCards}>
-                      perfil de membro:
-                      <br />
-                      <br />
-                      entrará em uma equipe e será responsável por informar sua
-                      disponibilidade para criação da escala
-                    </Typography>
-                  </Box>
-                </motion.div>
-              </Button>
-              {selectServo && (
-                <Box sx={styles.boxSelecionar}>
-                  <motion.div
-                    className="motionDiv"
-                    initial={{ opacity: 0 }}
-                    animate={selectServo ? { opacity: 1 } : { opacity: 0 }}
-                    transition={
-                      selectServo
-                        ? { delay: 0.3, ease: "easeInOut" }
-                        : { delay: 0, ease: "easeInOut" }
-                    }
+                  <Button
+                    sx={styles.botaoSelecionar}
+                    onClick={() => {
+                      setOpenModalSelectServo(true);
+                    }}
                   >
-                    <Button
-                      sx={styles.botaoSelecionar}
-                      onClick={() => {
-                        setOpenModalSelectServo(true);
-                      }}
-                    >
-                      Escolher
-                    </Button>
-                  </motion.div>
-                </Box>
-              )}
-            </motion.div>
-          </Box>
-        </Stack>
+                    Escolher
+                  </Button>
+                </motion.div>
+              </Box>
+            )}
+          </motion.div>
+        </Box>
       </Box>
       <Modal
         open={openModalAutorizacao}
@@ -671,6 +654,14 @@ const PrimerioAcesso = () => {
       >
         <Fade in={openModalSelectServo}>
           <Box sx={{ ...styles.boxModalAvisos, height: "250px" }}>
+            <IconButton
+              onClick={() => {
+                handleCloseModal();
+              }}
+              sx={{ position: "absolute", top: 4, right: 0 }}
+            >
+              <Close sx={{ fontSize: "26px", color: "#ffffff" }} />
+            </IconButton>
             <Box sx={styles.boxConteudoModalAvisos}>
               <Box sx={styles.boxAreaTituloModalAvisos}>
                 <Box sx={styles.boxTituloModalAvisos}>

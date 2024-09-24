@@ -42,6 +42,7 @@ const styles = {
     left: "50%",
     transform: "translate(-50%, -50%)",
     width: "446px",
+    maxWidth: "90dvw",
     height: "auto",
     boxShadow: 24,
   },
@@ -166,6 +167,9 @@ const styles = {
       color: "#ffffff",
       p: "0px",
       ml: "6px",
+      whiteSpace: "nowrap",
+      overflow: "hidden",
+      textOverflow: "ellipsis",
     },
     "& .MuiInputLabel-root": {
       color: "#BDBDBD",
@@ -188,6 +192,9 @@ const styles = {
       },
       "& .MuiInputBase-input": {
         color: "#ffffff",
+        whiteSpace: "nowrap",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
       },
     },
     "& .MuiMenuItem-root.Mui-selected": {
@@ -200,6 +207,7 @@ const styles = {
       textAlign: "center",
     },
   },
+
   configCheckbox: {
     color: "#F3A913",
     "& .MuiSvgIcon-root": {
@@ -354,6 +362,7 @@ const styles = {
     left: "50%",
     transform: "translate(-50%, -50%)",
     width: "400px",
+    maxWidth: "90dvw",
     height: "auto",
     paddingBottom: "4px",
     boxShadow: 24,

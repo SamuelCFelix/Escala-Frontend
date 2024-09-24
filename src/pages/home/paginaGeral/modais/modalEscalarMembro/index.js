@@ -42,8 +42,11 @@ const styles = {
     left: "50%",
     transform: "translate(-50%, -50%)",
     width: "446px",
-    height: "70vh",
+    maxWidth: "90dvw",
+    height: "487px",
+    maxHeight: "90dvh",
     boxShadow: 24,
+    overflowY: "auto",
   },
   boxConteudoModal: {
     position: "relative",
@@ -649,6 +652,7 @@ const ModalEscalarMembro = (params) => {
               ...styles.boxModal,
               background: "#1B1B1B",
               width: "400px",
+              maxWidth: "90dvw",
               height: "auto",
               top: "50%",
             }}

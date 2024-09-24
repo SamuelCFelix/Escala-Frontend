@@ -48,8 +48,11 @@ const styles = {
     left: "50%",
     transform: "translate(-50%, -50%)",
     width: "446px",
-    height: "450px",
+    maxWidth: "90dvw",
+    height: "auto",
+    maxHeight: "90dvh",
     boxShadow: 24,
+    overflowY: "auto",
   },
   boxModalConfirmacao: {
     background: "#1B1B1B",
@@ -60,6 +63,7 @@ const styles = {
     left: "50%",
     transform: "translate(-50%, -50%)",
     width: "400px",
+    maxWidth: "90dvw",
     height: "auto",
     boxShadow: 24,
   },
@@ -72,6 +76,7 @@ const styles = {
     left: "50%",
     transform: "translate(-50%, -50%)",
     width: "400px",
+    maxWidth: "90dvw",
     height: "auto",
     boxShadow: 24,
   },
@@ -175,7 +180,7 @@ const styles = {
   },
   boxAreaConteudoTabsInformacoes: {
     width: "100%",
-    height: "calc(100% - 146px)",
+    height: "auto",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
@@ -221,7 +226,7 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     width: "75%",
-    height: "calc(100% - 20px)",
+    height: "auto",
     alignItems: "center",
     justifyContent: "flex-start",
   },
@@ -261,7 +266,7 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     width: "100%",
-    height: "calc(100% - 36px)",
+    height: "184px",
     alignItems: "center",
     justifyContent: "flex-start",
     gap: "4px",
@@ -277,11 +282,10 @@ const styles = {
     minHeight: "32px",
   },
   divider: {
-    position: "absolute",
-    bottom: 0,
     borderColor: "#565656",
     width: "108%",
     height: "1px",
+    margin: "12px 0px",
   },
   configIconButton: {
     position: "absolute",
@@ -297,7 +301,7 @@ const styles = {
   boxAreaDoubleCheckbox: {
     display: "flex",
     width: "108%",
-    height: "25px",
+    height: "auto",
     alignItems: "center",
     justifyContent: "flex-start",
     gap: "10px",
@@ -306,7 +310,7 @@ const styles = {
   textCheckboxLabel: {
     color: "#ffffff",
     textAlign: "center",
-    fontSize: "16px",
+    fontSize: "15px",
     lineHeight: "24px",
     letterSpacing: "0.17px",
   },
@@ -316,6 +320,7 @@ const styles = {
     alignItems: "flex-start",
     justifyContent: "center",
     width: "100%",
+    height: "auto",
     gap: "10px",
     mt: "12px",
   },
@@ -356,6 +361,7 @@ const styles = {
     left: "50%",
     transform: "translate(-50%, -50%)",
     width: "400px",
+    maxWidth: "90dvw",
     height: "auto",
     paddingBottom: "4px",
     boxShadow: 24,
@@ -907,6 +913,7 @@ const ModalPerfilMembro = (params) => {
                               </Box>
                             )}
                           </Box>
+                          <Divider sx={styles.divider} />
                         </>
                       )}
                       {valueTabInformacoes === "dados" && (
@@ -1018,9 +1025,9 @@ const ModalPerfilMembro = (params) => {
                               )}
                             </Box>
                           </Box>
+                          <Divider sx={styles.divider} />
                         </>
                       )}
-                      <Divider sx={styles.divider} />
                     </Box>
                   </Box>
                 </Box>

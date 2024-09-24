@@ -18,8 +18,14 @@ import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
 import { useAuth } from "../../components/popUpCadastro/authContext";
 import api from "../../api";
-import { DeleteOutline, Person } from "@mui/icons-material";
+import {
+  DeleteOutline,
+  Person,
+  VisibilityOffOutlined,
+  VisibilityOutlined,
+} from "@mui/icons-material";
 import AddAPhotoOutlinedIcon from "@mui/icons-material/AddAPhotoOutlined";
+import useDeviceType from "../../hooks/useDeviceType";
 
 const styles = {
   container: {
@@ -31,16 +37,18 @@ const styles = {
     backgroundRepeat: "no-repeat",
     backgroundPosition: "center",
     position: "relative",
-    width: "100vw",
-    height: "100vh",
+    width: "100dvw",
+    height: "100dvh",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
+    overflow: "auto",
   },
   boxCadastro: {
     display: "flex",
-    width: "540px",
+    width: "90dvw",
+    maxWidth: "540px",
     height: "auto",
     flexDirection: "column",
     alignItems: "center",
@@ -52,6 +60,7 @@ const styles = {
               `,
     borderRadius: "10px",
     backdropFilter: "blur(10px)",
+    mb: "20px",
   },
   boxAreaColunaHorizontal: {
     display: "flex",
@@ -77,26 +86,30 @@ const styles = {
   boxAreaColunasInput: {
     display: "flex",
     width: "100%",
-    height: "240px",
+    height: "auto",
     alignItems: "center",
     justifyContent: "space-around",
+    mb: "12px",
   },
   boxColunaInput: {
     display: "flex",
     flexDirection: "column",
-    width: "auto",
-    height: "100%",
+    width: "100%",
+    height: "auto",
     alignItems: "center",
     justifyContent: "space-around",
+    gap: "26px",
   },
   inputCadastro: {
     background: "rgba(86, 86, 86, 0.8)",
     borderRadius: "5px",
-    width: "240px",
+    width: "88%",
+    height: "40px",
     "& .MuiInputLabel-root": {
       color: "#fff",
       fontFamily: "Libre Baskerville",
-      fontSize: "16px",
+      fontSize: "0.98em",
+      transform: "translate(10px, 9px)",
       "&.MuiInputLabel-shrink": {
         marginTop: "5px",
         transform: "translate(5px, -26px)",
@@ -117,6 +130,7 @@ const styles = {
     },
     "& input": {
       color: "#fff",
+      mt: "-6px",
     },
     "& .MuiOutlinedInput-notchedOutline": {
       borderRadius: "5px",
@@ -130,14 +144,22 @@ const styles = {
     "& .MuiOutlinedInput-root.Mui-error:hover .MuiOutlinedInput-notchedOutline":
       {
         borderColor: "#d32f2f",
+        height: "44px",
       },
     "& .MuiOutlinedInput-root.Mui-error .MuiOutlinedInput-notchedOutline": {
       borderColor: "#d32f2f",
+      height: "44px",
     },
     "& .MuiOutlinedInput-root.Mui-focused.Mui-error .MuiOutlinedInput-notchedOutline":
       {
         borderColor: "#d32f2f",
+        height: "44px",
       },
+    "& .MuiFormHelperText-root.Mui-error": {
+      color: "#d32f2f",
+      mt: "-8px",
+      ml: "0px",
+    },
   },
   botaoDefault: {
     display: "flex",
@@ -165,7 +187,7 @@ const styles = {
     alignItems: "center",
     justifyContent: "center",
     height: "5px",
-    width: "140px",
+    width: "auto",
     color: "#fff",
     background: "transparent",
     fontFamily: "Libre Baskerville",
@@ -229,6 +251,7 @@ const styles = {
 
 const Cadastrar = () => {
   const { showPopup, hidePopup } = useAuth();
+  const { isMobile, isTablet, isDesktop } = useDeviceType();
 
   const navigate = useNavigate();
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -252,6 +275,8 @@ const Cadastrar = () => {
   const [errorConfirmPassword, setErrorConfirmPassword] = useState(false);
   const [errorConfirmPassword2, setErrorConfirmPassword2] = useState(false);
   const [errorChecked, setErrorChecked] = useState(false);
+  const [typePassword, setTypePassword] = useState("password");
+  const [typePassword2, setTypePassword2] = useState("password");
 
   const handleSnackbarClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -560,11 +585,14 @@ const Cadastrar = () => {
             position={"relative"}
             sx={{
               ...styles.boxAreaColunaHorizontal,
-              mb: "20px",
+              mb: "34px",
             }}
           >
             <Avatar
-              sx={styles.avatarMembro}
+              sx={{
+                ...styles.avatarMembro,
+                ...(isMobile ? { width: "70px", height: "70px" } : {}),
+              }}
               src={fotoUsuario ? fotoUsuario : undefined}
             >
               {!fotoUsuario && <Person sx={{ fontSize: "32px" }} />}
@@ -690,7 +718,7 @@ const Cadastrar = () => {
                 label="Senha"
                 value={password}
                 variant="outlined"
-                type="password"
+                type={typePassword}
                 onChange={(event) => {
                   setPassword(event.target.value);
                   setErrorPassword(false);
@@ -699,14 +727,39 @@ const Cadastrar = () => {
                 onKeyDown={handleKeyDown}
                 sx={styles.inputCadastro}
                 onBlur={handleBlurPassword}
+                InputProps={{
+                  endAdornment: (
+                    <>
+                      <IconButton
+                        sx={{ mr: "-8px", mt: "-6px" }}
+                        onClick={() => {
+                          setTypePassword(
+                            typePassword === "password" ? "text" : "password"
+                          );
+                        }}
+                      >
+                        {typePassword === "password" ? (
+                          <VisibilityOutlined
+                            sx={{ color: "#F3A913", fontSize: "20px" }}
+                          />
+                        ) : (
+                          <VisibilityOffOutlined
+                            sx={{ color: "#F3A913", fontSize: "20px" }}
+                          />
+                        )}
+                      </IconButton>
+                    </>
+                  ),
+                }}
               />
               <TextField
-                error={errorConfirmPassword}
+                error={errorConfirmPassword || errorConfirmPassword2}
                 id="confirmarSenha"
                 label="Confirmar senha"
+                helperText={errorConfirmPassword2 ? "Senhas diferentes" : ""}
                 value={confirmPassword}
                 variant="outlined"
-                type="password"
+                type={typePassword2}
                 onChange={(event) => {
                   setConfirmPassword(event.target.value);
                   setErrorConfirmPassword(false);
@@ -715,18 +768,31 @@ const Cadastrar = () => {
                 onKeyDown={handleKeyDown}
                 sx={styles.inputCadastro}
                 onBlur={handleBlurConfirmPassword}
+                InputProps={{
+                  endAdornment: (
+                    <>
+                      <IconButton
+                        sx={{ mr: "-8px", mt: "-6px" }}
+                        onClick={() => {
+                          setTypePassword2(
+                            typePassword2 === "password" ? "text" : "password"
+                          );
+                        }}
+                      >
+                        {typePassword2 === "password" ? (
+                          <VisibilityOutlined
+                            sx={{ color: "#F3A913", fontSize: "20px" }}
+                          />
+                        ) : (
+                          <VisibilityOffOutlined
+                            sx={{ color: "#F3A913", fontSize: "20px" }}
+                          />
+                        )}
+                      </IconButton>
+                    </>
+                  ),
+                }}
               />
-              {errorConfirmPassword2 && (
-                <Typography
-                  height="10px"
-                  mt={"-32px"}
-                  mb={"22px"}
-                  variant="body2"
-                  color="error"
-                >
-                  Senhas diferentes
-                </Typography>
-              )}
             </Box>
           </Box>
           <Box
@@ -734,7 +800,7 @@ const Cadastrar = () => {
               ...styles.boxAreaColunaHorizontal,
               justifyContent: "flex-start",
               ml: "30px",
-              mt: "-14px",
+              mt: "4px",
             }}
           >
             <FormControlLabel
@@ -778,7 +844,7 @@ const Cadastrar = () => {
               onClick={(event) => handleCriarCadastro(event)}
               sx={styles.botaoDefault}
             >
-              CRIAR CONTA
+              Enviar
             </Button>
             <Button
               component={Link}
@@ -792,7 +858,7 @@ const Cadastrar = () => {
             </Button>
           </Box>
         </Box>
-        <Box sx={styles.boxLogoRodape}>
+        {/* <Box sx={styles.boxLogoRodape}>
           <img
             src={LogoRodape}
             alt="LogoRodape"
@@ -803,7 +869,7 @@ const Cadastrar = () => {
               transform: "scale(2.4)",
             }}
           />
-        </Box>
+        </Box> */}
 
         <Snackbar
           open={snackbarOpen}

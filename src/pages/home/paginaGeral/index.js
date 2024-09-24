@@ -50,6 +50,8 @@ import AddchartOutlinedIcon from "@mui/icons-material/AddchartOutlined";
 import api from "../../../api";
 import ModalDisponibilidade from "./modais/modalDisponibilidade";
 import ModalConfirmarCandidatura from "../paginaGeral/modais/modalConfirmarCandidatura";
+import useDeviceType from "../../../hooks/useDeviceType";
+import { useMediaQuery } from "react-responsive";
 
 const styles = {
   configBox: {
@@ -60,12 +62,14 @@ const styles = {
   },
   container: {
     display: "flex",
+    flexWrap: "wrap",
     width: "100%",
     alignItems: "center",
     justifyContent: "center",
     padding: "0px 20px",
-    gap: "30px",
-    mb: "68px",
+    gap: "20px",
+    overflow: "auto",
+    mb: "14px",
   },
   boxCardDefault: {
     background: "#000000",
@@ -73,7 +77,9 @@ const styles = {
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "flex-start",
-    minWidth: "446px",
+    width: "446px",
+    maxWidth: "90dvw",
+    minHeight: "487px",
     height: "70vh",
     borderRadius: "10px",
   },
@@ -628,6 +634,9 @@ const styles = {
 
 const PaginaGeral = (params) => {
   const { usuario } = params;
+  const { isMobile, isTablet, isDesktop } = useDeviceType();
+  const breakPoint01 = useMediaQuery({ query: "(max-width: 962px)" });
+
   const [isAdm, setIsAdm] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState("");

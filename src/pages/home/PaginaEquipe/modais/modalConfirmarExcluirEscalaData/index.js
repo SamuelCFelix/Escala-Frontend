@@ -82,6 +82,7 @@ const styles = {
     left: "50%",
     transform: "translate(-50%, -50%)",
     width: "420px",
+    maxWidth: "90dvw",
     height: "auto",
     paddingBottom: "4px",
     boxShadow: 24,

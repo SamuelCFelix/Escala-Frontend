@@ -1,14 +1,19 @@
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
-import Avatar from "@mui/material/Avatar";
+import React, { useEffect, useState } from "react";
+import {
+  AppBar,
+  Box,
+  Toolbar,
+  IconButton,
+  Avatar,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  Typography,
+} from "@mui/material";
+import { Logout, Person } from "@mui/icons-material";
 import { Outlet } from "react-router-dom";
 import LogoPardal from "../../img/logoZS.png";
-import { useEffect, useState } from "react";
-import { Divider, ListItemIcon, Menu, MenuItem } from "@mui/material";
-import { Logout, Person, Settings } from "@mui/icons-material";
+import Rodape from "../rodape";
 
 const styles = {
   configMenuLayoutBar: {
@@ -79,73 +84,96 @@ const LayoutBar = () => {
   }
 
   return (
-    <>
-      <Box sx={{ flexGrow: 1 }}>
-        <AppBar position="absolute">
-          <Toolbar sx={{ background: "#000000", height: "64px" }}>
-            <IconButton
-              onClick={() => {
-                window.location.href = "/home";
-              }}
-              sx={{ width: "166px", height: "64px", overflow: "hidden" }}
-            >
-              <img
-                src={LogoPardal}
-                alt="Logo Pardal"
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "contain",
-                  transform: "scale(3.0)",
-                }}
-              />
-            </IconButton>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              {""}
-            </Typography>
-            <IconButton onClick={handleClickOpenMenu}>
-              <Avatar
-                sx={{ background: "#F3A913" }}
-                src={user?.foto ? user?.foto : undefined}
-              >
-                {!user?.foto && user?.nome?.charAt(0)?.toUpperCase()}
-              </Avatar>
-            </IconButton>
-          </Toolbar>
-        </AppBar>
-        <Menu
-          anchorEl={anchorElMenu}
-          id="account-menu"
-          open={anchorElMenu !== null}
-          onClose={handleCloseMenu}
-          PaperProps={{
-            elevation: 0,
-            sx: styles.configMenuLayoutBar,
-          }}
-          transformOrigin={{ horizontal: "right", vertical: "top" }}
-          anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-        >
-          <MenuItem onClick={handleCloseMenu} sx={styles.menuItem}>
-            <ListItemIcon sx={styles.listItemIcon}>
-              <Person fontSize="small" />
-            </ListItemIcon>
-            Profile
-          </MenuItem>
-          <MenuItem
+    <Box
+      sx={{
+        background: "#1B1B1B",
+        display: "flex",
+        flexDirection: "column",
+        minHeight: "100vh",
+      }}
+    >
+      {/* Barra de navegação */}
+      <AppBar position="static" sx={{ background: "#000000", height: "64px" }}>
+        <Toolbar>
+          <IconButton
             onClick={() => {
-              handleLogout();
+              window.location.href = "/home";
             }}
-            sx={styles.menuItem}
+            sx={{ width: "166px", height: "64px", overflow: "hidden" }}
           >
-            <ListItemIcon sx={styles.listItemIcon}>
-              <Logout fontSize="small" />
-            </ListItemIcon>
-            Logout
-          </MenuItem>
-        </Menu>
+            <img
+              src={LogoPardal}
+              alt="Logo Pardal"
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "contain",
+                transform: "scale(3.0)",
+              }}
+            />
+          </IconButton>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            {""}
+          </Typography>
+          <IconButton onClick={handleClickOpenMenu}>
+            <Avatar
+              sx={{ background: "#F3A913" }}
+              src={user?.foto ? user?.foto : undefined}
+            >
+              {!user?.foto && user?.nome?.charAt(0)?.toUpperCase()}
+            </Avatar>
+          </IconButton>
+        </Toolbar>
+      </AppBar>
+
+      {/* Menu de usuário */}
+      <Menu
+        anchorEl={anchorElMenu}
+        id="account-menu"
+        open={anchorElMenu !== null}
+        onClose={handleCloseMenu}
+        PaperProps={{
+          elevation: 0,
+          sx: styles.configMenuLayoutBar,
+        }}
+        transformOrigin={{ horizontal: "right", vertical: "top" }}
+        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+      >
+        <MenuItem onClick={handleCloseMenu} sx={styles.menuItem}>
+          <ListItemIcon sx={styles.listItemIcon}>
+            <Person fontSize="small" />
+          </ListItemIcon>
+          Profile
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            handleLogout();
+          }}
+          sx={styles.menuItem}
+        >
+          <ListItemIcon sx={styles.listItemIcon}>
+            <Logout fontSize="small" />
+          </ListItemIcon>
+          Logout
+        </MenuItem>
+      </Menu>
+
+      {/* Conteúdo principal */}
+      <Box
+        sx={{
+          flex: 1, // Faz o Box ocupar o espaço restante entre a AppBar e o rodapé
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        <Outlet />
       </Box>
-      <Outlet />
-    </>
+
+      {/* Rodapé */}
+      <Box sx={{ background: "#1b1b1b", color: "#fff" }}>
+        <Rodape />
+      </Box>
+    </Box>
   );
 };
 

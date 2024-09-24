@@ -8,23 +8,23 @@ const styles = {
     justifyContent: "center",
   },
   container: {
-    background: "rgba(0, 0, 0, 0.3)",
-    position: "absolute",
-    bottom: "0",
+    background: "#141414f1",
     display: "flex",
     flexDirection: "column",
     width: "100%",
-    height: "48px",
+    height: "auto",
     alignItems: "center",
     justifyContent: "center",
     zIndex: 9,
+    overFlow: "hidden",
   },
   descricao: {
     color: "#ffffff",
-    fontSize: "12px",
+    fontSize: "0.7rem",
     lineHeight: "143%",
     letterSpacing: "0.17px",
     textAlign: "center",
+    padding: "2px 10px",
   },
 };
 

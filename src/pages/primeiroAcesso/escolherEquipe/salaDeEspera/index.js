@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import { useEffect } from "react";
 
 const styles = {
@@ -12,7 +12,7 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "flex-start",
     overflowY: "auto",
     overflowX: "hidden",
   },
@@ -20,6 +20,7 @@ const styles = {
     width: "384px",
     height: "72px",
     mb: "16px",
+    mt: "64px",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
@@ -39,15 +40,18 @@ const styles = {
     height: "3.8%",
   },
   boxCenter: {
-    width: "500px",
-    height: "72%",
+    width: "100dvw",
+    height: "auto",
     display: "flex",
+    flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
+    gap: "16px",
   },
   boxInfo: {
-    width: "420px",
-    height: "110px",
+    width: "90dvw",
+    maxWidth: "420px",
+    height: "auto",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -55,12 +59,29 @@ const styles = {
     borderRadius: "10px",
     border: "1px solid #F3A913",
     gap: "12px",
+    padding: "14px 0px",
   },
   textoDefault: {
     fontSize: "14px",
     color: "#ffffff",
     lineHeight: "24px",
     letterSpacing: "0.17px",
+  },
+  botaoDefault: {
+    display: "flex",
+    width: "auto",
+    height: "30px",
+    padding: "0px 40px",
+    borderRadius: "10px",
+    fontFamily: "Roboto, sans-serif",
+    fontSize: "12px",
+    lineHeight: "36px",
+    letterSpacing: "1.25px",
+    color: "#ffffff",
+    background: "#F3A913",
+    "&:hover": {
+      background: "#FEBC36",
+    },
   },
 };
 const SalaDeEspera = () => {
@@ -92,6 +113,15 @@ const SalaDeEspera = () => {
             Aguardando o líder da equipe confirmar sua entrada
           </Typography>
         </Box>
+        <Button
+          sx={styles.botaoDefault}
+          onClick={() => {
+            localStorage.clear();
+            window.location.href = "/login";
+          }}
+        >
+          Voltar para a tela inicial
+        </Button>
       </Box>
     </Box>
   );

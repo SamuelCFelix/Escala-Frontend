@@ -30,7 +30,7 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "flex-start",
     overflowY: "auto",
     overflowX: "hidden",
   },
@@ -38,10 +38,20 @@ const styles = {
     width: "384px",
     height: "72px",
     mb: "16px",
+    mt: "64px",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
+  },
+  boxTituloCard: {
+    width: "100%",
+    height: "100%",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    mb: "0px",
   },
   titulo: {
     color: "#ffffff",
@@ -57,8 +67,7 @@ const styles = {
     height: "3.8%",
   },
   boxCenter: {
-    width: "500px",
-    minHeight: "500px",
+    width: "100dvw",
     height: "auto",
     display: "flex",
     flexDirection: "column",
@@ -91,7 +100,8 @@ const styles = {
   boxAreaCardEquipe: {
     display: "flex",
     position: "relative",
-    width: "400px",
+    width: "90dvw",
+    maxWidth: "400px",
     cursor: "pointer",
   },
   boxEquipe: {
@@ -301,14 +311,7 @@ const EscolherEquipe = () => {
                   >
                     <Box sx={styles.blurBackground} />
                     <Box sx={styles.etiqueta} />
-                    <Box
-                      sx={{
-                        ...styles.boxTitulo,
-                        mb: "0px",
-                        width: "100%",
-                        height: "100%",
-                      }}
-                    >
+                    <Box sx={styles.boxTituloCard}>
                       <ControlCameraIcon
                         sx={{ color: "#F3A913", fontSize: "18px", mb: "-10px" }}
                       />
