@@ -386,9 +386,7 @@ const ModalEscalarMembro = (params) => {
         handleEscalarMembroModoEdit(usuarioId, nome, foto, tagId);
         if (
           escaladosUpdate?.some(
-            (escalados) =>
-              escalados.membroId === usuarioLogado?.usuarioHostId ||
-              escalados.membroId === usuarioLogado?.usuarioDefaultId
+            (escalados) => escalados.membroId === usuarioLogado?.usuarioId
           )
         ) {
           handleBuscarEscalacoesUsuario();

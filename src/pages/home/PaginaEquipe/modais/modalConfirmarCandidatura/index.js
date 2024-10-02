@@ -371,7 +371,7 @@ const ModalConfirmarCandidatura = (params) => {
                   disabled={loadingApiEscalarMembro}
                   onClick={() => {
                     handleAtualizarEscalaData(
-                      usuarioLogado?.usuarioDefaultId,
+                      usuarioLogado?.usuarioId,
                       usuarioLogado?.nome,
                       usuarioLogado?.foto,
                       infoEscalarMembro?.tagId

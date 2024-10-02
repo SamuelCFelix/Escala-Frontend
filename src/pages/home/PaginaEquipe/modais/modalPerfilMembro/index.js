@@ -490,40 +490,23 @@ const ModalPerfilMembro = (params) => {
 
   //API
 
-  const handleUpdateTagsMembroEquipe = async (acao, tagId, host) => {
+  const handleUpdateTagsMembroEquipe = async (acao, tagId) => {
     try {
       let response = null;
       let usuarioAtualizado = usuarioPerfil;
-      if (host) {
-        if (acao) {
-          response = await api.put("/updateTagsMembroEquipe", {
-            usuarioId: usuarioPerfil?.usuarioHostId,
-            tagId,
-            acao: "adicionar",
-            host,
-          });
-        } else {
-          response = await api.put("/updateTagsMembroEquipe", {
-            usuarioId: usuarioPerfil?.usuarioHostId,
-            tagId,
-            acao: "remover",
-            host,
-          });
-        }
+
+      if (acao) {
+        response = await api.put("/updateTagsMembroEquipe", {
+          usuarioId: usuarioPerfil?.usuarioId,
+          tagId,
+          acao: "adicionar",
+        });
       } else {
-        if (acao) {
-          response = await api.put("/updateTagsMembroEquipe", {
-            usuarioId: usuarioPerfil?.usuarioDefaultId,
-            tagId,
-            acao: "adicionar",
-          });
-        } else {
-          response = await api.put("/updateTagsMembroEquipe", {
-            usuarioId: usuarioPerfil?.usuarioDefaultId,
-            tagId,
-            acao: "remover",
-          });
-        }
+        response = await api.put("/updateTagsMembroEquipe", {
+          usuarioId: usuarioPerfil?.usuarioId,
+          tagId,
+          acao: "remover",
+        });
       }
 
       if (response?.status === 200) {
@@ -542,44 +525,27 @@ const ModalPerfilMembro = (params) => {
     }
   };
 
-  const handleStatusAtivoMembroEquipe = async (acao, host) => {
+  const handleStatusAtivoMembroEquipe = async (acao) => {
     try {
       let response = null;
       let usuarioAtualizado = usuarioPerfil;
 
-      if (host) {
-        if (acao) {
-          response = await api.put("/updateStatusMembroEquipe", {
-            usuarioId: usuarioPerfil?.usuarioHostId,
-            acao: "ativar",
-            host: true,
-          });
-        } else {
-          response = await api.put("/updateStatusMembroEquipe", {
-            usuarioId: usuarioPerfil?.usuarioHostId,
-            acao: "desativar",
-            host: true,
-          });
-          setOpenModalDesativarMembro(false);
-        }
+      if (acao) {
+        response = await api.put("/updateStatusMembroEquipe", {
+          usuarioId: usuarioPerfil?.usuarioId,
+          acao: "ativar",
+        });
       } else {
-        if (acao) {
-          response = await api.put("/updateStatusMembroEquipe", {
-            usuarioId: usuarioPerfil?.usuarioDefaultId,
-            acao: "ativar",
-          });
-        } else {
-          response = await api.put("/updateStatusMembroEquipe", {
-            usuarioId: usuarioPerfil?.usuarioDefaultId,
-            acao: "desativar",
-          });
-          setOpenModalDesativarMembro(false);
-        }
+        response = await api.put("/updateStatusMembroEquipe", {
+          usuarioId: usuarioPerfil?.usuarioId,
+          acao: "desativar",
+        });
+        setOpenModalDesativarMembro(false);
       }
 
       if (response?.status === 200) {
         handleBuscarMembrosMinhaEquipe();
-        usuarioAtualizado.ativo = response?.data?.ativo;
+        usuarioAtualizado.statusUsuario = response?.data?.statusUsuario;
       } else {
         setSnackbar("error", "Erro ao conectar com o servidor");
         console.error("erro ao executar ação", response?.status);
@@ -597,12 +563,12 @@ const ModalPerfilMembro = (params) => {
 
       if (acao) {
         response = await api.put("/updateAdmMembroEquipe", {
-          usuarioId: usuarioPerfil?.usuarioDefaultId,
+          usuarioId: usuarioPerfil?.usuarioId,
           acao: "adicionar",
         });
       } else {
         response = await api.put("/updateAdmMembroEquipe", {
-          usuarioId: usuarioPerfil?.usuarioDefaultId,
+          usuarioId: usuarioPerfil?.usuarioId,
           acao: "remover",
         });
       }
@@ -627,7 +593,7 @@ const ModalPerfilMembro = (params) => {
     try {
       const response = await api.put("/expulsarMembroEquipe", {
         equipeId: usuarioLogado?.equipeId,
-        usuarioId: usuarioPerfil?.usuarioDefaultId,
+        usuarioId: usuarioPerfil?.usuarioId,
       });
 
       if (response?.status === 200) {
@@ -662,13 +628,13 @@ const ModalPerfilMembro = (params) => {
     setValueTabInformacoes("tags");
   }
 
-  const handleChangeCheckTags = (event, tagId, host) => {
-    handleUpdateTagsMembroEquipe(event.target.checked, tagId, host);
+  const handleChangeCheckTags = (event, tagId) => {
+    handleUpdateTagsMembroEquipe(event.target.checked, tagId);
   };
 
-  const handleChangeCheckAtivo = (event, host) => {
+  const handleChangeCheckAtivo = (event) => {
     if (event.target.checked) {
-      handleStatusAtivoMembroEquipe(event.target.checked, host);
+      handleStatusAtivoMembroEquipe(event.target.checked);
     } else {
       setOpenModalDesativarMembro(true);
     }
@@ -752,7 +718,7 @@ const ModalPerfilMembro = (params) => {
                         sx={styles.chipName}
                       />
                     )}
-                    {!usuarioPerfil?.ativo && (
+                    {!usuarioPerfil?.statusUsuario && (
                       <Chip
                         label="Inativo"
                         variant="outlined"
@@ -859,23 +825,10 @@ const ModalPerfilMembro = (params) => {
                                               (userTag) => userTag.id === tag.id
                                             )}
                                             onChange={(event) => {
-                                              if (
-                                                usuarioLogado?.autorizacao ===
-                                                  "adm001" &&
-                                                usuarioPerfil?.autorizacao ===
-                                                  "adm001"
-                                              ) {
-                                                handleChangeCheckTags(
-                                                  event,
-                                                  tag.id,
-                                                  true
-                                                );
-                                              } else {
-                                                handleChangeCheckTags(
-                                                  event,
-                                                  tag.id
-                                                );
-                                              }
+                                              handleChangeCheckTags(
+                                                event,
+                                                tag.id
+                                              );
                                             }}
                                             sx={styles.configCheckboxMenu}
                                           />
@@ -930,16 +883,9 @@ const ModalPerfilMembro = (params) => {
                                     (usuarioPerfil?.autorizacao === "adm001" &&
                                       usuarioLogado?.autorizacao !== "adm001")
                                   }
-                                  checked={usuarioPerfil?.ativo}
+                                  checked={usuarioPerfil?.statusUsuario}
                                   onChange={(event) => {
-                                    if (
-                                      usuarioLogado?.autorizacao === "adm001" &&
-                                      usuarioPerfil?.autorizacao === "adm001"
-                                    ) {
-                                      handleChangeCheckAtivo(event, true);
-                                    } else {
-                                      handleChangeCheckAtivo(event);
-                                    }
+                                    handleChangeCheckAtivo(event);
                                   }}
                                   inputProps={{ "aria-label": "controlled" }}
                                   sx={styles.configCheckbox}

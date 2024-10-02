@@ -161,9 +161,7 @@ const ModalConfirmarCandidatura = (params) => {
         handleEscalarMembroModoEdit(usuarioId, nome, foto, tagId);
         if (
           escaladosUpdate?.some(
-            (escalados) =>
-              escalados.membroId === usuarioLogado?.usuarioHostId ||
-              escalados.membroId === usuarioLogado?.usuarioDefaultId
+            (escalados) => escalados.membroId === usuarioLogado?.usuarioId
           )
         ) {
           handleBuscarEscalacoesUsuario();
@@ -279,7 +277,7 @@ const ModalConfirmarCandidatura = (params) => {
                   disabled={loadingApiEscalarMembro}
                   onClick={() => {
                     handleAtualizarEscalaData(
-                      usuarioLogado?.usuarioDefaultId,
+                      usuarioLogado?.usuarioId,
                       usuarioLogado?.nome,
                       usuarioLogado?.foto,
                       infoEscalarMembro?.tagId

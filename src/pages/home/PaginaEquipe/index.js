@@ -1256,10 +1256,10 @@ const PaginaEquipe = (params) => {
     }
   };
 
-  const handleAceitarSolicitacao = async (usuarioDefaultId) => {
+  const handleAceitarSolicitacao = async (usuarioId) => {
     try {
       const response = await api.put("/aceitarMembroEquipe", {
-        usuarioId: usuarioDefaultId,
+        usuarioId,
         equipeId: usuario?.equipeId,
       });
 
@@ -1276,10 +1276,10 @@ const PaginaEquipe = (params) => {
     }
   };
 
-  const handleRecusarSolicitacao = async (usuarioDefaultId) => {
+  const handleRecusarSolicitacao = async (usuarioId) => {
     try {
       const response = await api.put("/recusarMembroEquipe", {
-        usuarioId: usuarioDefaultId,
+        usuarioId,
         equipeId: usuario?.equipeId,
       });
 
@@ -1318,18 +1318,9 @@ const PaginaEquipe = (params) => {
 
   const handleBuscarTagsMembroEquipe = async () => {
     try {
-      let response = null;
-
-      if (usuario?.usuarioHostId) {
-        response = await api.post("/buscarTagsMembroEquipe", {
-          usuarioId: usuario?.usuarioHostId,
-          host: true,
-        });
-      } else {
-        response = await api.post("/buscarTagsMembroEquipe", {
-          usuarioId: usuario?.usuarioDefaultId,
-        });
-      }
+      const response = await api.post("/buscarTagsMembroEquipe", {
+        usuarioId: usuario?.usuarioId,
+      });
 
       if (response?.status === 200) {
         setTagsUsuario(response?.data);
@@ -1734,8 +1725,7 @@ const PaginaEquipe = (params) => {
                             }}
                           />
                         )} */}
-                                {(usuario.usuarioHostId === membroId ||
-                                  usuario.usuarioDefaultId === membroId) && (
+                                {usuario.usuarioId === membroId && (
                                   <Chip
                                     label="Eu"
                                     variant="outlined"
@@ -1814,13 +1804,12 @@ const PaginaEquipe = (params) => {
                               )) ||
                                 (!escalados.some(
                                   (escala) =>
-                                    escala.membroId ===
-                                    usuario?.usuarioDefaultId
+                                    escala.membroId === usuario?.usuarioId
                                 ) &&
                                   tagsUsuario?.some(
                                     (userTags) => userTags.id === tagId
                                   ) &&
-                                  usuario?.ativo && (
+                                  usuario?.statusUsuario && (
                                     <IconButton
                                       sx={styles.IconButtonHover}
                                       onClick={() => {
@@ -2057,10 +2046,7 @@ const PaginaEquipe = (params) => {
             {!loadingTabelaSolicitacoesEntrada && (
               <>
                 {solicitacoesEntrada?.map(
-                  (
-                    { usuarioDefaultId, nome, foto, email, createAt },
-                    index
-                  ) => (
+                  ({ usuarioId, nome, foto, email, createAt }, index) => (
                     <Box key={index} sx={styles.boxCardSolicitacao}>
                       <Box sx={styles.boxAreaInfoSolicatao}>
                         <Avatar
@@ -2126,7 +2112,7 @@ const PaginaEquipe = (params) => {
                       <Box sx={styles.boxAreaBotoesSolicitacao}>
                         <Button
                           onClick={() => {
-                            handleRecusarSolicitacao(usuarioDefaultId);
+                            handleRecusarSolicitacao(usuarioId);
                           }}
                           variant="contained"
                           sx={{
@@ -2140,7 +2126,7 @@ const PaginaEquipe = (params) => {
                         </Button>
                         <Button
                           onClick={() => {
-                            handleAceitarSolicitacao(usuarioDefaultId);
+                            handleAceitarSolicitacao(usuarioId);
                           }}
                           variant="contained"
                           sx={{
@@ -2237,7 +2223,10 @@ const PaginaEquipe = (params) => {
                               <Divider sx={styles.dividerList} />
                             </Box>
                             {usuarioHostEquipe?.map(
-                              ({ nome, ativo, foto, email, tags }, index) => (
+                              (
+                                { nome, statusUsuario, foto, email, tags },
+                                index
+                              ) => (
                                 <Box key={index} sx={styles.boxCardMembroList}>
                                   <Avatar
                                     src={foto || undefined}
@@ -2265,7 +2254,7 @@ const PaginaEquipe = (params) => {
                                         variant="outlined"
                                         sx={styles.chipName}
                                       />
-                                      {!ativo && (
+                                      {!statusUsuario && (
                                         <Chip
                                           label="Inativo"
                                           variant="outlined"
@@ -2324,7 +2313,10 @@ const PaginaEquipe = (params) => {
                               )
                             )}
                             {administradoresEquipe?.map(
-                              ({ nome, ativo, foto, email, tags }, index) => (
+                              (
+                                { nome, statusUsuario, foto, email, tags },
+                                index
+                              ) => (
                                 <Box key={index} sx={styles.boxCardMembroList}>
                                   <Avatar
                                     src={foto || undefined}
@@ -2351,7 +2343,7 @@ const PaginaEquipe = (params) => {
                                         variant="outlined"
                                         sx={styles.chipName}
                                       />
-                                      {!ativo && (
+                                      {!statusUsuario && (
                                         <Chip
                                           label="Inativo"
                                           variant="outlined"
@@ -2415,7 +2407,10 @@ const PaginaEquipe = (params) => {
                               <Divider sx={styles.dividerList} />
                             </Box>
                             {membrosMinhaEquipe?.map(
-                              ({ nome, ativo, foto, email, tags }, index) => (
+                              (
+                                { nome, statusUsuario, foto, email, tags },
+                                index
+                              ) => (
                                 <Box key={index} sx={styles.boxCardMembroList}>
                                   <Avatar
                                     src={foto || undefined}
@@ -2437,7 +2432,7 @@ const PaginaEquipe = (params) => {
                                       >
                                         {nome}
                                       </Typography>
-                                      {!ativo && (
+                                      {!statusUsuario && (
                                         <Chip
                                           label="Inativo"
                                           variant="outlined"

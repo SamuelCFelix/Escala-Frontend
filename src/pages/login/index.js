@@ -292,23 +292,20 @@ const Login = () => {
 
           localStorage.setItem("token", JSON.stringify(data.token));
           localStorage.setItem("login", JSON.stringify(data));
+
           if (data.primeiroAcesso === true) {
             window.location.href = "/primeiroAcesso";
-          } else if (data.usuarioHostId) {
-            if (data?.equipe[0] === "sem equipe") {
+          } else if (!data?.equipeId) {
+            if (data.autorizacao === "adm001") {
               window.location.href = `/primeiroAcesso/criarequipe`;
             } else {
-              window.location.href = "/home";
-            }
-          } else if (data.usuarioDefaultId) {
-            if (data?.equipeId === "sem equipe") {
               window.location.href = `/primeiroAcesso/escolherequipe`;
-            } else if (data?.equipeId === "solicitacao enviada") {
-              window.location.href =
-                "/primeiroAcesso/escolherequipe/saladeespera";
-            } else {
-              window.location.href = "/home";
             }
+          } else if (data.equipeId === "solicitacao enviada") {
+            window.location.href =
+              "/primeiroAcesso/escolherequipe/saladeespera";
+          } else {
+            window.location.href = "/home";
           }
         }
       } catch (error) {

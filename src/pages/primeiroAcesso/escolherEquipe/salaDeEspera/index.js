@@ -87,11 +87,12 @@ const styles = {
 const SalaDeEspera = () => {
   useEffect(() => {
     const storedData = localStorage.getItem("login");
-
     const userData = JSON.parse(storedData);
+
     if (
-      !userData?.usuarioDefaultId ||
-      !(userData?.equipeId === "solicitacao enviada")
+      !userData?.usuarioId ||
+      userData?.equipeId !== "solicitacao enviada" ||
+      userData?.autorizacao === "adm001"
     ) {
       localStorage.clear();
       window.location.href = "/login";

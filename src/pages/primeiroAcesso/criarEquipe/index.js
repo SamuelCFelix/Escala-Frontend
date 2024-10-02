@@ -691,8 +691,12 @@ const CriarEquipe = () => {
 
     const userData = JSON?.parse(storedData);
 
-    if (userData?.usuarioHostId && userData?.equipe[0] === "sem equipe") {
-      setUsuarioHostId(userData?.usuarioHostId);
+    if (
+      userData?.usuarioId &&
+      !userData?.equipe &&
+      userData?.autorizacao === "adm001"
+    ) {
+      setUsuarioHostId(userData?.usuarioId);
     } else {
       localStorage?.clear();
       window.location.href = "/login";
@@ -1300,7 +1304,7 @@ const CriarEquipe = () => {
               equipe de forma individual futuramente.
             </Typography>
             <Typography sx={{ ...styles.textoDefault, mt: "12px" }}>
-              Todos os cultos tem uma quantidade de pessoas servindo, e será
+              Todos os cultos tem uma quantidade de membros escalados, e será
               através das tags que será informado a necessidade de cada culto.
             </Typography>
             <Typography sx={{ ...styles.textoDefault, mt: "12px", mb: "5px" }}>
@@ -1966,11 +1970,11 @@ const CriarEquipe = () => {
                     marginTop: "15px",
                   }}
                 >
-                  <InputLabel id="servindo">Servindo</InputLabel>
+                  <InputLabel id="servindo">Membros</InputLabel>
                   <Select
                     labelId="servindo"
                     value={servindo}
-                    label="Servindo"
+                    label="Membros"
                     onChange={(event) => {
                       setServindo(event.target.value);
                     }}

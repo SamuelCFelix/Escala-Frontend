@@ -498,7 +498,7 @@ const ModalDisponibilidade = (params) => {
 
         if (disponibilidadeSalva) {
           const disponibilidadeObject = JSON.parse(
-            disponibilidadeSalva.disponibilidade
+            disponibilidadeSalva.disponibilidadeProximoMes
           );
           configDisponibilidadeMembroModal(
             response?.data,
@@ -519,22 +519,13 @@ const ModalDisponibilidade = (params) => {
 
   const handleBuscarDisponibilidadeMembro = async () => {
     try {
-      let response = null;
-
-      if (usuarioLogado?.usuarioHostId) {
-        response = await api.post("/buscarDisponibilidadeMembro", {
-          usuarioId: usuarioLogado?.usuarioHostId,
-          host: true,
-        });
-      } else {
-        response = await api.post("/buscarDisponibilidadeMembro", {
-          usuarioId: usuarioLogado?.usuarioDefaultId,
-        });
-      }
+      const response = await api.post("/buscarDisponibilidadeMembro", {
+        usuarioId: usuarioLogado?.usuarioId,
+      });
 
       if (
         response?.status === 200 &&
-        response?.data?.disponibilidade !== null
+        response?.data?.disponibilidadeProximoMes !== null
       ) {
         return response?.data;
       } else {
@@ -554,11 +545,11 @@ const ModalDisponibilidade = (params) => {
       setOpenModalConfirmarDisponibilidade(false);
       setLoadingModalSave(true);
 
-      const disponibilidade = programacoes?.map(({ id, culto }) => {
+      const disponibilidadeProximoMes = programacoes?.map(({ id, culto }) => {
         return {
           culto,
           programacaoId: id,
-          disponibilidade: checkedDisponibilidade[id],
+          disponibilidadeProximoMes: checkedDisponibilidade[id],
           indisponibilidade: Object?.entries(checkedDatasIndisponibilidade)
             ?.filter(
               ([key, value]) =>
@@ -573,20 +564,11 @@ const ModalDisponibilidade = (params) => {
             }),
         };
       });
-      let response = null;
 
-      if (usuarioLogado?.usuarioHostId) {
-        response = await api.put("/salvarDisponibilidadeMembro", {
-          usuarioId: usuarioLogado?.usuarioHostId,
-          disponibilidade: JSON.stringify(disponibilidade),
-          host: true,
-        });
-      } else {
-        response = await api.put("/salvarDisponibilidadeMembro", {
-          usuarioId: usuarioLogado?.usuarioDefaultId,
-          disponibilidade: JSON.stringify(disponibilidade),
-        });
-      }
+      const response = await api.put("/salvarDisponibilidadeMembro", {
+        usuarioId: usuarioLogado?.usuarioId,
+        disponibilidadeProximoMes: JSON.stringify(disponibilidadeProximoMes),
+      });
 
       if (response?.status === 200) {
         handleCloseModal();
@@ -617,7 +599,7 @@ const ModalDisponibilidade = (params) => {
           (dispo) => dispo.programacaoId === programacao.id
         );
         acc[programacao.id] = disponibilidadeEncontrada
-          ? disponibilidadeEncontrada.disponibilidade
+          ? disponibilidadeEncontrada.disponibilidadeProximoMes
           : false;
         return acc;
       },

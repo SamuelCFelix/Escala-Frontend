@@ -731,15 +731,11 @@ const PaginaGeral = (params) => {
         setSnackbar("success", "Escala salva com sucesso");
 
         const userInCurrentScale = proximaEscala?.escalados?.some(
-          (escalados) =>
-            escalados.membroId === usuario?.usuarioHostId ||
-            escalados.membroId === usuario?.usuarioDefaultId
+          (escalados) => escalados.membroId === usuario?.usuarioId
         );
 
         const userInPreviousScale = copyProximaEscala?.escalados?.some(
-          (escalados) =>
-            escalados.membroId === usuario?.usuarioHostId ||
-            escalados.membroId === usuario?.usuarioDefaultId
+          (escalados) => escalados.membroId === usuario?.usuarioId
         );
 
         if (
@@ -764,20 +760,12 @@ const PaginaGeral = (params) => {
 
   const handleBuscarEscalacoesUsuario = async () => {
     try {
-      let response = null;
       setLoadingTabelaInformacoesEscalado(true);
 
-      if (usuario?.usuarioHostId) {
-        response = await api.post("/buscarEscalacoesUsuario", {
-          equipeId: usuario?.equipeId,
-          usuarioId: usuario?.usuarioHostId,
-        });
-      } else {
-        response = await api.post("/buscarEscalacoesUsuario", {
-          equipeId: usuario?.equipeId,
-          usuarioId: usuario?.usuarioDefaultId,
-        });
-      }
+      const response = await api.post("/buscarEscalacoesUsuario", {
+        equipeId: usuario?.equipeId,
+        usuarioId: usuario?.usuarioId,
+      });
 
       if (response?.status === 200) {
         setEscalacoesUsuario(response?.data);
@@ -794,19 +782,11 @@ const PaginaGeral = (params) => {
 
   const handleBuscarTagsMembroEquipe = async () => {
     try {
-      let response = null;
       setLoadingTabelaInformacoesTags(true);
 
-      if (usuario?.usuarioHostId) {
-        response = await api.post("/buscarTagsMembroEquipe", {
-          usuarioId: usuario?.usuarioHostId,
-          host: true,
-        });
-      } else {
-        response = await api.post("/buscarTagsMembroEquipe", {
-          usuarioId: usuario?.usuarioDefaultId,
-        });
-      }
+      const response = await api.post("/buscarTagsMembroEquipe", {
+        usuarioId: usuario?.usuarioId,
+      });
 
       if (response?.status === 200) {
         setTagsUsuario(response?.data);
@@ -984,8 +964,7 @@ const PaginaGeral = (params) => {
                                 }}
                               />
                             )} */}
-                              {(usuario.usuarioHostId === membroId ||
-                                usuario.usuarioDefaultId === membroId) && (
+                              {usuario.usuarioId === membroId && (
                                 <Chip
                                   label="Eu"
                                   variant="outlined"
@@ -1050,12 +1029,12 @@ const PaginaGeral = (params) => {
                             )) ||
                               (!proximaEscala?.escalados.some(
                                 (escala) =>
-                                  escala.membroId === usuario?.usuarioDefaultId
+                                  escala.membroId === usuario?.usuarioId
                               ) &&
                                 tagsUsuario?.some(
                                   (userTags) => userTags.id === tagId
                                 ) &&
-                                usuario?.ativo && (
+                                usuario?.statusUsuario && (
                                   <IconButton
                                     sx={styles.IconButtonHover}
                                     onClick={() => {
@@ -1255,7 +1234,7 @@ const PaginaGeral = (params) => {
               {isAdm && (
                 <Chip label="Admin" variant="outlined" sx={styles.chipName} />
               )}
-              {!usuario?.ativo && (
+              {!usuario?.statusUsuario && (
                 <Chip
                   label="Inativo"
                   variant="outlined"

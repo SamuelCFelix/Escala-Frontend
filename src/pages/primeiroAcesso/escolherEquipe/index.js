@@ -236,15 +236,19 @@ const styles = {
 const EscolherEquipe = () => {
   const [loadingPage, setLoadingPage] = useState(true);
   const [openModalEquipe, setOpenModalEquipe] = useState({});
-  const [usuarioDefaultId, setUsuarioDefaultId] = useState("");
+  const [usuarioId, setUsuarioId] = useState("");
   const [arrayEquipes, setArrayEquipes] = useState([]);
 
   useEffect(() => {
     const storedData = localStorage.getItem("login");
-
     const userData = JSON.parse(storedData);
-    if (userData?.usuarioDefaultId && userData?.equipeId === "sem equipe") {
-      setUsuarioDefaultId(userData.usuarioDefaultId);
+
+    if (
+      userData?.usuarioId &&
+      !userData?.equipeId &&
+      userData?.autorizacao !== "adm001"
+    ) {
+      setUsuarioId(userData.usuarioId);
     } else if (userData?.equipeId === "solicitacao enviada") {
       window.location.href = "/primeiroAcesso/escolherequipe/saladeespera";
     } else {
@@ -273,8 +277,8 @@ const EscolherEquipe = () => {
 
   async function handleApiEnviarSolicitacao(equipeId) {
     try {
-      const response = await api.post("/solicitacaoEquipe", {
-        usuarioDefaultId,
+      const response = await api.post("/enviarSolicitacaoEquipe", {
+        usuarioId,
         equipeId,
       });
 
@@ -357,13 +361,13 @@ const EscolherEquipe = () => {
                               sx={{ color: "#F3A913" }}
                             />
                             <Typography sx={styles.textoDefault}>
-                              Programações: {equipe?.Programacao?.length}
+                              Programações: {equipe?.Programacoes?.length}
                             </Typography>
                           </Box>
                           <Box sx={{ ...styles.boxRodapeEquipe, mr: "16px" }}>
                             <GroupsOutlinedIcon sx={{ color: "#F3A913" }} />
                             <Typography sx={styles.textoDefault}>
-                              Membros: {equipe?.UsuarioDefault?.length + 1}
+                              Membros: {equipe?.Usuarios?.length}
                             </Typography>
                           </Box>
                         </Box>
@@ -459,13 +463,13 @@ const EscolherEquipe = () => {
                                 sx={{ color: "#F3A913" }}
                               />
                               <Typography sx={styles.textoDefault}>
-                                Programações: {equipe?.Programacao?.length}
+                                Programações: {equipe?.Programacoes?.length}
                               </Typography>
                             </Box>
                             <Box sx={{ ...styles.boxRodapeEquipe, mr: "16px" }}>
                               <GroupsOutlinedIcon sx={{ color: "#F3A913" }} />
                               <Typography sx={styles.textoDefault}>
-                                Servindo: {equipe?.UsuarioDefault?.length + 1}
+                                Membros: {equipe?.Usuarios?.length}
                               </Typography>
                             </Box>
                           </Box>

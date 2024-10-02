@@ -109,19 +109,9 @@ const Home = ({ defaultTab }) => {
 
     if (userToken && userData) {
       try {
-        let response = "";
-
-        if (userData?.usuarioHostId) {
-          response = await api.post("/informacoesHome", {
-            usuarioId: userData?.usuarioHostId,
-            isHost: true,
-          });
-        } else if (userData?.usuarioDefaultId) {
-          response = await api.post("/informacoesHome", {
-            usuarioId: userData?.usuarioDefaultId,
-            isHost: false,
-          });
-        }
+        const response = await api.post("/informacoesHome", {
+          usuarioId: userData?.usuarioId,
+        });
 
         if (response?.status === 200) {
           setUser(response?.data);
