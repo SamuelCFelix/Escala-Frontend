@@ -31,6 +31,7 @@ const styles = {
     height: "100dvh",
     position: "relative",
     display: "flex",
+    flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
     overflow: "auto",
@@ -53,7 +54,6 @@ const styles = {
     backdropFilter: "blur(10px)",
     gap: "10px",
     padding: "20px",
-    mb: "10px",
   },
   tituloLogin: {
     fontFamily: "Libre Baskerville",
@@ -239,6 +239,31 @@ const styles = {
     alignItems: "center",
     width: "100%",
   },
+  textoDefault: {
+    fontFamily: "Libre Baskerville",
+    fontSize: "14px",
+    color: "#ffffff",
+    lineHeight: "24px",
+    letterSpacing: "0.17px",
+    textAlign: "center",
+  },
+  boxAreaVersaoSistema: {
+    display: "flex",
+    width: "98dvw",
+    height: "auto",
+    alignItems: "center",
+    justifyContent: "flex-start",
+  },
+  boxAreaLogin: {
+    display: "flex",
+    width: "100dvw",
+    height: "96dvh",
+    minHeight: "380px",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    mb: "40px",
+    paddingTop: "40px",
+  },
 };
 
 const Login = () => {
@@ -374,95 +399,113 @@ const Login = () => {
     <Box sx={styles.container}>
       <Box
         sx={{
-          ...styles.boxLogin,
-          ml: !isMobile && "auto",
-          mr: !isMobile && "5%",
+          ...styles.boxAreaLogin,
+          justifyContent: isMobile ? "center" : "flex-end",
         }}
       >
-        <Typography variant="h3" sx={styles.tituloLogin}>
-          Login
+        <Box
+          sx={{
+            ...styles.boxLogin,
+            mr: !isMobile && "5%",
+          }}
+        >
+          <Typography variant="h3" sx={styles.tituloLogin}>
+            Login
+          </Typography>
+          <Box sx={styles.boxInputs} autoComplete="off">
+            <TextField
+              error={errorEmail}
+              id="emailLogin"
+              label="Email"
+              variant="outlined"
+              type="email"
+              onChange={(event) => {
+                setEmail(event.target.value);
+                setErrorEmail(false);
+              }}
+              onKeyDown={handleKeyDown}
+              sx={styles.inputLogin}
+              onBlur={handleBlurEmail}
+              InputProps={{
+                endAdornment: <EmailOutlinedIcon sx={{ color: "#F3A913" }} />,
+              }}
+              placeholder="email@adpaz-zs.com.br"
+            />
+            <TextField
+              error={errorPassword}
+              id="senhaLogin"
+              label="Senha"
+              variant="outlined"
+              type={typePassword}
+              onChange={(event) => {
+                setPassword(event.target.value);
+                setErrorPassword(false);
+              }}
+              onKeyDown={handleKeyDown}
+              sx={styles.inputLogin}
+              onBlur={handleBlurPassword}
+              InputProps={{
+                endAdornment: (
+                  <>
+                    <IconButton
+                      sx={{ mr: "-8px" }}
+                      onClick={() => {
+                        setTypePassword(
+                          typePassword === "password" ? "text" : "password"
+                        );
+                      }}
+                    >
+                      {typePassword === "password" ? (
+                        <VisibilityOutlined sx={{ color: "#F3A913" }} />
+                      ) : (
+                        <VisibilityOffOutlined sx={{ color: "#F3A913" }} />
+                      )}
+                    </IconButton>
+                  </>
+                ),
+              }}
+            />
+          </Box>
+          <Button sx={styles.botaoEqueciSenha}>Esqueci minha senha</Button>
+          <Box sx={styles.centralizar}>
+            <Button
+              disabled={loadingLogin}
+              variant="contained"
+              onClick={(event) => handleLogin(event)}
+              sx={styles.botaoEntrar}
+            >
+              {loadingLogin ? (
+                <Box sx={styles.boxAreaCircularProgress}>
+                  <CircularProgress sx={{ color: "#ffffff" }} size={22} />
+                </Box>
+              ) : (
+                "ENTRAR"
+              )}
+            </Button>
+          </Box>
+          <Box sx={styles.centralizar}>
+            <Button
+              onClick={handleOpenPopUpSuccess}
+              component={Link}
+              to="/cadastrar"
+              sx={styles.botaoCadastrar}
+            >
+              Ainda não tenho uma conta
+            </Button>
+          </Box>
+        </Box>
+      </Box>
+
+      {/* Oficial.Beta.Atualização */}
+      <Box
+        sx={{
+          ...styles.boxAreaVersaoSistema,
+          justifyContent: isMobile ? "center" : "flex-start",
+        }}
+      >
+        <Typography sx={styles.textoDefault}>
+          Versão 0.1.0 - 2024 - Todos os direitos reservados
         </Typography>
-        <Box sx={styles.boxInputs} autoComplete="off">
-          <TextField
-            error={errorEmail}
-            id="emailLogin"
-            label="Email"
-            variant="outlined"
-            type="email"
-            onChange={(event) => {
-              setEmail(event.target.value);
-              setErrorEmail(false);
-            }}
-            onKeyDown={handleKeyDown}
-            sx={styles.inputLogin}
-            onBlur={handleBlurEmail}
-            InputProps={{
-              endAdornment: <EmailOutlinedIcon sx={{ color: "#F3A913" }} />,
-            }}
-            placeholder="email@adpaz-zs.com.br"
-          />
-          <TextField
-            error={errorPassword}
-            id="senhaLogin"
-            label="Senha"
-            variant="outlined"
-            type={typePassword}
-            onChange={(event) => {
-              setPassword(event.target.value);
-              setErrorPassword(false);
-            }}
-            onKeyDown={handleKeyDown}
-            sx={styles.inputLogin}
-            onBlur={handleBlurPassword}
-            InputProps={{
-              endAdornment: (
-                <>
-                  <IconButton
-                    sx={{ mr: "-8px" }}
-                    onClick={() => {
-                      setTypePassword(
-                        typePassword === "password" ? "text" : "password"
-                      );
-                    }}
-                  >
-                    {typePassword === "password" ? (
-                      <VisibilityOutlined sx={{ color: "#F3A913" }} />
-                    ) : (
-                      <VisibilityOffOutlined sx={{ color: "#F3A913" }} />
-                    )}
-                  </IconButton>
-                </>
-              ),
-            }}
-          />
-        </Box>
-        <Button sx={styles.botaoEqueciSenha}>Esqueci minha senha</Button>
-        <Box sx={styles.centralizar}>
-          <Button
-            disabled={loadingLogin}
-            variant="contained"
-            onClick={(event) => handleLogin(event)}
-            sx={styles.botaoEntrar}
-          >
-            {loadingLogin ? (
-              <Box sx={styles.boxAreaCircularProgress}>
-                <CircularProgress sx={{ color: "#ffffff" }} size={22} />
-              </Box>
-            ) : (
-              "ENTRAR"
-            )}
-          </Button>
-        </Box>
-        <Box sx={styles.centralizar}>
-          <Button
-            onClick={handleOpenPopUpSuccess}
-            component={Link}
-            to="/cadastrar"
-            sx={styles.botaoCadastrar}
-          >
-            Ainda não tenho uma conta
-          </Button>
-        </Box>
       </Box>
 
       <Snackbar

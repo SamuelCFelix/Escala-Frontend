@@ -121,6 +121,7 @@ const ModalConfirmarCandidatura = (params) => {
     setOpenModalConfirmarGerarEscala,
     handleGerarNovaEscalaMensal,
     loadingTabelaEscalaMensal,
+    escalaMensal,
   } = params;
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState("");
@@ -170,13 +171,29 @@ const ModalConfirmarCandidatura = (params) => {
         <Fade in={openModalConfirmarGerarEscala}>
           <Box sx={styles.boxModal}>
             <Box sx={styles.boxConteudoModal}>
-              {boxTituloCards("Gerar uma nova escala")}
-              <Typography sx={styles.dataTextModal}>
-                Você realmente deseja gerar uma nova escala?
-              </Typography>
-              <Typography sx={styles.dataTextModal}>
-                Ao confirmar, a escala atual será substituída
-              </Typography>
+              {escalaMensal ? (
+                <>
+                  {boxTituloCards("Gerar uma nova escala")}
+                  <Typography sx={styles.dataTextModal}>
+                    Você realmente deseja gerar uma nova escala?
+                  </Typography>
+                  <Typography sx={styles.dataTextModal}>
+                    Ao confirmar, a escala atual será substituída
+                  </Typography>
+                </>
+              ) : (
+                <>
+                  {boxTituloCards("Gerar escala mensal")}
+                  <Typography sx={styles.dataTextModal}>
+                    Você realmente deseja gerar uma escala?
+                  </Typography>
+                  <Typography sx={styles.dataTextModal}>
+                    A escala será gerada de acordo com a disponibilidade dos
+                    membros referente ao mês atual
+                  </Typography>
+                </>
+              )}
+
               <Box sx={styles.boxBotoesModal}>
                 <Button
                   onClick={() => {

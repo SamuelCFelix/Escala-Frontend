@@ -247,6 +247,31 @@ const styles = {
     borderRadius: "50%",
     zIndex: 99,
   },
+  boxAreaCadastro: {
+    display: "flex",
+    width: "100dvw",
+    height: "96dvh",
+    minHeight: "500px",
+    alignItems: "center",
+    justifyContent: "center",
+    mb: "40px",
+    paddingTop: "40px",
+  },
+  boxAreaVersaoSistema: {
+    display: "flex",
+    width: "98dvw",
+    height: "auto",
+    alignItems: "center",
+    justifyContent: "flex-start",
+  },
+  textoDefault: {
+    fontFamily: "Libre Baskerville",
+    fontSize: "14px",
+    color: "#ffffff",
+    lineHeight: "24px",
+    letterSpacing: "0.17px",
+    textAlign: "center",
+  },
 };
 
 const Cadastrar = () => {
@@ -577,287 +602,302 @@ const Cadastrar = () => {
   return (
     <>
       <Box sx={styles.container}>
-        <Box sx={styles.boxCadastro}>
-          <Box sx={styles.boxAreaColunaHorizontal}>
-            <Typography sx={styles.textTitulo}>Criar Perfil</Typography>
-          </Box>
-          <Box
-            position={"relative"}
-            sx={{
-              ...styles.boxAreaColunaHorizontal,
-              mb: "34px",
-            }}
-          >
-            <Avatar
+        <Box sx={styles.boxAreaCadastro}>
+          <Box sx={styles.boxCadastro}>
+            <Box sx={styles.boxAreaColunaHorizontal}>
+              <Typography sx={styles.textTitulo}>Criar Perfil</Typography>
+            </Box>
+            <Box
+              position={"relative"}
               sx={{
-                ...styles.avatarMembro,
-                ...(isMobile ? { width: "70px", height: "70px" } : {}),
+                ...styles.boxAreaColunaHorizontal,
+                mb: "34px",
               }}
-              src={fotoUsuario ? fotoUsuario : undefined}
             >
-              {!fotoUsuario && <Person sx={{ fontSize: "32px" }} />}
-            </Avatar>
+              <Avatar
+                sx={{
+                  ...styles.avatarMembro,
+                  ...(isMobile ? { width: "70px", height: "70px" } : {}),
+                }}
+                src={fotoUsuario ? fotoUsuario : undefined}
+              >
+                {!fotoUsuario && <Person sx={{ fontSize: "32px" }} />}
+              </Avatar>
 
-            <IconButton
-              onClick={() => {
-                if (fotoUsuario) {
-                  setFotoUsuario(null);
-                  setFotoUsuarioDB(null);
-                } else {
-                  document.getElementById("upload-photo-input").click();
+              <IconButton
+                onClick={() => {
+                  if (fotoUsuario) {
+                    setFotoUsuario(null);
+                    setFotoUsuarioDB(null);
+                  } else {
+                    document.getElementById("upload-photo-input").click();
+                  }
+                }}
+                sx={styles.iconButtonAddFoto}
+              >
+                {fotoUsuario ? (
+                  <DeleteOutline
+                    sx={{
+                      fontSize: "16px",
+                      color: "#ffffff",
+                    }}
+                  />
+                ) : (
+                  <AddAPhotoOutlinedIcon
+                    sx={{
+                      fontSize: "16px",
+                      color: "#ffffff",
+                    }}
+                  />
+                )}
+              </IconButton>
+              <input
+                id="upload-photo-input"
+                type="file"
+                accept="image/jpeg, image/png"
+                hidden
+                onChange={handleFileChange}
+              />
+            </Box>
+
+            <Box sx={styles.boxAreaColunasInput}>
+              <Box sx={styles.boxColunaInput}>
+                <TextField
+                  error={errorNome}
+                  id="nomeCompleto"
+                  label="Nome completo"
+                  value={nome}
+                  variant="outlined"
+                  inputProps={{
+                    inputMode: "text",
+                    pattern: "[A-Za-zÀ-ú ]*",
+                    maxLength: 50,
+                  }}
+                  onChange={(event) => {
+                    handleInputNome(event);
+                    setErrorNome(false);
+                  }}
+                  onKeyDown={handleKeyDown}
+                  sx={styles.inputCadastro}
+                  onBlur={handleBlurNome}
+                />
+                <TextField
+                  error={errorCpf}
+                  id="cpf"
+                  label="CPF"
+                  value={cpf}
+                  placeholder="___.___.___-__"
+                  variant="outlined"
+                  inputProps={{
+                    inputMode: "numeric",
+                    pattern: "[0-9]*",
+                    maxLength: 14,
+                  }}
+                  onChange={(event) => {
+                    handleInputCPF(event);
+                    setErrorCpf(false);
+                  }}
+                  onKeyDown={handleKeyDown}
+                  sx={styles.inputCadastro}
+                  onBlur={handleBlurCPF}
+                />
+                <TextField
+                  error={errorDataNascimento}
+                  id="dataDeNascimento"
+                  label="Data de nascimento"
+                  value={dataNascimento}
+                  placeholder="__/__/____"
+                  variant="outlined"
+                  inputProps={{
+                    inputMode: "numeric",
+                    pattern: "[0-9]*",
+                    maxLength: 10,
+                  }}
+                  onChange={(event) => {
+                    handleInputDataNascimento(event);
+                    setErrorDataNascimento(false);
+                  }}
+                  onKeyDown={handleKeyDown}
+                  sx={styles.inputCadastro}
+                  onBlur={handleBlurDataNascimento}
+                />
+              </Box>
+              <Box sx={styles.boxColunaInput}>
+                <TextField
+                  error={errorEmail}
+                  id="email"
+                  label="Email"
+                  variant="outlined"
+                  type="Email"
+                  onChange={(event) => {
+                    setEmail(event.target.value);
+                    setErrorEmail(false);
+                  }}
+                  onKeyDown={handleKeyDown}
+                  sx={styles.inputCadastro}
+                  onBlur={handleBlurEmail}
+                  placeholder="email@adpaz-zs.com.br"
+                />
+                <TextField
+                  error={errorPassword}
+                  id="senha"
+                  label="Senha"
+                  value={password}
+                  variant="outlined"
+                  type={typePassword}
+                  onChange={(event) => {
+                    setPassword(event.target.value);
+                    setErrorPassword(false);
+                    setErrorConfirmPassword2(false);
+                  }}
+                  onKeyDown={handleKeyDown}
+                  sx={styles.inputCadastro}
+                  onBlur={handleBlurPassword}
+                  InputProps={{
+                    endAdornment: (
+                      <>
+                        <IconButton
+                          sx={{ mr: "-8px", mt: "-6px" }}
+                          onClick={() => {
+                            setTypePassword(
+                              typePassword === "password" ? "text" : "password"
+                            );
+                          }}
+                        >
+                          {typePassword === "password" ? (
+                            <VisibilityOutlined
+                              sx={{ color: "#F3A913", fontSize: "20px" }}
+                            />
+                          ) : (
+                            <VisibilityOffOutlined
+                              sx={{ color: "#F3A913", fontSize: "20px" }}
+                            />
+                          )}
+                        </IconButton>
+                      </>
+                    ),
+                  }}
+                />
+                <TextField
+                  error={errorConfirmPassword || errorConfirmPassword2}
+                  id="confirmarSenha"
+                  label="Confirmar senha"
+                  helperText={errorConfirmPassword2 ? "Senhas diferentes" : ""}
+                  value={confirmPassword}
+                  variant="outlined"
+                  type={typePassword2}
+                  onChange={(event) => {
+                    setConfirmPassword(event.target.value);
+                    setErrorConfirmPassword(false);
+                    setErrorConfirmPassword2(false);
+                  }}
+                  onKeyDown={handleKeyDown}
+                  sx={styles.inputCadastro}
+                  onBlur={handleBlurConfirmPassword}
+                  InputProps={{
+                    endAdornment: (
+                      <>
+                        <IconButton
+                          sx={{ mr: "-8px", mt: "-6px" }}
+                          onClick={() => {
+                            setTypePassword2(
+                              typePassword2 === "password" ? "text" : "password"
+                            );
+                          }}
+                        >
+                          {typePassword2 === "password" ? (
+                            <VisibilityOutlined
+                              sx={{ color: "#F3A913", fontSize: "20px" }}
+                            />
+                          ) : (
+                            <VisibilityOffOutlined
+                              sx={{ color: "#F3A913", fontSize: "20px" }}
+                            />
+                          )}
+                        </IconButton>
+                      </>
+                    ),
+                  }}
+                />
+              </Box>
+            </Box>
+            <Box
+              sx={{
+                ...styles.boxAreaColunaHorizontal,
+                justifyContent: "flex-start",
+                ml: "30px",
+                mt: "4px",
+              }}
+            >
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={checked}
+                    onChange={handleChangeCheck}
+                    inputProps={{ "aria-label": "controlled" }}
+                    sx={{
+                      color: errorChecked ? "red" : "#fff",
+                      "&.Mui-checked": {
+                        color: "#F3A913",
+                      },
+                    }}
+                  />
                 }
-              }}
-              sx={styles.iconButtonAddFoto}
-            >
-              {fotoUsuario ? (
-                <DeleteOutline
-                  sx={{
-                    fontSize: "16px",
-                    color: "#ffffff",
-                  }}
-                />
-              ) : (
-                <AddAPhotoOutlinedIcon
-                  sx={{
-                    fontSize: "16px",
-                    color: "#ffffff",
-                  }}
-                />
-              )}
-            </IconButton>
-            <input
-              id="upload-photo-input"
-              type="file"
-              accept="image/jpeg, image/png"
-              hidden
-              onChange={handleFileChange}
-            />
-          </Box>
-
-          <Box sx={styles.boxAreaColunasInput}>
-            <Box sx={styles.boxColunaInput}>
-              <TextField
-                error={errorNome}
-                id="nomeCompleto"
-                label="Nome completo"
-                value={nome}
-                variant="outlined"
-                inputProps={{
-                  inputMode: "text",
-                  pattern: "[A-Za-zÀ-ú ]*",
-                  maxLength: 50,
-                }}
-                onChange={(event) => {
-                  handleInputNome(event);
-                  setErrorNome(false);
-                }}
-                onKeyDown={handleKeyDown}
-                sx={styles.inputCadastro}
-                onBlur={handleBlurNome}
-              />
-              <TextField
-                error={errorCpf}
-                id="cpf"
-                label="CPF"
-                value={cpf}
-                placeholder="___.___.___-__"
-                variant="outlined"
-                inputProps={{
-                  inputMode: "numeric",
-                  pattern: "[0-9]*",
-                  maxLength: 14,
-                }}
-                onChange={(event) => {
-                  handleInputCPF(event);
-                  setErrorCpf(false);
-                }}
-                onKeyDown={handleKeyDown}
-                sx={styles.inputCadastro}
-                onBlur={handleBlurCPF}
-              />
-              <TextField
-                error={errorDataNascimento}
-                id="dataDeNascimento"
-                label="Data de nascimento"
-                value={dataNascimento}
-                placeholder="__/__/____"
-                variant="outlined"
-                inputProps={{
-                  inputMode: "numeric",
-                  pattern: "[0-9]*",
-                  maxLength: 10,
-                }}
-                onChange={(event) => {
-                  handleInputDataNascimento(event);
-                  setErrorDataNascimento(false);
-                }}
-                onKeyDown={handleKeyDown}
-                sx={styles.inputCadastro}
-                onBlur={handleBlurDataNascimento}
+                label={
+                  <Typography
+                    color={errorChecked ? "red" : "#fff"}
+                    variant="body1"
+                    component="div"
+                  >
+                    Eu li e concordo com os{" "}
+                    <a href="#" style={{ color: "#00A7CC" }}>
+                      termos de uso e políticas de privacidade
+                    </a>
+                    .
+                  </Typography>
+                }
               />
             </Box>
-            <Box sx={styles.boxColunaInput}>
-              <TextField
-                error={errorEmail}
-                id="email"
-                label="Email"
-                variant="outlined"
-                type="Email"
-                onChange={(event) => {
-                  setEmail(event.target.value);
-                  setErrorEmail(false);
-                }}
-                onKeyDown={handleKeyDown}
-                sx={styles.inputCadastro}
-                onBlur={handleBlurEmail}
-                placeholder="email@adpaz-zs.com.br"
-              />
-              <TextField
-                error={errorPassword}
-                id="senha"
-                label="Senha"
-                value={password}
-                variant="outlined"
-                type={typePassword}
-                onChange={(event) => {
-                  setPassword(event.target.value);
-                  setErrorPassword(false);
-                  setErrorConfirmPassword2(false);
-                }}
-                onKeyDown={handleKeyDown}
-                sx={styles.inputCadastro}
-                onBlur={handleBlurPassword}
-                InputProps={{
-                  endAdornment: (
-                    <>
-                      <IconButton
-                        sx={{ mr: "-8px", mt: "-6px" }}
-                        onClick={() => {
-                          setTypePassword(
-                            typePassword === "password" ? "text" : "password"
-                          );
-                        }}
-                      >
-                        {typePassword === "password" ? (
-                          <VisibilityOutlined
-                            sx={{ color: "#F3A913", fontSize: "20px" }}
-                          />
-                        ) : (
-                          <VisibilityOffOutlined
-                            sx={{ color: "#F3A913", fontSize: "20px" }}
-                          />
-                        )}
-                      </IconButton>
-                    </>
-                  ),
-                }}
-              />
-              <TextField
-                error={errorConfirmPassword || errorConfirmPassword2}
-                id="confirmarSenha"
-                label="Confirmar senha"
-                helperText={errorConfirmPassword2 ? "Senhas diferentes" : ""}
-                value={confirmPassword}
-                variant="outlined"
-                type={typePassword2}
-                onChange={(event) => {
-                  setConfirmPassword(event.target.value);
-                  setErrorConfirmPassword(false);
-                  setErrorConfirmPassword2(false);
-                }}
-                onKeyDown={handleKeyDown}
-                sx={styles.inputCadastro}
-                onBlur={handleBlurConfirmPassword}
-                InputProps={{
-                  endAdornment: (
-                    <>
-                      <IconButton
-                        sx={{ mr: "-8px", mt: "-6px" }}
-                        onClick={() => {
-                          setTypePassword2(
-                            typePassword2 === "password" ? "text" : "password"
-                          );
-                        }}
-                      >
-                        {typePassword2 === "password" ? (
-                          <VisibilityOutlined
-                            sx={{ color: "#F3A913", fontSize: "20px" }}
-                          />
-                        ) : (
-                          <VisibilityOffOutlined
-                            sx={{ color: "#F3A913", fontSize: "20px" }}
-                          />
-                        )}
-                      </IconButton>
-                    </>
-                  ),
-                }}
-              />
-            </Box>
-          </Box>
-          <Box
-            sx={{
-              ...styles.boxAreaColunaHorizontal,
-              justifyContent: "flex-start",
-              ml: "30px",
-              mt: "4px",
-            }}
-          >
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={checked}
-                  onChange={handleChangeCheck}
-                  inputProps={{ "aria-label": "controlled" }}
-                  sx={{
-                    color: errorChecked ? "red" : "#fff",
-                    "&.Mui-checked": {
-                      color: "#F3A913",
-                    },
-                  }}
-                />
-              }
-              label={
-                <Typography
-                  color={errorChecked ? "red" : "#fff"}
-                  variant="body1"
-                  component="div"
-                >
-                  Eu li e concordo com os{" "}
-                  <a href="#" style={{ color: "#00A7CC" }}>
-                    termos de uso e políticas de privacidade
-                  </a>
-                  .
-                </Typography>
-              }
-            />
-          </Box>
-          <Box
-            sx={{
-              ...styles.boxAreaColunaHorizontal,
-              flexDirection: "column",
-              gap: "16px",
-            }}
-          >
-            <Button
-              variant="contained"
-              onClick={(event) => handleCriarCadastro(event)}
-              sx={styles.botaoDefault}
-            >
-              Enviar
-            </Button>
-            <Button
-              component={Link}
-              to="/login"
-              sx={styles.botaoJaTenhoConta}
-              onClick={() => {
-                hidePopup();
+            <Box
+              sx={{
+                ...styles.boxAreaColunaHorizontal,
+                flexDirection: "column",
+                gap: "16px",
               }}
             >
-              Já tenho uma conta
-            </Button>
+              <Button
+                variant="contained"
+                onClick={(event) => handleCriarCadastro(event)}
+                sx={styles.botaoDefault}
+              >
+                Enviar
+              </Button>
+              <Button
+                component={Link}
+                to="/login"
+                sx={styles.botaoJaTenhoConta}
+                onClick={() => {
+                  hidePopup();
+                }}
+              >
+                Já tenho uma conta
+              </Button>
+            </Box>
           </Box>
         </Box>
+
+        {/* Oficial.Beta.Atualização */}
+        <Box
+          sx={{
+            ...styles.boxAreaVersaoSistema,
+            justifyContent: isMobile ? "center" : "flex-start",
+          }}
+        >
+          <Typography sx={styles.textoDefault}>
+            Versão 0.1.0 - 2024 - Todos os direitos reservados
+          </Typography>
+        </Box>
+
         {/* <Box sx={styles.boxLogoRodape}>
           <img
             src={LogoRodape}

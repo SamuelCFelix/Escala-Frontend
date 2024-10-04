@@ -91,9 +91,10 @@ const Home = ({ defaultTab }) => {
     } else {
       let userDataInitial = JSON?.parse(storedData);
       if (
-        userDataInitial?.equipeId === null ||
+        !userDataInitial?.equipeId ||
         userDataInitial?.equipeId === "solicitacao enviada" ||
-        userDataInitial?.equipeId === "sem equipe"
+        !userDataInitial?.usuarioId ||
+        userDataInitial?.primeiroAcesso
       ) {
         localStorage?.clear();
         window.location.href = "/login";

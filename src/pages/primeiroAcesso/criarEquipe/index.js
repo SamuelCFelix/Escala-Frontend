@@ -766,7 +766,9 @@ const CriarEquipe = () => {
         programacoes,
         tags,
       });
-      if (response) {
+      if (response.status === 201) {
+        setSnackbar("success", "Equipe criada com sucesso");
+        localStorage.setItem("login", JSON.stringify(response.data));
         window.location.href = "/home";
       }
     } catch (error) {
@@ -1054,6 +1056,13 @@ const CriarEquipe = () => {
     />
   ));
 
+  //APERTAR ENTER
+  const handleKeyDownNameTags = (event) => {
+    if (event.key === "Enter") {
+      handleAddChip();
+    }
+  };
+
   const stepsCriarEquipe = [
     {
       label: "Informações da equipe",
@@ -1300,7 +1309,7 @@ const CriarEquipe = () => {
             </Typography>
             <Typography sx={{ ...styles.textoDefault, mt: "12px" }}>
               As tags são identificações que serão necessárias para criação das
-              escalas. Elas também serão atribuídas por você aos servos da sua
+              escalas. Elas também serão atribuídas por você aos membros da sua
               equipe de forma individual futuramente.
             </Typography>
             <Typography sx={{ ...styles.textoDefault, mt: "12px" }}>
@@ -1336,7 +1345,7 @@ const CriarEquipe = () => {
             </Box>
 
             <Typography sx={{ ...styles.textoDefault, mt: "5px" }}>
-              Nesse culto precisa de 3 servos e suas TAGS serão:
+              Nesse culto precisa de 3 membros e suas TAGS serão:
             </Typography>
             <Box sx={styles.boxChipDefault}>
               <Chip
@@ -1359,6 +1368,7 @@ const CriarEquipe = () => {
           <Box sx={styles.box2Stepper1}>
             <TextField
               value={valueTag}
+              onKeyDown={handleKeyDownNameTags}
               onChange={(event) => {
                 setValueTag(event.target.value);
               }}

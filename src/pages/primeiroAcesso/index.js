@@ -177,7 +177,7 @@ const styles = {
     width: "140px",
     height: "30px",
     padding: "0px 40px",
-    borderRadius: "10px",
+    borderRadius: "5px",
     fontFamily: "Roboto, sans-serif",
     fontSize: "12px",
     lineHeight: "36px",

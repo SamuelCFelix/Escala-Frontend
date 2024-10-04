@@ -65,6 +65,7 @@ import ModalConfirmarGerarEscala from "./modais/modalConfirmarGerarEscala";
 import ModalConfirmarExcluirEscalaData from "./modais/modalConfirmarExcluirEscalaData";
 import useDeviceType from "../../../hooks/useDeviceType";
 import { useMediaQuery } from "react-responsive";
+import ModalConfirmarExcluirEquipe from "./modais/modalConfirmarExcluirEquipe";
 
 const styles = {
   configBox: {
@@ -985,8 +986,6 @@ const styles = {
 const PaginaEquipe = (params) => {
   const { usuario } = params;
   const { isMobile, isTablet, isDesktop } = useDeviceType();
-  const breakPoint01 = useMediaQuery({ query: "(max-width: 962px)" });
-  const breakPoint02 = useMediaQuery({ query: "(max-width: 1438px)" });
 
   const [isAdm, setIsAdm] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -1036,6 +1035,8 @@ const PaginaEquipe = (params) => {
     setOpenModalConfirmarExcluirEscalaData,
   ] = useState(false);
   const [infoDeletarEscalaData, setInfoDeletarEscalaData] = useState([]);
+  const [openModalConfirmarExcluirEquipe, setOpenModalConfirmarExcluirEquipe] =
+    useState(false);
 
   // Obter o mês atual e o próximo mês
   const today = new Date();
@@ -1997,7 +1998,7 @@ const PaginaEquipe = (params) => {
                   </Box>
                 )
               )}
-              {escalaMensal?.length === 0 && (
+              {!escalaMensal && (
                 <Box sx={{ ...styles.configBox, height: "100%" }}>
                   <Typography sx={styles.textTitulo}>
                     Escala não gerada
@@ -2019,7 +2020,7 @@ const PaginaEquipe = (params) => {
               }}
             >
               <RestartAltOutlinedIcon sx={{ fontSize: "18px" }} />
-              Gerar escala novamente
+              {escalaMensal ? "Gerar escala novamente" : "Gerar escala"}
             </Button>
           )}
         </Box>
@@ -2187,6 +2188,14 @@ const PaginaEquipe = (params) => {
                   sx={{ color: "#ffffff" }}
                 />
                 <Tab label="Tags" value="tags" sx={{ color: "#ffffff" }} />
+
+                {usuario?.autorizacao === "adm001" && (
+                  <Tab
+                    label="Configurações"
+                    value="configuracoes"
+                    sx={{ color: "#ffffff" }}
+                  />
+                )}
               </Tabs>
             </Box>
             <Box sx={styles.boxAreaConteudoTabsMinhaEquipe}>
@@ -2515,6 +2524,35 @@ const PaginaEquipe = (params) => {
                   <Typography sx={styles.textTitulo}>Em Breve</Typography>
                 </Box>
               )}
+
+              {valueTabInformacoesEquipe === "configuracoes" &&
+                usuario?.autorizacao === "adm001" && (
+                  <Box
+                    sx={{
+                      ...styles.boxAreaTabMembros,
+                      justifyContent: "flex-end",
+                    }}
+                  >
+                    <Button
+                      disabled={usuario?.autorizacao !== "adm001"}
+                      variant="contained"
+                      sx={{
+                        ...styles.botaoDefaultCancelar,
+                        mb: "10px",
+                        padding: "0px 20px",
+                        gap: "5px",
+                      }}
+                      onClick={() => {
+                        setOpenModalConfirmarExcluirEquipe(true);
+                      }}
+                    >
+                      <ReportProblemOutlined
+                        sx={{ fontSize: "18px", color: "#F3A913", mt: "-2px" }}
+                      />
+                      Deletar equipe
+                    </Button>
+                  </Box>
+                )}
             </Box>
           </Box>
         </Box>
@@ -2605,7 +2643,18 @@ const PaginaEquipe = (params) => {
         setOpenModalConfirmarGerarEscala={setOpenModalConfirmarGerarEscala}
         loadingTabelaEscalaMensal={loadingTabelaEscalaMensal}
         handleGerarNovaEscalaMensal={handleGerarNovaEscalaMensal}
+        escalaMensal={escalaMensal}
       />
+
+      {usuario?.autorizacao === "adm001" && (
+        <ModalConfirmarExcluirEquipe
+          usuarioLogado={usuario}
+          openModalConfirmarExcluirEquipe={openModalConfirmarExcluirEquipe}
+          setOpenModalConfirmarExcluirEquipe={
+            setOpenModalConfirmarExcluirEquipe
+          }
+        />
+      )}
 
       <Snackbar
         open={snackbarOpen}
