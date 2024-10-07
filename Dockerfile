@@ -32,8 +32,8 @@ COPY --from=build /app/build /usr/share/nginx/html
 # Copia o arquivo de configuração do NGINX para o local correto
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Expõe a porta 80 para acessar a aplicação
-EXPOSE 80
+# Expõe a porta 3001 para acessar a aplicação
+EXPOSE 3001
 
 # Comando para rodar o NGINX
 CMD ["nginx", "-g", "daemon off;"]
