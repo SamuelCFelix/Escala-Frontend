@@ -15,8 +15,8 @@ import {
 } from "@mui/material";
 import { motion } from "framer-motion";
 import "../../../src/style.css";
-import imagemPastor from "../../img/zs-pastor.jpg";
-import imagemServo from "../../img/zs-vini.png";
+import imagemPastor from "../../img/zs-pastor.webp";
+import imagemServo from "../../img/zs-vini.webp";
 import { useEffect, useState } from "react";
 import api from "../../api";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";

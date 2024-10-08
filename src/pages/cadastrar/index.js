@@ -10,7 +10,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import BackgroundImage from "../../img/fotoProducaoSamuel.jpeg";
+import BackgroundImage from "../../img/fotoProducaoSamuel.webp";
 import { useState, forwardRef } from "react";
 import LogoRodape from "../../img/logoZS.png";
 import { Link, json, useNavigate } from "react-router-dom";

@@ -8,7 +8,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import BackgroundImage from "../../img/fotoProducaoSamuel.jpeg";
+import BackgroundImage from "../../img/fotoProducaoSamuel.webp";
 import { forwardRef, useEffect, useState } from "react";
 import LogoRodape from "../../img/logoZS.png";
 import { Link, useNavigate } from "react-router-dom";
