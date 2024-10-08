@@ -308,10 +308,6 @@ const Login = () => {
     } else {
       try {
         setLoadingLogin(true);
-        let variavel = process.env.REACT_APP_HOST;
-        console.log(variavel);
-
-        console.log(process.env.REACT_APP_HOST);
         const response = await api.post("/loginAuth", {
           email: email,
           senha: password,
