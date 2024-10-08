@@ -3,6 +3,8 @@ FROM node:latest AS build
 
 WORKDIR /app
 
+ARG REACT_APP_HOST
+
 COPY package*.json ./
 
 # Configurações de rede do npm
@@ -13,9 +15,6 @@ RUN npm config set fetch-retry-maxtimeout 120000
 
 # Instala as dependências
 RUN npm install
-
-# Copia o arquivo .env para o diretório de trabalho
-COPY .env ./
 
 # Copia os arquivos restantes da aplicação
 COPY . .
