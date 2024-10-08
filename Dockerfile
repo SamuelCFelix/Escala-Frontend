@@ -3,6 +3,7 @@ FROM node:latest AS build
 
 WORKDIR /app
 
+# Definir a variável de build ARG
 ARG REACT_APP_HOST
 
 COPY package*.json ./
@@ -19,8 +20,8 @@ RUN npm install
 # Copia os arquivos restantes da aplicação
 COPY . .
 
-# Executa o build da aplicação React
-RUN npm run build
+# Passar a variável REACT_APP_HOST durante o build
+RUN REACT_APP_HOST=$REACT_APP_HOST npm run build
 
 # Fase 2: Servir com NGINX
 FROM nginx:alpine
