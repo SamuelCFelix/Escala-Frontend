@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import BackgroundImage from "../../img/fotoProducaoSamuel.webp";
 import { useState, forwardRef } from "react";
-import LogoRodape from "../../img/logoZS.png";
+/* import LogoRodape from "../../img/logoZS.png"; */
 import { Link, json, useNavigate } from "react-router-dom";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
@@ -521,7 +521,8 @@ const Cadastrar = () => {
   };
 
   const validarEmail = (email) => {
-    const regex = /^[^\s@]+@adpaz-zs\.com\.br$/;
+    /* const regex = /^[^\s@]+@adpaz-zs\.com\.br$/; */ // Regex para validar email com domínio específico ADPAZ
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(email);
   };
 
@@ -736,7 +737,7 @@ const Cadastrar = () => {
                   onKeyDown={handleKeyDown}
                   sx={styles.inputCadastro}
                   onBlur={handleBlurEmail}
-                  placeholder="email@adpaz-zs.com.br"
+                  placeholder="email@exemplo.com"
                 />
                 <TextField
                   error={errorPassword}

@@ -15,8 +15,10 @@ import {
 } from "@mui/material";
 import { motion } from "framer-motion";
 import "../../../src/style.css";
-import imagemPastor from "../../img/zs-pastor.webp";
-import imagemServo from "../../img/zs-vini.webp";
+/* import imagemPastor from "../../img/zs-pastor.webp"; */
+/* import imagemServo from "../../img/zs-vini.webp"; */
+import imagemLider from "../../img/cardLider.webp";
+import imagemMembro from "../../img/cardMembro.webp";
 import { useEffect, useState } from "react";
 import api from "../../api";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
@@ -405,9 +407,9 @@ const PrimerioAcesso = () => {
             <Button
               sx={{
                 ...styles.boxButton,
-                backgroundImage: `url(${imagemPastor})`,
-                backgroundSize: isMobile ? "190%" : "164%",
-                backgroundPosition: isMobile ? "center 0%" : "center 50%",
+                backgroundImage: `url(${imagemLider})`,
+                backgroundSize: /* isMobile ? "130%" : */ "130%",
+                backgroundPosition: /* isMobile ? "center 0%" : */ "center 16%",
                 border: selectLider ? "4px solid #F3A913" : "4px solid #ffffff",
               }}
               onClick={handleSelectLider}
@@ -471,9 +473,9 @@ const PrimerioAcesso = () => {
             <Button
               sx={{
                 ...styles.boxButton,
-                backgroundImage: `url(${imagemServo})`,
-                backgroundSize: isMobile ? "210%" : "170%",
-                backgroundPosition: isMobile ? "center 63%" : "center 70%",
+                backgroundImage: `url(${imagemMembro})`,
+                backgroundSize: isMobile ? "130%" : "130%",
+                backgroundPosition: isMobile ? "center 0%" : "center 0%",
                 border: selectServo ? "4px solid #F3A913" : "4px solid #ffffff",
               }}
               onClick={handleSelectServo}

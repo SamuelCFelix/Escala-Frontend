@@ -36,7 +36,7 @@ const Rodape = () => {
         Privacidade.
       </Typography>
       <Typography sx={styles.descricao}>
-        ©2024 Todos os direitos reservados - Contato:
+        ©2025 Todos os direitos reservados - Contato:
         suportedevescalix@gmail.com
       </Typography>
     </Box>

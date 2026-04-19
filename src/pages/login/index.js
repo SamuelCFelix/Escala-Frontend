@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import BackgroundImage from "../../img/fotoProducaoSamuel.webp";
 import { forwardRef, useEffect, useState } from "react";
-import LogoRodape from "../../img/logoZS.png";
+/* import LogoRodape from "../../img/logoZS.png"; */
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../components/popUpCadastro/authContext";
 import api from "../../api";
@@ -429,7 +429,7 @@ const Login = () => {
               InputProps={{
                 endAdornment: <EmailOutlinedIcon sx={{ color: "#F3A913" }} />,
               }}
-              placeholder="email@adpaz-zs.com.br"
+              placeholder="email@exemplo.com"
             />
             <TextField
               error={errorPassword}

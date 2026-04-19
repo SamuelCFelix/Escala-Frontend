@@ -12,7 +12,8 @@ import {
 } from "@mui/material";
 import { Logout, Person } from "@mui/icons-material";
 import { Outlet } from "react-router-dom";
-import LogoPardal from "../../img/logoZS.png";
+/* import LogoPardal from "../../img/logoZS.png"; */
+import LogoEscalix from "../../img/logoEscalix.webp";
 import Rodape from "../rodape";
 
 const styles = {
@@ -102,6 +103,16 @@ const LayoutBar = () => {
             sx={{ width: "166px", height: "64px", overflow: "hidden" }}
           >
             <img
+              src={LogoEscalix}
+              alt="Logo Escalix"
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "contain",
+                transform: "scale(3.0)",
+              }}
+            />
+            {/* <img
               src={LogoPardal}
               alt="Logo Pardal"
               style={{
@@ -110,7 +121,8 @@ const LayoutBar = () => {
                 objectFit: "contain",
                 transform: "scale(3.0)",
               }}
-            />
+            /> */}{" "}
+            {/* Logo Pardal ADPAZ */}
           </IconButton>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             {""}
