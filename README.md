@@ -1,6 +1,6 @@
 # Getting Started with Create React App
 
-https://zs-escala.com
+https://escalix.com.br
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
